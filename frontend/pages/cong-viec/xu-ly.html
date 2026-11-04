@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Báo cáo xử lý công việc - Quản lý văn bản Sở GD&ĐT Đà Nẵng</title>
+  <title>Báo cáo xử lý công việc - Sở GD&ĐT Đà Nẵng</title>
   <link rel="icon" type="image/svg+xml" href="../../assets/logo-sodad.svg">
   <link rel="stylesheet" href="../../css/base.css">
   <link rel="stylesheet" href="../../css/layout.css">
@@ -52,18 +52,10 @@
       </header>
 
       <main class="content-wrapper">
-        <div class="mock-data-banner">
-          <div>
-            <span class="banner-icon">📌</span>
-            <b>DỮ LIỆU MẪU (MOCK DATA)</b> - Báo cáo tiến độ cập nhật vào mảng mock JS qua <code>congViecService</code>.
-          </div>
-          <span class="badge badge-info">Mock Active</span>
-        </div>
-
         <div class="page-header">
           <div>
             <h1 class="page-title">Cập nhật tiến độ & Báo cáo kết quả xử lý nhiệm vụ</h1>
-            <p class="page-subtitle">Dành cho Chuyên viên: cập nhật % tiến độ thực hiện và trình kết quả lên Lãnh đạo</p>
+            <p class="page-subtitle">Dành cho Chuyên viên: cập nhật % tiến độ thực hiện và trình nộp kết quả</p>
           </div>
           <a href="danh-sach.html" class="btn btn-secondary">Quay lại danh sách</a>
         </div>
@@ -76,13 +68,18 @@
             <div class="card-body">
               <form id="progressForm">
                 <div class="form-group">
-                  <label class="form-label required">Chọn nhiệm vụ đang xử lý</label>
+                  <label class="form-label required">Chọn nhiệm vụ cần báo cáo</label>
                   <select id="selectTask" class="form-select" required>
                     <option value="">-- Đang nạp danh sách công việc --</option>
                   </select>
                 </div>
 
                 <div id="taskDetailBox" style="background-color: #f8fafc; padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-bottom: 20px; display: none;">
+                  <!-- Căn cứ văn bản -->
+                  <div id="taskDocBox" style="background: #e0f2fe; color: #0369a1; padding: 6px 12px; border-radius: 4px; font-size: 12.5px; margin-bottom: 10px; display: none;">
+                    📄 <b>Căn cứ văn bản:</b> <span id="taskDocText">...</span>
+                  </div>
+
                   <div class="d-flex justify-content-between mb-2">
                     <span class="badge badge-danger" id="taskPriority">...</span>
                     <span class="text-danger fw-bold" id="taskDeadline">...</span>
@@ -100,17 +97,18 @@
                     <input type="range" id="progressRange" min="0" max="100" step="5" value="50" style="flex-grow: 1;">
                     <span id="progressValue" style="font-size: 18px; font-weight: bold; color: var(--primary-color); min-width: 50px;">50%</span>
                   </div>
+                  <small class="text-muted" style="font-size: 11.5px;">* Lưu ý: Khi tiến độ đạt 100%, nhiệm vụ sẽ tự động chuyển sang trạng thái <b>Chờ nghiệm thu</b>.</small>
                 </div>
 
                 <div class="form-group">
                   <label class="form-label required">Báo cáo tóm tắt kết quả thực hiện</label>
-                  <textarea id="reportNote" class="form-control" rows="4" placeholder="Nhập các đầu việc đã hoàn thành, khó khăn vướng mắc nếu có..." required></textarea>
+                  <textarea id="reportNote" class="form-control" rows="4" placeholder="Nhập các đầu việc đã hoàn thành, sản phẩm đầu ra, khó khăn vướng mắc nếu có..." required></textarea>
                 </div>
 
                 <div class="d-flex justify-content-end gap-2 mt-4">
                   <a href="danh-sach.html" class="btn btn-secondary">Hủy bỏ</a>
                   <button type="submit" class="btn btn-primary">
-                    📤 Cập nhật tiến độ nhiệm vụ
+                    💾 Cập nhật tiến độ nhiệm vụ
                   </button>
                 </div>
               </form>
@@ -138,6 +136,8 @@
 
       const selectTask = document.getElementById('selectTask');
       const detailBox = document.getElementById('taskDetailBox');
+      const taskDocBox = document.getElementById('taskDocBox');
+      const taskDocText = document.getElementById('taskDocText');
       const progressRange = document.getElementById('progressRange');
       const progressValue = document.getElementById('progressValue');
       const reportNote = document.getElementById('reportNote');
@@ -147,9 +147,19 @@
         progressValue.textContent = `${progressRange.value}%`;
       });
 
-      const tasks = await window.congViecService.getAll();
-      selectTask.innerHTML = '<option value="">-- Chọn nhiệm vụ cần báo cáo --</option>' +
-        tasks.map(t => `<option value="${t.id}">${t.ten_cong_viec} (Tiến độ: ${t.tien_do}%)</option>`).join('');
+      let tasks = [];
+      try {
+        tasks = await window.congViecService.getAll();
+      } catch (e) {
+        tasks = [];
+      }
+
+      if (tasks.length === 0) {
+        selectTask.innerHTML = '<option value="">-- Không có nhiệm vụ nào cần báo cáo --</option>';
+      } else {
+        selectTask.innerHTML = '<option value="">-- Chọn nhiệm vụ cần báo cáo --</option>' +
+          tasks.map(t => `<option value="${t.id}">${t.ten_cong_viec} (${t.tien_do}%)</option>`).join('');
+      }
 
       selectTask.addEventListener('change', () => {
         const id = selectTask.value;
@@ -162,8 +172,16 @@
           document.getElementById('taskPriority').textContent = task.do_uu_tien;
           document.getElementById('taskDeadline').textContent = `Hạn: ${task.han_hoan_thanh}`;
           document.getElementById('taskName').textContent = task.ten_cong_viec;
-          document.getElementById('taskContent').textContent = task.noi_dung;
-          document.getElementById('taskAssigner').textContent = task.nguoi_giao;
+          document.getElementById('taskContent').textContent = task.noi_dung || 'Không có mô tả chi tiết.';
+          document.getElementById('taskAssigner').textContent = task.nguoi_giao || 'Lãnh đạo Sở';
+
+          if (task.so_ky_hieu_vb) {
+            taskDocText.textContent = `${task.so_ky_hieu_vb} - ${task.trich_yeu_vb || ''}`;
+            taskDocBox.style.display = 'block';
+          } else {
+            taskDocBox.style.display = 'none';
+          }
+
           progressRange.value = task.tien_do;
           progressValue.textContent = `${task.tien_do}%`;
           reportNote.value = task.ket_qua_bao_cao || '';
@@ -179,11 +197,15 @@
           return;
         }
 
-        await window.congViecService.updateProgress(id, progressRange.value, reportNote.value);
-        window.Toast.success('Cập nhật tiến độ công việc thành công!');
-        setTimeout(() => {
-          window.location.replace('danh-sach.html');
-        }, 800);
+        try {
+          await window.congViecService.updateProgress(id, progressRange.value, reportNote.value);
+          window.Toast.success('Cập nhật tiến độ công việc thành công!');
+          setTimeout(() => {
+            window.location.replace('danh-sach.html');
+          }, 800);
+        } catch (e) {
+          // Handled by service
+        }
       });
     });
   </script>

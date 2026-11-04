@@ -150,6 +150,19 @@
     });
 
     navContainer.innerHTML = html;
+
+    // Tự động kết nối chuông thông báo & nhắc nhở trên Topbar
+    const root = getRootPath();
+    if (!window.thongBaoService) {
+      const s1 = document.createElement('script');
+      s1.src = `${root}js/mock/du-lieu-thong-bao.js`;
+      document.head.appendChild(s1);
+    }
+    if (!window.NotificationBell) {
+      const s2 = document.createElement('script');
+      s2.src = `${root}js/core/notification-bell.js`;
+      document.head.appendChild(s2);
+    }
   }
 
   window.MenuBuilder = {

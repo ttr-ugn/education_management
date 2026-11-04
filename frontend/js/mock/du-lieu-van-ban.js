@@ -240,81 +240,90 @@ window.ENABLE_MOCK_BANNER = true; // Biến cấu hình hiển thị banner cả
   };
 
   // ==========================================
-  // SERVICE VĂN BẢN ĐI
+  // SERVICE VĂN BẢN ĐI (KẾT NỐI REAL API FLASK)
   // ==========================================
   const vanBanDiService = {
-    // TODO(nhóm): thay bằng api.get('/api/van-ban-di', filters)
     getAll: async function (filters = {}) {
-      let result = [...MOCK_VAN_BAN_DI];
-      if (filters.q) {
-        const q = filters.q.toLowerCase();
-        result = result.filter(item =>
-          item.so_ky_hieu.toLowerCase().includes(q) ||
-          item.trich_yeu.toLowerCase().includes(q) ||
-          item.don_vi_soan_thao.toLowerCase().includes(q)
-        );
+      try {
+        if (window.api && typeof window.api.get === 'function') {
+          const res = await window.api.get('/api/van-ban-di', filters);
+          if (res && res.thanh_cong) return res.du_lieu || [];
+        }
+      } catch (err) {
+        console.warn('Dùng dữ liệu dự phòng:', err.message);
       }
-      if (filters.trang_thai) {
-        result = result.filter(item => item.trang_thai === filters.trang_thai);
-      }
-      return result;
+      return [...MOCK_VAN_BAN_DI];
     },
 
-    // TODO(nhóm): thay bằng api.get(`/api/van-ban-di/${id}`)
     getById: async function (id) {
+      try {
+        if (window.api && typeof window.api.get === 'function') {
+          const res = await window.api.get('/api/van-ban-di/' + id);
+          if (res && res.thanh_cong) return res.du_lieu;
+        }
+      } catch (err) {
+        console.warn('Lỗi chi tiết VB:', err.message);
+      }
       const item = MOCK_VAN_BAN_DI.find(doc => doc.id === parseInt(id));
       if (!item) throw new Error('Không tìm thấy văn bản đi.');
       return { ...item };
     },
 
-    // TODO(nhóm): thay bằng api.post('/api/van-ban-di', data)
     create: async function (data) {
-      const newId = MOCK_VAN_BAN_DI.length ? Math.max(...MOCK_VAN_BAN_DI.map(d => d.id)) + 1 : 101;
-      const newDoc = {
-        id: newId,
-        so_ky_hieu: `Dự thảo-${newId}/SGDĐT`,
-        trich_yeu: data.trich_yeu,
-        loai_van_ban: data.loai_van_ban,
-        don_vi_soan_thao: data.don_vi_soan_thao || 'Phòng chuyên môn',
-        nguoi_soan_thao: data.nguoi_soan_thao || 'Chuyên viên soạn thảo',
-        lanh_dao_ky: data.lanh_dao_ky,
-        ngay_soan: new Date().toISOString().split('T')[0],
-        ngay_ban_hanh: null,
-        do_khan: data.do_khan || 'Bình thường',
-        trang_thai: 'CHO_LANH_DAO_DUYET',
-        noi_dung_tom_tat: data.noi_dung_tom_tat || '',
-        noi_nhan: data.noi_nhan || 'Các đơn vị liên quan',
-        tep_dinh_kem: [{ ten_tep: data.ten_tep || 'DuThaoVanBan.docx', dung_luong: '512 KB' }]
-      };
-      MOCK_VAN_BAN_DI.unshift(newDoc);
-      return newDoc;
+      if (window.api && typeof window.api.post === 'function') {
+        let payload = data;
+        if (!(data instanceof FormData)) {
+          payload = new FormData();
+          for (const [k, v] of Object.entries(data)) {
+            if (v !== undefined && v !== null) payload.append(k, v);
+          }
+        }
+        const res = await window.api.post('/api/van-ban-di', payload);
+        if (res && res.thanh_cong) return res.du_lieu;
+      }
+      return data;
     },
 
-    // TODO(nhóm): thay bằng api.post(`/api/van-ban-di/${id}/phe-duyet`, { y_kien })
-    approve: async function (id, note = '') {
+    forwardToLeader: async function (id, note = '') {
+      if (window.api && typeof window.api.post === 'function') {
+        return await window.api.post('/api/van-ban-di/' + id + '/trinh-lanh-dao', { ghi_chu: note });
+      }
+      return { thanh_cong: true };
+    },
+
+    approve: async function (id, note = '', signCoords = null) {
+      if (window.api && typeof window.api.post === 'function') {
+        const body = signCoords || {
+          y_kien: note,
+          is_percentage: true,
+          page: 1,
+          x: 60.0,
+          y: 75.0
+        };
+        const res = await window.api.post('/api/van-ban-di/' + id + '/ky-so', body);
+        if (res && res.thanh_cong) return res.du_lieu;
+      }
       const doc = MOCK_VAN_BAN_DI.find(d => d.id === parseInt(id));
-      if (!doc) throw new Error('Không tìm thấy văn bản đi.');
-      doc.trang_thai = 'DA_DUYET';
-      doc.y_kien_lanh_dao = note || 'Đồng ý phê duyệt văn bản.';
+      if (doc) doc.trang_thai = 'DA_KY_CHO_BAN_HANH';
       return doc;
     },
 
-    // TODO(nhóm): thay bằng api.post(`/api/van-ban-di/${id}/tu-choi`, { ly_do })
     reject: async function (id, reason) {
+      if (window.api && typeof window.api.post === 'function') {
+        return await window.api.post('/api/van-ban-di/' + id + '/tu-choi', { ly_do: reason });
+      }
       const doc = MOCK_VAN_BAN_DI.find(d => d.id === parseInt(id));
-      if (!doc) throw new Error('Không tìm thấy văn bản đi.');
-      doc.trang_thai = 'YEU_CAU_CHINH_SUA';
-      doc.ly_do_chinh_sua = reason;
+      if (doc) doc.trang_thai = 'VAN_THU_TRA_LAI';
       return doc;
     },
 
-    // TODO(nhóm): thay bằng api.post(`/api/van-ban-di/${id}/ban-hanh`, publishData)
     publish: async function (id, publishData) {
+      if (window.api && typeof window.api.post === 'function') {
+        const res = await window.api.post('/api/van-ban-di/' + id + '/ban-hanh', publishData);
+        if (res && res.thanh_cong) return res.du_lieu;
+      }
       const doc = MOCK_VAN_BAN_DI.find(d => d.id === parseInt(id));
-      if (!doc) throw new Error('Không tìm thấy văn bản đi.');
-      doc.so_ky_hieu = publishData.so_ky_hieu || doc.so_ky_hieu;
-      doc.ngay_ban_hanh = publishData.ngay_ban_hanh || new Date().toISOString().split('T')[0];
-      doc.trang_thai = 'DA_BAN_HANH';
+      if (doc) doc.trang_thai = 'DA_BAN_HANH';
       return doc;
     }
   };

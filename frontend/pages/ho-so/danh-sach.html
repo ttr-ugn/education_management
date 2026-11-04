@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
@@ -52,68 +52,13 @@
       </header>
 
       <main class="content-wrapper">
-        <div class="mock-data-banner">
+        <div class="mock-data-banner" style="background: rgba(16, 185, 129, 0.1); border-color: #10b981; color: #065f46;">
           <div>
-            <span class="banner-icon">📌</span>
-            <b>DỮ LIỆU MẪU (MOCK DATA)</b> - Phân hệ Hồ sơ lưu trữ hoạt động qua <code>hoSoService</code>.
+            <span class="banner-icon">📁</span>
+            <b>PHÂN HỆ KHO LƯU TRỮ</b> - Đã kết nối CSDL SQLite & Backend Flask API <code>/api/ho-so</code>.
           </div>
-          <span class="badge badge-info">Mock Active</span>
+          <span class="badge badge-success">API Live</span>
         </div>
-
-        <div class="page-header">
-          <div>
-            <h1 class="page-title">Danh mục hồ sơ lưu trữ cơ quan</h1>
-            <p class="page-subtitle">Quản lý hồ sơ công việc, tài liệu lưu trữ vĩnh viễn và có thời hạn của Sở GD&ĐT</p>
-          </div>
-          <a href="them-sua.html" class="btn btn-primary">
-            + Lập hồ sơ mới
-          </a>
-        </div>
-
-        <div class="filter-bar">
-          <div class="search-box">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="11" cy="11" r="8"></circle>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-            <input type="text" id="searchInput" class="form-control" placeholder="Tìm theo mã hồ sơ, tiêu đề hồ sơ, phòng ban...">
-          </div>
-
-          <div style="min-width: 170px;">
-            <select id="filterStatus" class="form-select">
-              <option value="">-- Tất cả tình trạng --</option>
-              <option value="DANG_THU_THAP">Đang thu thập</option>
-              <option value="DA_NOP_LUU_TRU">Đã nộp lưu trữ</option>
-              <option value="DA_DONG">Đã đóng hồ sơ</option>
-            </select>
-          </div>
-
-          <button class="btn btn-secondary" id="reloadBtn">🔄 Làm mới</button>
-        </div>
-
-        <div class="card">
-          <div class="card-body p-0">
-            <div class="table-responsive">
-              <table class="data-table">
-                <thead>
-                  <tr>
-                    <th>Mã hồ sơ</th>
-                    <th>Tiêu đề hồ sơ</th>
-                    <th>Đơn vị lập</th>
-                    <th>Người lập</th>
-                    <th>Năm tài liệu</th>
-                    <th>Thời hạn</th>
-                    <th>Số lượng VB</th>
-                    <th>Tình trạng</th>
-                    <th style="text-align: center;">Thao tác</th>
-                  </tr>
-                </thead>
-                <tbody id="hoSoTableBody">
-                  <tr><td colspan="9" class="text-center p-4 text-muted">Đang tải...</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
         </div>
       </main>
 

@@ -52,32 +52,24 @@
       </header>
 
       <main class="content-wrapper">
-        <div class="mock-data-banner">
-          <div>
-            <span class="banner-icon">📌</span>
-            <b>DỮ LIỆU MẪU (MOCK DATA)</b> - Thao tác nghiệm thu và đánh giá nhiệm vụ qua <code>congViecService</code>.
-          </div>
-          <span class="badge badge-info">Mock Active</span>
-        </div>
-
         <div class="page-header">
           <div>
             <h1 class="page-title">Đánh giá & Nghiệm thu kết quả thực hiện nhiệm vụ</h1>
-            <p class="page-subtitle">Dành cho Lãnh đạo Sở: xem xét báo cáo hoàn thành và đánh giá chất lượng của chuyên viên</p>
+            <p class="page-subtitle">Dành cho Văn thư & Lãnh đạo Sở: xem xét báo cáo hoàn thành và đánh giá chất lượng</p>
           </div>
           <a href="danh-sach.html" class="btn btn-secondary">Quay lại danh sách</a>
         </div>
 
         <div class="card">
           <div class="card-header">
-            <h2 class="card-title">Các nhiệm vụ đã hoàn thành 100%, chờ Lãnh đạo nghiệm thu</h2>
+            <h2 class="card-title">Các nhiệm vụ đã hoàn thành 100%, chờ nghiệm thu</h2>
           </div>
           <div class="card-body p-0">
             <div class="table-responsive">
               <table class="data-table">
                 <thead>
                   <tr>
-                    <th>Tên nhiệm vụ</th>
+                    <th>Tên nhiệm vụ / Căn cứ văn bản</th>
                     <th>Cán bộ thực hiện</th>
                     <th>Hạn hoàn thành</th>
                     <th>Nội dung báo cáo kết quả</th>
@@ -85,7 +77,7 @@
                   </tr>
                 </thead>
                 <tbody id="evalTableBody">
-                  <tr><td colspan="5" class="text-center p-4 text-muted">Đang tải...</td></tr>
+                  <tr><td colspan="5" class="text-center p-4 text-muted">Đang tải danh sách chờ nghiệm thu...</td></tr>
                 </tbody>
               </table>
             </div>
@@ -110,20 +102,27 @@
       const user = await window.AuthGuard.check();
       if (!user) return;
 
+      if (user.vai_tro === 'CHUYEN_VIEN') {
+        window.Toast.warning('Chuyên viên không có quyền nghiệm thu nhiệm vụ.');
+        setTimeout(() => window.location.replace('danh-sach.html'), 1200);
+        return;
+      }
+
       const tbody = document.getElementById('evalTableBody');
 
       async function loadData() {
-        const list = await window.congViecService.getAll({ trang_thai: 'CHO_DANH_GIA' });
-        if (list.length === 0) {
+        const list = await window.congViecService.getAll({ trang_thai: 'CHO_DANH_GIA', scope: 'all' });
+        if (!list || list.length === 0) {
           tbody.innerHTML = '<tr><td colspan="5" class="text-center p-4 text-muted">Không có nhiệm vụ nào đang chờ nghiệm thu.</td></tr>';
           return;
         }
 
         tbody.innerHTML = list.map(item => `
           <tr>
-            <td style="max-width: 280px;">
+            <td style="max-width: 300px;">
               <b>${item.ten_cong_viec}</b>
               <div style="font-size: 11.5px; color: #64748b;">${item.phong_ban}</div>
+              ${item.so_ky_hieu_vb ? `<div style="font-size: 11px; color: #0284c7; margin-top: 2px;">📄 Căn cứ: ${item.so_ky_hieu_vb}</div>` : ''}
             </td>
             <td><strong>${item.nguoi_xu_ly}</strong></td>
             <td><small>${item.han_hoan_thanh}</small></td>
@@ -133,7 +132,7 @@
               </div>
             </td>
             <td style="text-align: center;">
-              <div class="actions justify-content-center">
+              <div class="actions justify-content-center" style="display: flex; gap: 6px;">
                 <button class="btn btn-success btn-sm btn-accept" data-id="${item.id}">
                   ✓ Nghiệm thu Đạt
                 </button>
@@ -147,7 +146,7 @@
 
         tbody.querySelectorAll('.btn-accept').forEach(btn => {
           btn.addEventListener('click', async () => {
-            const comment = prompt('Nhập nhận xét đánh giá của Lãnh đạo:', 'Đạt chất lượng, hoàn thành đúng tiến độ.');
+            const comment = prompt('Nhập nhận xét / đánh giá chất lượng của Lãnh đạo:', 'Đạt chất lượng, hoàn thành đúng tiến độ yêu cầu.');
             if (comment !== null) {
               await window.congViecService.evaluate(btn.dataset.id, 'DAT', comment);
               window.Toast.success('Đã nghiệm thu và đóng nhiệm vụ thành công!');
@@ -158,7 +157,7 @@
 
         tbody.querySelectorAll('.btn-retry').forEach(btn => {
           btn.addEventListener('click', async () => {
-            const reason = prompt('Nhập lý do chưa đạt yêu cầu:');
+            const reason = prompt('Nhập lý do chưa đạt yêu cầu / chỉ đạo chỉnh sửa:');
             if (reason) {
               await window.congViecService.evaluate(btn.dataset.id, 'CHUA_DAT', reason);
               window.Toast.info('Đã hoàn trả nhiệm vụ để chuyên viên bổ sung.');
