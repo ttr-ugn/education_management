@@ -1,0 +1,29 @@
+# Môi trường ảo Python
+venv/
+env/
+.venv/
+
+# PyCharm & VS Code
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Bytecode Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Biến môi trường bí mật (chỉ commit .env.example)
+.env
+
+# Cơ sở dữ liệu SQLite
+database/*.db
+database/*.sqlite3
+*.db
+*.sqlite3
+
+# Log & OS
+*.log
+.DS_Store
+Thumbs.db
