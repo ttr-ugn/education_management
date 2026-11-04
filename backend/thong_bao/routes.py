@@ -3,6 +3,7 @@ from backend.auth.decorators import login_required, role_required
 from .services import (
     get_user_notifications,
     get_unread_count,
+    get_due_reminders,
     mark_as_read,
     mark_all_as_read,
     create_notification,
@@ -35,12 +36,25 @@ def danh_sach_thong_bao():
 @thong_bao_bp.route('/dem-chua-doc', methods=['GET'])
 @login_required
 def dem_chua_doc():
-    """Lấy số lượng thông báo chưa đọc của người dùng hiện tại."""
+    """Lấy số lượng thông báo chưa đọc và số nhắc nhở đến hạn."""
     user_id = g.current_user['nguoi_dung_id']
-    count = get_unread_count(user_id)
+    stats = get_unread_count(user_id)
     return jsonify({
         'thanh_cong': True,
-        'chua_doc': count
+        'chua_doc': stats['chua_doc'],
+        'den_han': stats['den_han']
+    }), 200
+
+@thong_bao_bp.route('/kiem-tra-den-han', methods=['GET'])
+@login_required
+def kiem_tra_den_han():
+    """Kiểm tra và lấy danh sách các nhắc nhở đã đến hoặc quá hạn."""
+    user_id = g.current_user['nguoi_dung_id']
+    due_items = get_due_reminders(user_id)
+    return jsonify({
+        'thanh_cong': True,
+        'nhac_nho_den_han': due_items,
+        'so_luong': len(due_items)
     }), 200
 
 @thong_bao_bp.route('/<int:thong_bao_id>/da-doc', methods=['POST'])
@@ -68,11 +82,16 @@ def danh_dau_tat_ca_da_doc():
 @thong_bao_bp.route('', methods=['POST'])
 @login_required
 def tao_thong_bao():
-    """Tạo thông báo mới hoặc lời nhắc nhở."""
+    """Tạo thông báo điều hành (Văn thư/Lãnh đạo) hoặc lời nhắc nhở cá nhân (Mọi cán bộ)."""
     user_id = g.current_user['nguoi_dung_id']
+    user_role = g.current_user['vai_tro']
     data = request.get_json(silent=True) or {}
 
-    success, message, result, status_code = create_notification(data, nguoi_gui_id=user_id)
+    success, message, result, status_code = create_notification(
+        data=data,
+        nguoi_gui_id=user_id,
+        user_role=user_role
+    )
     return jsonify({
         'thanh_cong': success,
         'thong_bao': message,

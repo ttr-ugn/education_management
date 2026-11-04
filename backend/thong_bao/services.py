@@ -43,6 +43,60 @@ def get_user_notifications(user_id: int, loai: str = None, muc_do: str = None, c
     query += ' ORDER BY tb.ngay_tao DESC'
 
     rows = db.execute(query, params).fetchall()
+    now_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+    result = []
+    for r in rows:
+        hen_gio = r['ngay_hen_gio']
+        da_den_han = False
+        if hen_gio and hen_gio <= now_str and not r['da_doc']:
+            da_den_han = True
+
+        result.append({
+            'id': r['thong_bao_id'],
+            'tieu_de': r['tieu_de'],
+            'noi_dung': r['noi_dung'],
+            'loai': r['loai'],
+            'muc_do': r['muc_do'],
+            'nguoi_gui': r['nguoi_gui'],
+            'thoi_gian': r['ngay_tao'],
+            'da_doc': bool(r['da_doc']),
+            'ngay_hen_gio': hen_gio,
+            'da_den_han': da_den_han,
+            'lien_ket': r['lien_ket'],
+            'nguoi_nhan_id': r['nguoi_nhan_id']
+        })
+
+    return result
+
+def get_due_reminders(user_id: int) -> list[dict]:
+    """Lấy danh sách các thông báo / nhắc nhở có hẹn giờ đã đến hoặc quá hạn mà chưa đọc."""
+    db = get_db()
+    now_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    
+    query = '''
+        SELECT 
+            tb.thong_bao_id,
+            tb.tieu_de,
+            tb.noi_dung,
+            tb.loai,
+            tb.muc_do,
+            tb.nguoi_gui_id,
+            tb.nguoi_nhan_id,
+            tb.ngay_hen_gio,
+            tb.lien_ket,
+            tb.ngay_tao,
+            COALESCE(nd_gui.ho_va_ten, 'Văn phòng Sở GD&ĐT') AS nguoi_gui
+        FROM thong_bao tb
+        LEFT JOIN nguoi_dung nd_gui ON tb.nguoi_gui_id = nd_gui.nguoi_dung_id
+        LEFT JOIN thong_bao_da_doc tb_dd ON tb.thong_bao_id = tb_dd.thong_bao_id AND tb_dd.nguoi_dung_id = ?
+        WHERE (tb.nguoi_nhan_id IS NULL OR tb.nguoi_nhan_id = ?)
+          AND tb.ngay_hen_gio IS NOT NULL
+          AND tb.ngay_hen_gio <= ?
+          AND tb_dd.ngay_doc IS NULL
+        ORDER BY tb.ngay_hen_gio ASC
+    '''
+    rows = db.execute(query, (user_id, user_id, now_str)).fetchall()
 
     result = []
     for r in rows:
@@ -54,17 +108,19 @@ def get_user_notifications(user_id: int, loai: str = None, muc_do: str = None, c
             'muc_do': r['muc_do'],
             'nguoi_gui': r['nguoi_gui'],
             'thoi_gian': r['ngay_tao'],
-            'da_doc': bool(r['da_doc']),
             'ngay_hen_gio': r['ngay_hen_gio'],
             'lien_ket': r['lien_ket'],
-            'nguoi_nhan_id': r['nguoi_nhan_id']
+            'da_doc': False,
+            'da_den_han': True
         })
-
     return result
 
-def get_unread_count(user_id: int) -> int:
-    """Đếm số lượng thông báo chưa đọc của người dùng."""
+def get_unread_count(user_id: int) -> dict:
+    """Đếm số lượng thông báo chưa đọc và số nhắc nhở đến hạn."""
     db = get_db()
+    now_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+    # Tổng số chưa đọc
     row = db.execute('''
         SELECT COUNT(*) AS chua_doc
         FROM thong_bao tb
@@ -72,13 +128,28 @@ def get_unread_count(user_id: int) -> int:
         WHERE (tb.nguoi_nhan_id IS NULL OR tb.nguoi_nhan_id = ?)
           AND tb_dd.ngay_doc IS NULL
     ''', (user_id, user_id)).fetchone()
+    total_unread = row['chua_doc'] if row else 0
 
-    return row['chua_doc'] if row else 0
+    # Số lượng nhắc nhở có hẹn giờ đã đến hạn
+    row_due = db.execute('''
+        SELECT COUNT(*) AS den_han
+        FROM thong_bao tb
+        LEFT JOIN thong_bao_da_doc tb_dd ON tb.thong_bao_id = tb_dd.thong_bao_id AND tb_dd.nguoi_dung_id = ?
+        WHERE (tb.nguoi_nhan_id IS NULL OR tb.nguoi_nhan_id = ?)
+          AND tb.ngay_hen_gio IS NOT NULL
+          AND tb.ngay_hen_gio <= ?
+          AND tb_dd.ngay_doc IS NULL
+    ''', (user_id, user_id, now_str)).fetchone()
+    due_count = row_due['den_han'] if row_due else 0
+
+    return {
+        'chua_doc': total_unread,
+        'den_han': due_count
+    }
 
 def mark_as_read(thong_bao_id: int, user_id: int) -> tuple[bool, str, int]:
     """Đánh dấu thông báo cụ thể là đã đọc."""
     db = get_db()
-    # Kiểm tra thông báo có tồn tại và người dùng có quyền đọc không
     tb = db.execute('''
         SELECT thong_bao_id FROM thong_bao 
         WHERE thong_bao_id = ? AND (nguoi_nhan_id IS NULL OR nguoi_nhan_id = ?)
@@ -109,8 +180,8 @@ def mark_all_as_read(user_id: int) -> tuple[bool, str, int]:
 
     return True, "Đã đánh dấu tất cả thông báo là đã đọc.", 200
 
-def create_notification(data: dict, nguoi_gui_id: int) -> tuple[bool, str, dict | None, int]:
-    """Tạo mới một thông báo hoặc nhắc nhở."""
+def create_notification(data: dict, nguoi_gui_id: int, user_role: str = 'CHUYEN_VIEN') -> tuple[bool, str, dict | None, int]:
+    """Tạo mới một thông báo điều hành (Văn thư/Lãnh đạo) hoặc lời nhắc nhở cá nhân (Mọi cán bộ)."""
     tieu_de = (data.get('tieu_de') or '').strip()
     noi_dung = (data.get('noi_dung') or '').strip()
     loai = (data.get('loai') or 'Hệ thống').strip()
@@ -120,10 +191,10 @@ def create_notification(data: dict, nguoi_gui_id: int) -> tuple[bool, str, dict 
     lien_ket = (data.get('lien_ket') or '').strip() or None
 
     if not tieu_de:
-        return False, "Tiêu đề thông báo không được để trống.", None, 400
+        return False, "Tiêu đề thông báo / nhắc nhở không được để trống.", None, 400
 
     if not noi_dung:
-        return False, "Nội dung thông báo không được để trống.", None, 400
+        return False, "Nội dung không được để trống.", None, 400
 
     if loai not in VALID_LOAI:
         loai = 'Hệ thống'
@@ -132,7 +203,14 @@ def create_notification(data: dict, nguoi_gui_id: int) -> tuple[bool, str, dict 
         muc_do = 'Bình thường'
 
     db = get_db()
-    if nguoi_nhan_id:
+
+    # Phân quyền:
+    # - Nếu người tạo không phải Văn thư hoặc Lãnh đạo mà không chọn người nhận -> tự động gán cho chính mình làm lời nhắc cá nhân
+    if not nguoi_nhan_id and user_role not in ('VAN_THU', 'LANH_DAO'):
+        nguoi_nhan_id = nguoi_gui_id
+        if loai != 'Nhắc nhở':
+            loai = 'Nhắc nhở'
+    elif nguoi_nhan_id:
         try:
             nguoi_nhan_id = int(nguoi_nhan_id)
             user_exists = db.execute('SELECT nguoi_dung_id FROM nguoi_dung WHERE nguoi_dung_id = ?', (nguoi_nhan_id,)).fetchone()
@@ -141,6 +219,7 @@ def create_notification(data: dict, nguoi_gui_id: int) -> tuple[bool, str, dict 
         except (ValueError, TypeError):
             return False, "Định dạng người nhận không hợp lệ.", None, 400
     else:
+        # nguoi_nhan_id = None: Phát hành thông báo chung toàn thể cán bộ cơ quan (chỉ Văn thư/Lãnh đạo)
         nguoi_nhan_id = None
 
     now_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -156,7 +235,8 @@ def create_notification(data: dict, nguoi_gui_id: int) -> tuple[bool, str, dict 
     db.commit()
 
     created_id = cursor.lastrowid
-    return True, "Tạo thông báo thành công.", {'id': created_id, 'tieu_de': tieu_de}, 201
+    msg = "Phát hành thông báo thành công." if not nguoi_nhan_id else "Đã thiết lập nhắc nhở thành công."
+    return True, msg, {'id': created_id, 'tieu_de': tieu_de, 'ngay_hen_gio': ngay_hen_gio}, 201
 
 def delete_notification(thong_bao_id: int, user_id: int, user_role: str) -> tuple[bool, str, int]:
     """Xóa thông báo (chỉ Văn thư hoặc người tạo thông báo mới có quyền)."""
