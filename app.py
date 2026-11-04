@@ -16,15 +16,17 @@ if str(BASE_DIR) not in sys.path:
 from config import Config
 from database import db
 
-# Import 8 Blueprints tương ứng với các phân hệ trong hệ thống
-from backend.auth.routes import auth_bp
-from backend.users.routes import users_bp
-from backend.documents.routes import documents_bp
-from backend.ho_so.routes import ho_so_bp
-from backend.kho_van_ban.routes import kho_van_ban_bp
-from backend.thong_bao.routes import thong_bao_bp
-from backend.cong_viec.routes import cong_viec_bp
-from backend.chatbot.routes import chatbot_bp
+# ==============================================================================
+# IMPORT 8 CONTROLLER BLUEPRINTS THEO MÔ HÌNH MVC (MODEL - VIEW - CONTROLLER)
+# ==============================================================================
+from controllers.auth_controller import auth_bp
+from controllers.users_controller import users_bp
+from controllers.documents_controller import documents_bp
+from controllers.ho_so_controller import ho_so_bp
+from controllers.kho_van_ban_controller import kho_van_ban_bp
+from controllers.thong_bao_controller import thong_bao_bp
+from controllers.cong_viec_controller import cong_viec_bp
+from controllers.chatbot_controller import chatbot_bp
 
 def create_app():
     """Khởi tạo và cấu hình ứng dụng Flask (MVC Architecture)."""

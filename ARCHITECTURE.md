@@ -7,13 +7,20 @@
 
 ```
                         [ NGƯỜI DÙNG / TRÌNH DUYỆT WEB ]
-                                      │
-                         HTTP Requests (GET/POST/PUT)
-                                      ▼
+                                       │
+                          HTTP Requests (GET/POST/PUT)
+                                       ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                       CONTROLLER (Bộ điều khiển)                           │
+│                       CONTROLLER (Bộ điều khiển - controllers/)            │
 │  - app.py: Dispatcher trung tâm điều hướng request                          │
-│  - backend/*/routes.py: 8 Flask Blueprints RESTful API                      │
+│  - controllers/auth_controller.py: Quản lý phiên, đăng nhập, đổi mật khẩu   │
+│  - controllers/users_controller.py: Quản trị tài khoản, duyệt chuyên viên    │
+│  - controllers/documents_controller.py: Vòng đời văn bản đi 5 bước & ký số  │
+│  - controllers/ho_so_controller.py: Quản lý hồ sơ lưu trữ & đồng bộ tài liệu│
+│  - controllers/cong_viec_controller.py: Giao việc & nhật ký tiến độ         │
+│  - controllers/thong_bao_controller.py: Thông báo & nhắc nhở real-time 2s   │
+│  - controllers/kho_van_ban_controller.py: Cây niên đại & kho ban hành       │
+│  - controllers/chatbot_controller.py: Trợ lý ảo AI & biểu mẫu hành chính    │
 │  - backend/auth/decorators.py: Guards phân quyền (@login_required, @role)   │
 └───────────────────────────┬─────────────────────────────────────────────────┘
                             │
@@ -21,10 +28,17 @@
                             │
                             ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                          MODEL (Dữ liệu & Nghiệp vụ)                         │
+│                          MODEL (Dữ liệu & Nghiệp vụ - models/)              │
+│  - models/base_model.py: BaseModel kết nối SQLite và tiện ích mapping       │
+│  - models/user_model.py: Thực thể người dùng (UserModel)                    │
+│  - models/document_model.py: Thực thể văn bản đi (DocumentModel)            │
+│  - models/dossier_model.py: Thực thể hồ sơ lưu trữ (DossierModel)           │
+│  - models/task_model.py: Thực thể công việc điều hành (TaskModel)           │
+│  - models/notification_model.py: Thực thể thông báo & nhắc nhở              │
+│  - models/repository_model.py: Thực thể kho lưu trữ số hóa                  │
+│  - models/chatbot_model.py: Thực thể trợ lý ảo & mẫu văn bản                │
 │  - database/schema.sql: 10 bảng CSDL SQLite quan hệ chặt chẽ               │
 │  - database/db.py: Connection Pool (sqlite3.Row, PRAGMA foreign_keys = ON) │
-│  - backend/*/services.py: Xử lý Business Logic, tính toán, mã hóa mật khẩu  │
 │  - backend/documents/pdf_sign.py: Đóng dấu chữ ký số điện tử chuẩn NĐ 30   │
 └───────────────────────────┬─────────────────────────────────────────────────┘
                             │
@@ -32,57 +46,69 @@
                             │
                             ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                          VIEW (Giao diện hiển thị)                          │
-│  - frontend/pages/: Các trang HTML ngữ cảnh theo vai trò cán bộ              │
-│  - frontend/css/: Hệ thống giao diện chuẩn cơ quan hành chính Nhà nước      │
-│  - frontend/js/core/: api.js (Fetch wrapper), menu.js (Sidebar role-based), │
-│                       auth-guard.js (Bảo vệ tuyến đường), toast.js          │
-│  - frontend/js/mock/: Service Adapter trung gian kết nối Controller         │
+│                          VIEW (Giao diện hiển thị - views/ & frontend/)     │
+│  - views/__init__.py: Module ánh xạ và phục vụ View Engine                  │
+│  - frontend/pages/: Màn hình giao diện nghiệp vụ theo vai trò cán bộ:       │
+│      + van-ban-di/: Soạn thảo, Ký số duyệt, Cấp số ban hành, Xem trước A4   │
+│      + van-ban-den/: Tiếp nhận ngoài Sở, Phân công chỉ đạo, Xử lý           │
+│      + cong-viec/: Giao nhiệm vụ, Báo cáo xử lý tiến độ, Đánh giá           │
+│      + ho-so/: Danh mục hồ sơ, Chi tiết hồ sơ, Thêm/Gỡ văn bản              │
+│      + thong-bao.html: Trung tâm thông báo điều hành & Lời nhắc real-time   │
+│      + thong-ke.html: Báo cáo & Thống kê trực quan hóa (Chart.js)           │
+│      + chatbot.html: Trợ lý ảo hỏi đáp và gợi ý mẫu công văn                │
+│      + dashboard.html: Bảng điều khiển phân quyền đa tầng                   │
+│  - frontend/css/: Hệ thống định dạng giao diện hành chính chuẩn mực         │
+│  - frontend/js/core/: api.js, menu.js, auth-guard.js, notification-bell.js  │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-### 2. PHÂN TÁCH CHI TIẾT CÁC THÀNH PHẦN
+### 2. CẤU TRÚC THƯ MỤC CHUẨN MVC
 
-#### A. MODEL (Tầng dữ liệu & Logic nghiệp vụ)
-1. **Cơ sở dữ liệu SQLite (`database/`):**
-   * `schema.sql`: Định nghĩa toàn bộ 10 bảng dữ liệu (`nguoi_dung`, `van_ban_di`, `lich_su_xu_ly_van_ban`, `ho_so_luu_tru`, `van_ban_ban_hanh`, `van_ban_mau`, `thong_bao`, `thong_bao_da_doc`, `cong_viec`, `nhat_ky_cong_viec`, `mau_van_ban`, `lich_su_chat`).
-   * `db.py`: Cung cấp hàm `get_db()` theo vòng đời request của Flask, quản lý kết nối và đóng kết nối an toàn.
-   * `init_db.py`: Nạp schema và seed dữ liệu mẫu đầy đủ cho tất cả các phân hệ.
-2. **Services (`backend/*/services.py`):**
-   * Xử lý xác thực, hash mật khẩu `scrypt/pbkdf2` qua Werkzeug.
-   * Xử lý kiểm tra điều kiện chuyển trạng thái văn bản theo quy trình 5 bước.
-   * `pdf_sign.py`: Nhúng chữ ký số và con dấu đỏ điện tử vào file PDF tại tọa độ click chuột của Lãnh đạo.
-
-#### B. CONTROLLER (Tầng điều khiển & Điều phối)
-1. **Dispatcher (`app.py`):**
-   * Khởi tạo ứng dụng Flask, nạp cấu hình `Config`.
-   * Đăng ký 8 Blueprints điều khiển tương ứng với 8 phân hệ con.
-   * Phục vụ static frontend và bắt lỗi toàn cục (`404`, `500`).
-2. **Blueprints (`backend/*/routes.py`):**
-   * `backend/auth/routes.py`: Tiếp nhận đăng nhập, đăng ký, đổi mật khẩu, phiên làm việc (`/api/auth/*`).
-   * `backend/users/routes.py`: Duyệt tài khoản, phân quyền, quản lý cán bộ (`/api/users/*`).
-   * `backend/documents/routes.py`: Tiếp nhận soạn thảo, chuyển văn thư, lãnh đạo ký số, ban hành (`/api/van-ban-di/*`).
-   * `backend/ho_so/routes.py`: Quản lý hồ sơ cơ quan (`/api/ho-so/*`).
-   * `backend/kho_van_ban/routes.py`: Tra cứu văn bản theo trục thời gian niên đại và biểu mẫu (`/api/kho-van-ban/*`).
-   * `backend/thong_bao/routes.py`: Thông báo điều hành, nhắc nhở tự động theo lịch hẹn (`/api/thong-bao/*`).
-   * `backend/cong_viec/routes.py`: Giao việc, cập nhật tiến độ, đánh giá nhiệm vụ (`/api/cong-viec/*`).
-   * `backend/chatbot/routes.py`: Trợ lý ảo AI gợi ý mẫu văn bản và tra cứu pháp quy (`/api/chatbot/*`).
-3. **Guards & Middleware (`backend/auth/decorators.py`):**
-   * `@login_required`: Kiểm tra Session Cookie xác thực.
-   * `@role_required`: Phân quyền RBAC (`VAN_THU`, `LANH_DAO`, `CHUYEN_VIEN`).
-
-#### C. VIEW (Tầng giao diện & Trình diễn)
-1. **Templates / Pages (`frontend/pages/`):**
-   * `van-ban-di/`: Soạn thảo, Ký số, Ban hành, Chi tiết, Danh sách.
-   * `van-ban-den/`: Tiếp nhận, Phân công, Xử lý.
-   * `cong-viec/`: Giao việc, Danh sách nhiệm vụ, Báo cáo kết quả, Phê duyệt.
-   * `ho-so/`: Lưu trữ hồ sơ, Xem danh mục tài liệu.
-   * `thong-bao.html`: Trung tâm thông báo & nhắc nhở.
-   * `chatbot.html`: Giao diện tương tác với trợ lý ảo và xem trước mẫu A4.
-   * `dashboard.html`: Bảng điều khiển phân quyền theo từng vai trò.
-2. **Presentation Logic (`frontend/js/core/`):**
-   * `api.js`: Wrapper chuẩn giao tiếp RESTful với Controllers.
-   * `menu.js`: Render menu sidebar động theo vai trò người dùng đăng nhập.
-   * `notification-bell.js`: Chuông thông báo trên topbar hiển thị số lượng và danh sách nhắc nhở.
+```
+education_management/
+├── controllers/                  # CONTROLLERS LAYER
+│   ├── __init__.py
+│   ├── auth_controller.py
+│   ├── chatbot_controller.py
+│   ├── cong_viec_controller.py
+│   ├── documents_controller.py
+│   ├── ho_so_controller.py
+│   ├── kho_van_ban_controller.py
+│   ├── thong_bao_controller.py
+│   └── users_controller.py
+│
+├── models/                       # MODELS LAYER
+│   ├── __init__.py
+│   ├── base_model.py
+│   ├── chatbot_model.py
+│   ├── document_model.py
+│   ├── dossier_model.py
+│   ├── notification_model.py
+│   ├── repository_model.py
+│   ├── task_model.py
+│   └── user_model.py
+│
+├── views/                        # VIEWS LAYER WRAPPER
+│   ├── __init__.py
+│   └── README.md
+│
+├── frontend/                     # VIEWS IMPLEMENTATION
+│   ├── assets/                   # Logo, icons, tài nguyên tĩnh
+│   ├── css/                      # base.css, layout.css, components.css
+│   ├── js/
+│   │   ├── core/                 # api.js, auth-guard.js, menu.js, notification-bell.js, toast.js
+│   │   └── mock/                 # du-lieu-ho-so.js, du-lieu-van-ban.js, du-lieu-thong-ke.js...
+│   └── pages/                    # Toàn bộ view HTML nghiệp vụ
+│
+├── database/                     # DATABASE & PERSISTENCE
+│   ├── schema.sql                # Cấu trúc CSDL SQLite quan hệ
+│   ├── db.py                     # Quản lý kết nối SQLite
+│   ├── init_db.py                # Khởi tạo CSDL & Seed tài khoản
+│   └── qlvb.db                   # File CSDL SQLite thực tế
+│
+├── app.py                        # Central Application Dispatcher
+├── config.py                     # Cấu hình hệ thống & biến môi trường
+└── requirements.txt              # Thư viện phụ thuộc
+```
