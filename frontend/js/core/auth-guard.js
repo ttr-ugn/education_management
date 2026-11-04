@@ -160,6 +160,9 @@
       avatarEls.forEach(el => { el.textContent = initials; });
     }
 
+    // Khởi chạy cơ chế lắng nghe thông báo thời gian thực mỗi 2 giây
+    setupRealtimeNotifications(user);
+
     // Đăng ký sự kiện nút Đăng xuất
     const logoutBtns = document.querySelectorAll('#logoutBtn, .btn-logout');
     logoutBtns.forEach(btn => {
@@ -175,6 +178,80 @@
         }
       });
     });
+  }
+
+  /**
+   * Khởi chạy cơ chế cập nhật thông báo thời gian thực mỗi 2 giây (2000 ms).
+   * Hiển thị số lượng thông báo chưa đọc dạng số tròn màu đỏ trên icon chuông topbar.
+   */
+  function setupRealtimeNotifications(user) {
+    if (!user) return;
+
+    // Tìm nút chuông thông báo trên topbar
+    const bellBtn = document.querySelector('.topbar-icon-btn[title*="Thông báo"]') ||
+                    document.querySelector('.topbar-right a[href*="thong-bao.html"]') ||
+                    document.querySelector('.topbar-right .topbar-icon-btn');
+    if (!bellBtn) return;
+
+    // Đảm bảo nút chuông có position: relative để badge định vị chuẩn xác
+    bellBtn.style.position = 'relative';
+
+    // Đảm bảo có thẻ badge hiển thị số thông báo
+    let badge = bellBtn.querySelector('.topbar-icon-badge');
+    if (!badge) {
+      badge = document.createElement('span');
+      badge.className = 'topbar-icon-badge';
+      badge.style.display = 'none';
+      bellBtn.appendChild(badge);
+    }
+
+    // Thiết lập phong cách trực quan cho badge số
+    badge.style.position = 'absolute';
+    badge.style.top = '0px';
+    badge.style.right = '-2px';
+    badge.style.minWidth = '18px';
+    badge.style.height = '18px';
+    badge.style.padding = '0 4px';
+    badge.style.backgroundColor = '#ef4444';
+    badge.style.color = '#ffffff';
+    badge.style.borderRadius = '9px';
+    badge.style.border = '2px solid #ffffff';
+    badge.style.fontSize = '10.5px';
+    badge.style.fontWeight = '700';
+    badge.style.lineHeight = '1';
+    badge.style.boxShadow = '0 2px 4px rgba(239, 68, 68, 0.4)';
+    badge.style.alignItems = 'center';
+    badge.style.justifyContent = 'center';
+
+    // Hàm gọi API lấy số thông báo chưa đọc thời gian thực
+    async function loadRealtimeNotifications() {
+      try {
+        if (!window.api || typeof window.api.get !== 'function') return;
+        const res = await window.api.get('/api/thong-bao/dem-chua-doc');
+        if (res && res.thanh_cong) {
+          const unreadCount = res.chua_doc || 0;
+          if (unreadCount > 0) {
+            badge.style.display = 'flex';
+            badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+            badge.setAttribute('title', `${unreadCount} thông báo chưa đọc`);
+          } else {
+            badge.style.display = 'none';
+            badge.textContent = '0';
+          }
+        }
+      } catch (e) {
+        // Bỏ qua lỗi kết nối tạm thời
+      }
+    }
+
+    // Tải ngay lập tức khi vào trang
+    loadRealtimeNotifications();
+
+    // Thiết lập tự động quét mỗi 2 giây (2000 ms) theo đúng yêu cầu
+    if (window._notifRealtimeInterval) {
+      clearInterval(window._notifRealtimeInterval);
+    }
+    window._notifRealtimeInterval = setInterval(loadRealtimeNotifications, 2000);
   }
 
   /**

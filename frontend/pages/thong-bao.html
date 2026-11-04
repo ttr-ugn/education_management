@@ -124,13 +124,7 @@
       </header>
 
       <main class="content-wrapper">
-        <div class="mock-data-banner" style="background-color: #ecfdf5; border-color: #a7f3d0; color: #065f46;">
-          <div>
-            <span class="banner-icon">⚡</span>
-            <b>HỆ THỐNG ĐÃ KẾT NỐI</b> - Phân hệ Thông báo điều hành (Văn thư phát hành) & Lời nhắc tự động (Date/Time Alert) đang hoạt động.
-          </div>
-          <span class="badge badge-success">SQLite Live</span>
-        </div>
+
 
         <div class="page-header d-flex justify-content-between align-items-center">
           <div>
@@ -469,6 +463,9 @@
 
       // Nạp dữ liệu lần đầu
       loadData();
+
+      // Cài đặt hàm thời gian thực tự động load lại danh sách mỗi 2 giây (2000 ms)
+      setInterval(loadData, 2000);
     });
   </script>
 </body>

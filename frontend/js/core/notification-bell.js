@@ -252,8 +252,17 @@
         if (totalBadgeCount > 0) {
           badge.style.display = 'flex';
           badge.textContent = totalBadgeCount > 99 ? '99+' : totalBadgeCount;
+          badge.style.backgroundColor = '#ef4444';
+          badge.style.color = '#ffffff';
+          badge.style.minWidth = '18px';
+          badge.style.height = '18px';
+          badge.style.fontSize = '10.5px';
+          badge.style.fontWeight = '700';
+          badge.style.borderRadius = '9px';
+          badge.style.border = '2px solid #ffffff';
         } else {
           badge.style.display = 'none';
+          badge.textContent = '0';
         }
 
         // Nếu có nhắc nhở đến hạn -> kích hoạt hiệu ứng chuông rung lắc
@@ -299,7 +308,11 @@
     await checkAutoReminders();
 
     // Thiết lập tự động quét mỗi 30 giây (30,000 ms)
-    setInterval(checkAutoReminders, 30000);
+    // Thiết lập tự động quét thời gian thực mỗi 2 giây (2000 ms) theo đúng yêu cầu
+    setInterval(async () => {
+      await updateBellStats();
+      await checkAutoReminders();
+    }, 2000);
   }
 
   // Khởi chạy khi DOM sẵn sàng
