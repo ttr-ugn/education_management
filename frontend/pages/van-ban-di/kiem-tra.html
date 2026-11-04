@@ -165,6 +165,46 @@
     </div>
   </div>
 
+  <!-- Modal Xem trước văn bản (không cần tải về) -->
+  <div id="previewModal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px); z-index: 9999; align-items: center; justify-content: center; padding: 16px;">
+    <div style="background: #ffffff; width: 95%; max-width: 1050px; height: 92vh; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);">
+      <!-- Modal Header -->
+      <div style="background: #003366; color: #ffffff; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #0284c7;">
+        <div style="display: flex; align-items: center; gap: 12px; overflow: hidden;">
+          <span style="background: #0284c7; color: #fff; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Bản xem trước</span>
+          <div style="overflow: hidden;">
+            <div id="previewModalTitle" style="font-weight: 600; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Xem trước văn bản</div>
+            <div id="previewModalSubtitle" style="font-size: 12px; color: #cbd5e1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></div>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
+          <a id="previewDownloadBtn" href="#" class="btn btn-sm btn-outline-light" download title="Tải file gốc về máy tính" style="display: inline-flex; align-items: center; gap: 4px;">
+            📥 Tải về máy
+          </a>
+          <button type="button" class="btn btn-sm btn-light" onclick="closePreviewModal()" title="Đóng cửa sổ xem trước (Phím ESC)" style="font-weight: 600; padding: 4px 12px;">
+            ✕ Đóng
+          </button>
+        </div>
+      </div>
+
+      <!-- Modal Body (Iframe Viewer) -->
+      <div style="flex: 1; position: relative; background: #525659; overflow: hidden;">
+        <div id="previewLoading" style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #f8fafc; z-index: 10; color: #334155;">
+          <div style="width: 36px; height: 36px; border: 3px solid #cbd5e1; border-top-color: #003366; border-radius: 50%; animation: spinPreview 0.8s linear infinite; margin-bottom: 12px;"></div>
+          <div style="font-weight: 500; font-size: 14px;">Đang tải nội dung văn bản từ máy chủ...</div>
+          <div style="font-size: 12px; color: #64748b; margin-top: 4px;">Tự động chuẩn hóa hiển thị không cần tải về máy</div>
+        </div>
+        <iframe id="previewIframe" src="" style="width: 100%; height: 100%; border: none;" onload="onPreviewLoaded()"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    @keyframes spinPreview {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+
   <script src="../../js/core/toast.js"></script>
   <script src="../../js/core/api.js"></script>
   <script src="../../js/core/menu.js"></script>
@@ -176,6 +216,51 @@
     function closeEditModal() {
       document.getElementById('editModal').style.display = 'none';
     }
+
+    function openPreviewModal(docId, fileName, trichYeu, soKyHieu) {
+      const modal = document.getElementById('previewModal');
+      const modalTitle = document.getElementById('previewModalTitle');
+      const modalSubtitle = document.getElementById('previewModalSubtitle');
+      const downloadBtn = document.getElementById('previewDownloadBtn');
+      const iframe = document.getElementById('previewIframe');
+      const loading = document.getElementById('previewLoading');
+
+      modalTitle.textContent = fileName || 'Xem trước văn bản';
+      modalSubtitle.textContent = (soKyHieu ? `[${soKyHieu}] ` : '') + (trichYeu || '');
+      downloadBtn.href = `/api/van-ban-di/${docId}/download?type=goc`;
+      downloadBtn.download = fileName || 'van_ban_goc';
+
+      loading.style.display = 'flex';
+      iframe.src = `/api/van-ban-di/${docId}/preview?type=goc`;
+      modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function onPreviewLoaded() {
+      const loading = document.getElementById('previewLoading');
+      if (loading) {
+        loading.style.display = 'none';
+      }
+    }
+
+    function closePreviewModal() {
+      const modal = document.getElementById('previewModal');
+      const iframe = document.getElementById('previewIframe');
+      if (modal) modal.style.display = 'none';
+      if (iframe) iframe.src = '';
+      document.body.style.overflow = '';
+    }
+
+    window.openPreviewModal = openPreviewModal;
+    window.closePreviewModal = closePreviewModal;
+    window.onPreviewLoaded = onPreviewLoaded;
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closePreviewModal();
+        closeEditModal();
+      }
+    });
 
     document.addEventListener('DOMContentLoaded', async () => {
       // Xác thực vai trò Văn thư
@@ -276,9 +361,14 @@
               </td>
               <td>${d.lanh_dao_ky || 'Lãnh đạo Sở'}</td>
               <td>
-                <a href="${downloadUrl}" target="_blank" class="btn btn-outline-secondary btn-sm" title="Tải về xem tệp">
-                  📄 ${fileInfo.ten_tep}
-                </a>
+                <div class="d-flex align-items-center gap-1 flex-wrap">
+                  <button type="button" class="btn btn-outline-primary btn-sm btn-preview-file" onclick="openPreviewModal(${d.id}, '${(fileInfo.ten_tep || '').replace(/'/g, "\\'")}', '${(d.trich_yeu || '').replace(/'/g, "\\'")}', '${(d.so_ky_hieu || '').replace(/'/g, "\\'")}')" title="Xem trước nội dung văn bản (không cần tải về)">
+                    👁 ${fileInfo.ten_tep}
+                  </button>
+                  <a href="${downloadUrl}" class="btn btn-outline-secondary btn-sm" title="Tải tệp về máy" download="${fileInfo.ten_tep}">
+                    📥
+                  </a>
+                </div>
               </td>
               <td><small>${d.ngay_soan || d.ngay_tao || ''}</small></td>
               <td style="text-align: center;">${actionsHtml}</td>

@@ -170,12 +170,92 @@
     </div>
   </div>
 
+  <!-- Modal Xem trước văn bản (không cần tải về) -->
+  <div id="previewModal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px); z-index: 9999; align-items: center; justify-content: center; padding: 16px;">
+    <div style="background: #ffffff; width: 95%; max-width: 1050px; height: 92vh; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);">
+      <!-- Modal Header -->
+      <div style="background: #003366; color: #ffffff; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #0284c7;">
+        <div style="display: flex; align-items: center; gap: 12px; overflow: hidden;">
+          <span style="background: #0284c7; color: #fff; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Bản xem trước</span>
+          <div style="overflow: hidden;">
+            <div id="previewModalTitle" style="font-weight: 600; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Xem trước văn bản</div>
+            <div id="previewModalSubtitle" style="font-size: 12px; color: #cbd5e1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></div>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
+          <a id="previewDownloadBtn" href="#" class="btn btn-sm btn-outline-light" download title="Tải file về máy tính" style="display: inline-flex; align-items: center; gap: 4px;">
+            📥 Tải về máy
+          </a>
+          <button type="button" class="btn btn-sm btn-light" onclick="closePreviewModal()" title="Đóng cửa sổ xem trước (Phím ESC)" style="font-weight: 600; padding: 4px 12px;">
+            ✕ Đóng
+          </button>
+        </div>
+      </div>
+
+      <!-- Modal Body (Iframe Viewer) -->
+      <div style="flex: 1; position: relative; background: #525659; overflow: hidden;">
+        <div id="previewLoading" style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #f8fafc; z-index: 10; color: #334155;">
+          <div style="width: 36px; height: 36px; border: 3px solid #cbd5e1; border-top-color: #003366; border-radius: 50%; animation: spinPreview 0.8s linear infinite; margin-bottom: 12px;"></div>
+          <div style="font-weight: 500; font-size: 14px;">Đang tải nội dung văn bản từ máy chủ...</div>
+          <div style="font-size: 12px; color: #64748b; margin-top: 4px;">Tự động chuẩn hóa hiển thị không cần tải về máy</div>
+        </div>
+        <iframe id="previewIframe" src="" style="width: 100%; height: 100%; border: none;" onload="onPreviewLoaded()"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    @keyframes spinPreview {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+
   <script src="../../js/core/toast.js"></script>
   <script src="../../js/core/api.js"></script>
   <script src="../../js/core/menu.js"></script>
   <script src="../../js/core/auth-guard.js"></script>
   <script src="../../js/mock/du-lieu-van-ban.js"></script>
   <script>
+    function openPreviewModal(docId, fileType, fileName, trichYeu, soKyHieu) {
+      const modal = document.getElementById('previewModal');
+      const modalTitle = document.getElementById('previewModalTitle');
+      const modalSubtitle = document.getElementById('previewModalSubtitle');
+      const downloadBtn = document.getElementById('previewDownloadBtn');
+      const iframe = document.getElementById('previewIframe');
+      const loading = document.getElementById('previewLoading');
+
+      modalTitle.textContent = fileName || 'Xem trước văn bản';
+      modalSubtitle.textContent = (soKyHieu ? `[${soKyHieu}] ` : '') + (trichYeu || '');
+      downloadBtn.href = `/api/van-ban-di/${docId}/download?type=${fileType || 'goc'}`;
+      downloadBtn.download = fileName || 'van_ban';
+
+      loading.style.display = 'flex';
+      iframe.src = `/api/van-ban-di/${docId}/preview?type=${fileType || 'goc'}`;
+      modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function onPreviewLoaded() {
+      const loading = document.getElementById('previewLoading');
+      if (loading) loading.style.display = 'none';
+    }
+
+    function closePreviewModal() {
+      const modal = document.getElementById('previewModal');
+      const iframe = document.getElementById('previewIframe');
+      if (modal) modal.style.display = 'none';
+      if (iframe) iframe.src = '';
+      document.body.style.overflow = '';
+    }
+
+    window.openPreviewModal = openPreviewModal;
+    window.closePreviewModal = closePreviewModal;
+    window.onPreviewLoaded = onPreviewLoaded;
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closePreviewModal();
+    });
+
     document.addEventListener('DOMContentLoaded', async () => {
       const user = await window.AuthGuard.check();
       if (!user) return;
@@ -227,14 +307,19 @@
           const attachContainer = document.getElementById('attachmentsList');
           if (doc.tep_dinh_kem && doc.tep_dinh_kem.length) {
             attachContainer.innerHTML = doc.tep_dinh_kem.map(f => `
-              <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; background-color: #f1f5f9; border-radius: 6px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; background-color: #f1f5f9; border-radius: 6px; flex-wrap: wrap; gap: 8px;">
                 <div>
                   <b style="font-size: 13.5px;">📄 ${f.ten_tep}</b>
                   <div style="font-size: 11.5px; color: #64748b;">${f.dung_luong} | ${f.loai === 'da_ky' ? '<b style="color: #10b981;">✓ Bản có chữ ký số</b>' : 'Bản dự thảo'}</div>
                 </div>
-                <a href="${f.download_url || `/api/van-ban-di/${docId}/download?type=${f.loai}`}" target="_blank" class="btn btn-outline-primary btn-sm" download="${f.ten_tep}">
-                  Tải về
-                </a>
+                <div class="d-flex gap-2">
+                  <button type="button" class="btn btn-primary btn-sm" onclick="openPreviewModal(${docId}, '${f.loai}', '${f.ten_tep.replace(/'/g, "\\'")}', '${(doc.trich_yeu || '').replace(/'/g, "\\'")}', '${doc.so_ky_hieu || ''}')" title="Xem trước tài liệu trực tiếp">
+                    👁 Xem trước
+                  </button>
+                  <a href="${f.download_url || `/api/van-ban-di/${docId}/download?type=${f.loai}`}" target="_blank" class="btn btn-outline-secondary btn-sm" download="${f.ten_tep}" title="Tải tệp về máy tính">
+                    📥 Tải về
+                  </a>
+                </div>
               </div>
             `).join('');
           }
