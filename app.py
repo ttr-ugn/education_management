@@ -14,6 +14,7 @@ from database import db
 from backend.auth.routes import auth_bp
 from backend.users.routes import users_bp
 from backend.ho_so.routes import ho_so_bp
+from backend.kho_van_ban.routes import kho_van_ban_bp
 
 def create_app():
     """Khởi tạo và cấu hình ứng dụng Flask."""
@@ -34,6 +35,7 @@ def create_app():
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     app.register_blueprint(users_bp, url_prefix='/api/users')
     app.register_blueprint(ho_so_bp, url_prefix='/api/ho-so')
+    app.register_blueprint(kho_van_ban_bp, url_prefix='/api/kho-van-ban')
 
     # Định tuyến trang chủ -> phục vụ frontend/index.html
     @app.route('/')
