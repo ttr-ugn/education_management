@@ -94,7 +94,7 @@
             </div>
             <div class="stat-info">
               <span class="stat-number" id="statVBDen">24</span>
-              <span class="stat-label">Văn bản đến tháng này</span>
+              <span class="stat-label">Dự thảo đang xử lý</span>
             </div>
           </div>
 
@@ -142,48 +142,25 @@
 
         <!-- Hai khối nội dung chính: Văn bản gần đây & Nhiệm vụ cần làm -->
         <div style="display: grid; grid-template-columns: 1.3fr 1fr; gap: 24px;">
-          <!-- Khối 1: Văn bản đến mới nhất -->
+          <!-- Khối 1: Dự thảo văn bản nội bộ mới nhất -->
           <div class="card">
             <div class="card-header">
-              <h2 class="card-title">Văn bản đến mới nhận</h2>
-              <a href="van-ban-den/danh-sach.html" class="btn btn-outline-primary btn-sm">Xem tất cả &rarr;</a>
+              <h2 class="card-title">Dự thảo văn bản nội bộ mới nhất</h2>
+              <a href="van-ban-di/danh-sach.html" class="btn btn-outline-primary btn-sm">Xem tất cả &rarr;</a>
             </div>
             <div class="card-body p-0">
               <div class="table-responsive">
                 <table class="data-table">
                   <thead>
                     <tr>
-                      <th>Số ký hiệu</th>
+                      <th>Mã dự thảo</th>
                       <th>Trích yếu nội dung</th>
-                      <th>Cơ quan gửi</th>
-                      <th>Độ khẩn</th>
+                      <th>Người soạn</th>
+                      <th>Trạng thái</th>
                     </tr>
                   </thead>
                   <tbody id="recentVBDenList">
-                    <tr>
-                      <td><b>142/BGDĐT-GDTrH</b></td>
-                      <td>V/v hướng dẫn tổ chức Kỳ thi tốt nghiệp THPT năm 2026</td>
-                      <td>Bộ Giáo dục và Đào tạo</td>
-                      <td><span class="badge badge-danger">Khẩn</span></td>
-                    </tr>
-                    <tr>
-                      <td><b>88/UBND-VX</b></td>
-                      <td>V/v phân bổ kinh phí cơ sở vật chất trường chuẩn quốc gia</td>
-                      <td>UBND TP. Đà Nẵng</td>
-                      <td><span class="badge badge-warning">Thượng khẩn</span></td>
-                    </tr>
-                    <tr>
-                      <td><b>1205/SGDĐT-VP</b></td>
-                      <td>Kế hoạch tổ chức Tuần lễ học tập suốt đời năm 2026</td>
-                      <td>Sở GD&ĐT Đà Nẵng</td>
-                      <td><span class="badge badge-info">Bình thường</span></td>
-                    </tr>
-                    <tr>
-                      <td><b>45/STTTT-CNTT</b></td>
-                      <td>Hướng dẫn bảo đảm an toàn thông tin cơ quan hành chính</td>
-                      <td>Sở Thông tin & Truyền thông</td>
-                      <td><span class="badge badge-info">Bình thường</span></td>
-                    </tr>
+                    <tr><td colspan="4" class="text-center p-3 text-muted">Đang nạp dữ liệu...</td></tr>
                   </tbody>
                 </table>
               </div>
@@ -291,42 +268,70 @@
           <a href="van-ban-di/ban-hanh.html" class="btn btn-outline-primary" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3);">
             Cấp số & Ban hành
           </a>
-          <a href="van-ban-den/them.html" class="btn btn-outline-primary" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3);">
-            + Vào sổ VB đến ngoài Sở
+          <a href="van-ban-di/soan-thao.html" class="btn btn-outline-primary" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3);">
+            + Soạn dự thảo mới
           </a>
           <a href="admin/duyet-tai-khoan.html" class="btn btn-outline-primary" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3);">
             Duyệt tài khoản
           </a>
         `;
       } else if (user.vai_tro === 'LANH_DAO') {
-        subtextEl.textContent = 'Vai trò: Lãnh đạo cơ quan. Đồng chí có quyền phê duyệt văn bản đi, phân công xử lý văn bản đến và chỉ đạo công việc.';
+        subtextEl.textContent = 'Vai trò: Lãnh đạo Sở. Đồng chí xem xét phê duyệt, ký số điện tử văn bản nội bộ và chỉ đạo phân công công việc.';
         statRoleLabel.textContent = 'Văn bản chờ duyệt';
-        statRoleSpec.textContent = '5';
+        statRoleSpec.textContent = '0';
         quickActionsEl.innerHTML = `
-          <a href="van-ban-den/phe-duyet-phan-cong.html" class="btn btn-warning">
-            Phân công VB đến
-          </a>
-          <a href="van-ban-di/phe-duyet.html" class="btn btn-outline-primary" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3);">
-            Phê duyệt VB đi
+          <a href="van-ban-di/phe-duyet.html" class="btn btn-warning">
+            ✍ Ký số & Phê duyệt VB
           </a>
           <a href="cong-viec/giao-viec.html" class="btn btn-primary">
             + Giao việc mới
           </a>
+          <a href="van-ban-di/danh-sach.html" class="btn btn-outline-primary" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3);">
+            Sổ theo dõi văn bản
+          </a>
         `;
       } else {
         // CHUYEN_VIEN
-        subtextEl.textContent = 'Vai trò: Chuyên viên xử lý nghiệp vụ. Đồng chí theo dõi văn bản đến được phân công, soạn thảo văn bản đi và báo cáo tiến độ.';
-        statRoleLabel.textContent = 'Nhiệm vụ đến hạn';
-        statRoleSpec.textContent = '3';
+        subtextEl.textContent = 'Vai trò: Chuyên viên xử lý nghiệp vụ. Soạn thảo văn bản đi, theo dõi tiến độ phê duyệt và thực hiện nhiệm vụ được giao.';
+        statRoleLabel.textContent = 'Văn bản của tôi';
+        statRoleSpec.textContent = '0';
         quickActionsEl.innerHTML = `
-          <a href="van-ban-di/soan-thao.html" class="btn btn-outline-primary" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3);">
-            + Soạn thảo VB đi
+          <a href="van-ban-di/soan-thao.html" class="btn btn-primary">
+            + Soạn thảo dự thảo mới
+          </a>
+          <a href="van-ban-di/danh-sach.html" class="btn btn-outline-primary" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3);">
+            Văn bản của tôi
           </a>
           <a href="cong-viec/xu-ly.html" class="btn btn-warning">
             Báo cáo tiến độ CV
           </a>
         `;
       }
+
+      // Nạp danh sách dự thảo nội bộ thật vào bảng
+      try {
+        const vbAll = await window.api.get('/api/van-ban-di');
+        if (vbAll.du_lieu && vbAll.du_lieu.length > 0) {
+          const list = vbAll.du_lieu.slice(0, 5);
+          document.getElementById('statVBDen').textContent = vbAll.du_lieu.length;
+          const statusMap = {
+            'CHO_VAN_THU_KIEM_TRA': '<span class="badge badge-warning">Chờ VT kiểm tra</span>',
+            'CHO_LANH_DAO_KY': '<span class="badge badge-primary">Chờ LĐ ký</span>',
+            'DA_KY_CHO_BAN_HANH': '<span class="badge badge-info">Chờ ban hành</span>',
+            'DA_BAN_HANH': '<span class="badge badge-success">Đã ban hành</span>',
+            'VAN_THU_TRA_LAI': '<span class="badge badge-danger">VT trả lại</span>',
+            'LANH_DAO_TRA_LAI': '<span class="badge badge-danger">LĐ trả lại</span>'
+          };
+          document.getElementById('recentVBDenList').innerHTML = list.map(d => `
+            <tr>
+              <td><code>${d.so_ky_hieu}</code></td>
+              <td style="max-width: 260px;"><b>${d.trich_yeu}</b></td>
+              <td>${d.nguoi_soan_thao}</td>
+              <td>${statusMap[d.trang_thai] || d.trang_thai}</td>
+            </tr>
+          `).join('');
+        }
+      } catch (e) {}
     });
   </script>
 </body>

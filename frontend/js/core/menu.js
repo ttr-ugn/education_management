@@ -1,6 +1,7 @@
 /**
  * MENU.JS - DỰNG THANH ĐIỀU HƯỚNG SIDEBAR THEO VAI TRÒ
  * Tự động tạo menu chuẩn xác cho: VAN_THU, LANH_DAO, CHUYEN_VIEN
+ * Đã tinh gọn chuẩn hóa theo mô hình QUẢN LÝ VĂN BẢN NỘI BỘ SỞ GD&ĐT
  */
 
 (function (window) {
@@ -10,7 +11,6 @@
 
   const ICONS = {
     dashboard: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>',
-    docIn: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>',
     docOut: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="11" x2="12" y2="17"/><polyline points="9 14 12 11 15 14"/></svg>',
     checkDraft: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>',
     signDoc: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>',
@@ -37,18 +37,11 @@
           ]
         },
         {
-          title: 'Văn bản đi (Quy trình nội bộ Sở)',
+          title: 'Quản lý văn bản nội bộ',
           items: [
             { label: '📥 Tiếp nhận dự thảo từ Chuyên viên', href: `${root}pages/van-ban-di/kiem-tra.html`, icon: ICONS.checkDraft, id: 'nav-vb-kiemtra' },
             { label: 'Sổ theo dõi Văn bản đi', href: `${root}pages/van-ban-di/danh-sach.html`, icon: ICONS.docOut, id: 'nav-vb-di' },
             { label: '📑 Cấp số & Ban hành', href: `${root}pages/van-ban-di/ban-hanh.html`, icon: ICONS.publish, id: 'nav-vb-banhanh' }
-          ]
-        },
-        {
-          title: 'Văn bản đến (Ngoài cơ quan gửi tới)',
-          items: [
-            { label: 'Sổ Văn bản đến ngoài Sở', href: `${root}pages/van-ban-den/danh-sach.html`, icon: ICONS.docIn, id: 'nav-vb-den' },
-            { label: '+ Vào sổ công văn ngoài Sở gửi đến', href: `${root}pages/van-ban-den/them.html`, icon: ICONS.userPlus, id: 'nav-vb-den-them' }
           ]
         },
         {
@@ -79,12 +72,10 @@
           ]
         },
         {
-          title: 'Chỉ đạo & Ký duyệt văn bản',
+          title: 'Phê duyệt & Ký số văn bản',
           items: [
-            { label: 'Ký số & Duyệt văn bản đi', href: `${root}pages/van-ban-di/phe-duyet.html`, icon: ICONS.signDoc, id: 'nav-vb-phe-duyet' },
-            { label: 'Sổ theo dõi Văn bản đi', href: `${root}pages/van-ban-di/danh-sach.html`, icon: ICONS.docOut, id: 'nav-vb-di' },
-            { label: 'Phân công Văn bản đến', href: `${root}pages/van-ban-den/phe-duyet-phan-cong.html`, icon: ICONS.docIn, id: 'nav-vb-den-phancong' },
-            { label: 'Sổ Văn bản đến', href: `${root}pages/van-ban-den/danh-sach.html`, icon: ICONS.docIn, id: 'nav-vb-den' }
+            { label: '✍ Ký số & Duyệt văn bản', href: `${root}pages/van-ban-di/phe-duyet.html`, icon: ICONS.signDoc, id: 'nav-vb-phe-duyet' },
+            { label: 'Sổ theo dõi Văn bản đi', href: `${root}pages/van-ban-di/danh-sach.html`, icon: ICONS.docOut, id: 'nav-vb-di' }
           ]
         },
         {
@@ -109,11 +100,10 @@
           ]
         },
         {
-          title: 'Quản lý văn bản',
+          title: 'Quản lý văn bản nội bộ',
           items: [
-            { label: 'Soạn thảo văn bản đi mới', href: `${root}pages/van-ban-di/soan-thao.html`, icon: ICONS.docOut, id: 'nav-vb-soan' },
-            { label: 'Văn bản đi của tôi', href: `${root}pages/van-ban-di/danh-sach.html`, icon: ICONS.folder, id: 'nav-vb-di' },
-            { label: 'Văn bản đến (Xem chỉ đạo)', href: `${root}pages/van-ban-den/danh-sach.html`, icon: ICONS.docIn, id: 'nav-vb-den' }
+            { label: '+ Soạn thảo dự thảo mới', href: `${root}pages/van-ban-di/soan-thao.html`, icon: ICONS.docOut, id: 'nav-vb-soan' },
+            { label: 'Văn bản của tôi', href: `${root}pages/van-ban-di/danh-sach.html`, icon: ICONS.folder, id: 'nav-vb-di' }
           ]
         },
         {
