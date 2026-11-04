@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bảng điều khiển - Quản lý văn bản Sở GD&ĐT Đà Nẵng</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/logo-sodad.svg">
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/components.css">
+</head>
+<body>
+  <div class="app-wrapper">
+    <aside class="app-sidebar" id="appSidebar">
+      <div class="sidebar-brand">
+        <img src="../assets/logo-sodad.svg" alt="Logo Sở GD&ĐT">
+        <div class="brand-text">
+          <span class="brand-title">Sở GD&ĐT Đà Nẵng</span>
+          <span class="brand-subtitle">Quản lý văn bản điều hành</span>
+        </div>
+      </div>
+      <div class="sidebar-nav" id="sidebarNav"></div>
+      <div class="sidebar-footer">
+        Đang đăng nhập: <b id="currentUserRole">Cán bộ</b>
+      </div>
+    </aside>
+
+    <div class="app-main">
+      <header class="app-topbar">
+        <div class="topbar-left">
+          <button class="sidebar-toggle-btn" id="sidebarToggle" aria-label="Toggle Menu">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <span class="system-header-title">HỆ THỐNG QUẢN LÝ VĂN BẢN VÀ ĐIỀU HÀNH NỘI BỘ</span>
+        </div>
+        <div class="topbar-right">
+          <a href="thong-bao.html" class="topbar-icon-btn" title="Thông báo mới">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+            <span class="topbar-icon-badge"></span>
+          </a>
+
+          <a href="ho-so-ca-nhan.html" class="user-profile-widget" style="text-decoration: none;">
+            <div class="user-avatar" id="currentUserAvatar">CB</div>
+            <div class="user-details">
+              <span class="user-name" id="currentUserName">Đang nạp...</span>
+              <span class="user-role-badge" id="currentUserRoleTop">Cán bộ</span>
+            </div>
+          </a>
+
+          <button class="btn btn-outline-primary btn-sm btn-logout" id="logoutBtn" title="Đăng xuất">
+            Đăng xuất
+          </button>
+        </div>
+      </header>
+
+      <main class="content-wrapper">
+        <!-- Banner chào mừng -->
+        <div style="background: linear-gradient(135deg, #003366 0%, #004b91 100%); color: #ffffff; padding: 24px; border-radius: var(--radius-lg); margin-bottom: 24px; box-shadow: var(--shadow-md);">
+          <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+              <span style="font-size: 13px; color: #ffd700; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">
+                CỔNG ĐIỀU HÀNH VĂN PHÒNG ĐIỆN TỬ
+              </span>
+              <h1 style="font-size: 22px; font-weight: 700; margin: 6px 0;" id="welcomeGreeting">
+                Xin chào đồng chí!
+              </h1>
+              <p style="font-size: 13.5px; opacity: 0.9; margin: 0;" id="welcomeSubtext">
+                Chúc đồng chí một ngày làm việc hiệu quả tại Sở Giáo dục và Đào tạo TP. Đà Nẵng.
+              </p>
+            </div>
+            <div class="d-flex gap-2" id="quickActionButtons">
+              <!-- Nút tác vụ nhanh tùy theo vai trò -->
+            </div>
+          </div>
+        </div>
+
+        <!-- 4 thẻ thống kê số liệu tổng quan -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 24px;">
+          <div class="stat-card">
+            <div class="stat-icon icon-blue">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+              </svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-number" id="statVBDen">24</span>
+              <span class="stat-label">Văn bản đến tháng này</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon icon-green">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                <line x1="12" y1="11" x2="12" y2="17"></line>
+                <polyline points="9 14 12 11 15 14"></polyline>
+              </svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-number" id="statVBDi">18</span>
+              <span class="stat-label">Văn bản đi đã ban hành</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon icon-orange">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+              </svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-number" id="statCongViec">7</span>
+              <span class="stat-label">Công việc đang xử lý</span>
+            </div>
+          </div>
+
+          <div class="stat-card" id="roleStatCard">
+            <div class="stat-icon icon-red">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-number" id="statRoleSpec">2</span>
+              <span class="stat-label" id="statRoleLabel">Yêu cầu chờ duyệt</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hai khối nội dung chính: Văn bản gần đây & Nhiệm vụ cần làm -->
+        <div style="display: grid; grid-template-columns: 1.3fr 1fr; gap: 24px;">
+          <!-- Khối 1: Văn bản đến mới nhất -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Văn bản đến mới nhận</h2>
+              <a href="van-ban-den/danh-sach.html" class="btn btn-outline-primary btn-sm">Xem tất cả &rarr;</a>
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Số ký hiệu</th>
+                      <th>Trích yếu nội dung</th>
+                      <th>Cơ quan gửi</th>
+                      <th>Độ khẩn</th>
+                    </tr>
+                  </thead>
+                  <tbody id="recentVBDenList">
+                    <tr>
+                      <td><b>142/BGDĐT-GDTrH</b></td>
+                      <td>V/v hướng dẫn tổ chức Kỳ thi tốt nghiệp THPT năm 2026</td>
+                      <td>Bộ Giáo dục và Đào tạo</td>
+                      <td><span class="badge badge-danger">Khẩn</span></td>
+                    </tr>
+                    <tr>
+                      <td><b>88/UBND-VX</b></td>
+                      <td>V/v phân bổ kinh phí cơ sở vật chất trường chuẩn quốc gia</td>
+                      <td>UBND TP. Đà Nẵng</td>
+                      <td><span class="badge badge-warning">Thượng khẩn</span></td>
+                    </tr>
+                    <tr>
+                      <td><b>1205/SGDĐT-VP</b></td>
+                      <td>Kế hoạch tổ chức Tuần lễ học tập suốt đời năm 2026</td>
+                      <td>Sở GD&ĐT Đà Nẵng</td>
+                      <td><span class="badge badge-info">Bình thường</span></td>
+                    </tr>
+                    <tr>
+                      <td><b>45/STTTT-CNTT</b></td>
+                      <td>Hướng dẫn bảo đảm an toàn thông tin cơ quan hành chính</td>
+                      <td>Sở Thông tin & Truyền thông</td>
+                      <td><span class="badge badge-info">Bình thường</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Khối 2: Công việc điều hành cần xử lý -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Công việc điều hành trọng tâm</h2>
+              <a href="cong-viec/danh-sach.html" class="btn btn-outline-primary btn-sm">Xem tất cả &rarr;</a>
+            </div>
+            <div class="card-body">
+              <div style="display: flex; flex-direction: column; gap: 14px;">
+                <div style="padding: 12px; background-color: #f8fafc; border-left: 3px solid #004b91; border-radius: 4px;">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <b style="font-size: 13.5px; color: #1e293b;">Báo cáo số liệu tuyển sinh lớp 10 THPT</b>
+                    <span class="badge badge-danger">Hạn: Hôm nay</span>
+                  </div>
+                  <p style="font-size: 12.5px; color: #64748b; margin-bottom: 6px;">Tổng hợp số liệu dự kiến từ các trường THPT công lập trên địa bàn quận Hải Châu, Thanh Khê.</p>
+                  <div style="font-size: 11.5px; color: #0284c7;">Tiến độ: 80%</div>
+                </div>
+
+                <div style="padding: 12px; background-color: #f8fafc; border-left: 3px solid #f59e0b; border-radius: 4px;">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <b style="font-size: 13.5px; color: #1e293b;">Dự thảo Kế hoạch bồi dưỡng giáo viên hè 2026</b>
+                    <span class="badge badge-warning">Hạn: 08/11</span>
+                  </div>
+                  <p style="font-size: 12.5px; color: #64748b; margin-bottom: 6px;">Chủ trì phối hợp Phòng GD Trung học và Phòng GD Tiểu học biên soạn khung tập huấn.</p>
+                  <div style="font-size: 11.5px; color: #d97706;">Tiến độ: 45%</div>
+                </div>
+
+                <div style="padding: 12px; background-color: #f8fafc; border-left: 3px solid #10b981; border-radius: 4px;">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <b style="font-size: 13.5px; color: #1e293b;">Kiểm tra công tác phòng cháy tại các trường học</b>
+                    <span class="badge badge-success">Hạn: 15/11</span>
+                  </div>
+                  <p style="font-size: 12.5px; color: #64748b; margin-bottom: 6px;">Phối hợp Cảnh sát PCCC TP. Đà Nẵng lập biên bản kiểm tra liên ngành đợt 2.</p>
+                  <div style="font-size: 11.5px; color: #059669;">Tiến độ: 20%</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer class="app-footer">
+        <span>© 2026 Sở Giáo dục và Đào tạo thành phố Đà Nẵng</span>
+        <span>Hệ thống Quản lý văn bản điều hành nội bộ</span>
+      </footer>
+    </div>
+  </div>
+
+  <script src="../js/core/toast.js"></script>
+  <script src="../js/core/api.js"></script>
+  <script src="../js/core/menu.js"></script>
+  <script src="../js/core/auth-guard.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = await window.AuthGuard.check();
+      if (!user) return;
+
+      // Cập nhật thông tin chào mừng
+      const greetingEl = document.getElementById('welcomeGreeting');
+      const subtextEl = document.getElementById('welcomeSubtext');
+      const quickActionsEl = document.getElementById('quickActionButtons');
+
+      const hour = new Date().getHours();
+      const timeGreeting = hour < 12 ? 'Chào buổi sáng' : (hour < 18 ? 'Chào buổi chiều' : 'Chào buổi tối');
+      greetingEl.textContent = `${timeGreeting}, đồng chí ${user.ho_va_ten}!`;
+
+      // Cấu hình nút tác vụ nhanh và card thống kê theo vai trò
+      const statRoleSpec = document.getElementById('statRoleSpec');
+      const statRoleLabel = document.getElementById('statRoleLabel');
+
+      if (user.vai_tro === 'VAN_THU') {
+        subtextEl.textContent = 'Vai trò: Văn thư cơ quan & Quản trị hệ thống. Đồng chí có thể tiếp nhận văn bản, phát hành và duyệt tài khoản cán bộ.';
+        statRoleLabel.textContent = 'Tài khoản chờ duyệt';
+        
+        // Nạp số lượng chờ duyệt thật từ API
+        try {
+          const usersRes = await window.api.get('/api/users?trang_thai=CHO_DUYET');
+          if (usersRes.du_lieu) {
+            statRoleSpec.textContent = usersRes.du_lieu.length;
+          }
+        } catch (e) {}
+
+        quickActionsEl.innerHTML = `
+          <a href="van-ban-den/them.html" class="btn btn-outline-primary" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3);">
+            + Tiếp nhận VB đến
+          </a>
+          <a href="van-ban-di/ban-hanh.html" class="btn btn-outline-primary" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3);">
+            Đóng dấu & Ban hành
+          </a>
+          <a href="admin/duyet-tai-khoan.html" class="btn btn-warning">
+            Duyệt tài khoản
+          </a>
+        `;
+      } else if (user.vai_tro === 'LANH_DAO') {
+        subtextEl.textContent = 'Vai trò: Lãnh đạo cơ quan. Đồng chí có quyền phê duyệt văn bản đi, phân công xử lý văn bản đến và chỉ đạo công việc.';
+        statRoleLabel.textContent = 'Văn bản chờ duyệt';
+        statRoleSpec.textContent = '5';
+        quickActionsEl.innerHTML = `
+          <a href="van-ban-den/phe-duyet-phan-cong.html" class="btn btn-warning">
+            Phân công VB đến
+          </a>
+          <a href="van-ban-di/phe-duyet.html" class="btn btn-outline-primary" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3);">
+            Phê duyệt VB đi
+          </a>
+          <a href="cong-viec/giao-viec.html" class="btn btn-primary">
+            + Giao việc mới
+          </a>
+        `;
+      } else {
+        // CHUYEN_VIEN
+        subtextEl.textContent = 'Vai trò: Chuyên viên xử lý nghiệp vụ. Đồng chí theo dõi văn bản đến được phân công, soạn thảo văn bản đi và báo cáo tiến độ.';
+        statRoleLabel.textContent = 'Nhiệm vụ đến hạn';
+        statRoleSpec.textContent = '3';
+        quickActionsEl.innerHTML = `
+          <a href="van-ban-di/soan-thao.html" class="btn btn-outline-primary" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3);">
+            + Soạn thảo VB đi
+          </a>
+          <a href="cong-viec/xu-ly.html" class="btn btn-warning">
+            Báo cáo tiến độ CV
+          </a>
+        `;
+      }
+    });
+  </script>
+</body>
+</html>
