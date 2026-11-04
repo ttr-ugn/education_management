@@ -175,7 +175,7 @@
                 <b style="font-size: 13px;">📄 ${f.ten_tep}</b>
                 <div style="font-size: 11px; color: #64748b;">${f.dung_luong}</div>
               </div>
-              <button class="btn btn-outline-primary btn-sm" onclick="Toast.info('Tải xuống tệp văn bản đi mô phỏng.');">
+              <button class="btn btn-outline-primary btn-sm" onclick="window.open(f.download_url || '#', '_blank');">
                 Tải về
               </button>
             </div>
