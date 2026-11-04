@@ -5,6 +5,7 @@ from .decorators import login_required
 auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/dang-ky', methods=['POST'])
+@auth_bp.route('/register', methods=['POST'])
 def dang_ky():
     """Đăng ký tài khoản người dùng mới (Chuyên viên hoặc Văn thư)."""
     data = request.get_json(silent=True) or {}
@@ -15,11 +16,12 @@ def dang_ky():
     }), status_code
 
 @auth_bp.route('/dang-nhap', methods=['POST'])
+@auth_bp.route('/login', methods=['POST'])
 def dang_nhap():
     """Xác thực đăng nhập và thiết lập session."""
     data = request.get_json(silent=True) or {}
-    ten_dang_nhap = data.get('ten_dang_nhap')
-    mat_khau = data.get('mat_khau')
+    ten_dang_nhap = data.get('ten_dang_nhap') or data.get('username')
+    mat_khau = data.get('mat_khau') or data.get('password')
 
     success, message, user_info, status_code = authenticate_user(ten_dang_nhap, mat_khau)
     if not success:
@@ -40,6 +42,7 @@ def dang_nhap():
     }), 200
 
 @auth_bp.route('/dang-xuat', methods=['POST'])
+@auth_bp.route('/logout', methods=['POST'])
 def dang_xuat():
     """Xóa session đăng nhập."""
     session.clear()
@@ -49,6 +52,7 @@ def dang_xuat():
     }), 200
 
 @auth_bp.route('/toi', methods=['GET'])
+@auth_bp.route('/me', methods=['GET'])
 @login_required
 def toi():
     """Lấy thông tin người dùng hiện tại đang đăng nhập."""
