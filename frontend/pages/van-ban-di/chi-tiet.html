@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chi tiết văn bản đi - Quản lý văn bản Sở GD&ĐT Đà Nẵng</title>
+  <title>Chi tiết Văn bản đi - Quản lý văn bản Sở GD&ĐT Đà Nẵng</title>
   <link rel="icon" type="image/svg+xml" href="../../assets/logo-sodad.svg">
   <link rel="stylesheet" href="../../css/base.css">
   <link rel="stylesheet" href="../../css/layout.css">
@@ -38,13 +38,19 @@
           <span class="system-header-title">HỆ THỐNG QUẢN LÝ VĂN BẢN VÀ ĐIỀU HÀNH NỘI BỘ</span>
         </div>
         <div class="topbar-right">
-          <div class="user-profile-widget">
+          <a href="../thong-bao.html" class="topbar-icon-btn" title="Thông báo">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+          </a>
+          <a href="../ho-so-ca-nhan.html" class="user-profile-widget" style="text-decoration: none;">
             <div class="user-avatar" id="currentUserAvatar">CB</div>
             <div class="user-details">
-              <span class="user-name" id="currentUserName">...</span>
-              <span class="user-role-badge">Cán bộ</span>
+              <span class="user-name" id="currentUserName">Đang nạp...</span>
+              <span class="user-role-badge" id="currentUserRoleTop">Cán bộ</span>
             </div>
-          </div>
+          </a>
           <button class="btn btn-outline-primary btn-sm btn-logout" id="logoutBtn" title="Đăng xuất">
             Đăng xuất
           </button>
@@ -52,31 +58,36 @@
       </header>
 
       <main class="content-wrapper">
-        <div class="mock-data-banner">
-          <div>
-            <span class="banner-icon">📌</span>
-            <b>DỮ LIỆU MẪU (MOCK DATA)</b> - Thông tin văn bản đi tải từ <code>vanBanDiService</code>.
-          </div>
-          <span class="badge badge-info">Mock Active</span>
-        </div>
-
         <div class="page-header">
           <div>
             <h1 class="page-title" id="docTitle">Chi tiết văn bản đi</h1>
             <p class="page-subtitle" id="docSubTitle">Số ký hiệu: ...</p>
           </div>
-          <a href="danh-sach.html" class="btn btn-secondary">Quay lại danh sách</a>
+          <div class="d-flex gap-2">
+            <a href="danh-sach.html" class="btn btn-secondary">&larr; Quay lại danh sách</a>
+          </div>
+        </div>
+
+        <!-- Thanh điều khiển tác vụ nghiệp vụ theo vai trò -->
+        <div id="actionControlPanel" class="card mb-3" style="display: none; background: #f8fafc; border: 1px solid #cbd5e1;">
+          <div class="card-body d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+              <span class="text-muted" style="font-size: 13px;">Hành động tiếp theo theo quy trình:</span>
+              <div class="fw-bold" id="actionPromptText" style="color: #003366; font-size: 15px;">...</div>
+            </div>
+            <div class="d-flex gap-2" id="actionButtonsContainer"></div>
+          </div>
         </div>
 
         <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
           <div class="card">
-            <div class="card-header">
+            <div class="card-header d-flex justify-content-between align-items-center">
               <h2 class="card-title">Thông tin thể thức & Trích yếu văn bản</h2>
               <span id="docStatusBadge"></span>
             </div>
             <div class="card-body">
               <div style="background-color: #f8fafc; padding: 16px; border-radius: var(--radius-md); border-left: 4px solid var(--primary-color); margin-bottom: 20px;">
-                <span class="text-muted" style="font-size: 12px; text-transform: uppercase;">Trích yếu văn bản:</span>
+                <span class="text-muted" style="font-size: 12px; text-transform: uppercase;">Trích yếu nội dung:</span>
                 <p style="font-size: 16px; font-weight: 600; color: #1e293b; margin-top: 4px;" id="docTrichYeu">...</p>
               </div>
 
@@ -90,7 +101,7 @@
                   <div class="fw-bold" id="docNguoiSoan">...</div>
                 </div>
                 <div>
-                  <span class="text-muted">Lãnh đạo ký duyệt:</span>
+                  <span class="text-muted">Lãnh đạo Sở phụ trách ký:</span>
                   <div class="fw-bold" id="docLanhDao">...</div>
                 </div>
                 <div>
@@ -98,12 +109,20 @@
                   <div id="docLoai">...</div>
                 </div>
                 <div>
+                  <span class="text-muted">Độ khẩn:</span>
+                  <div id="docDoKhan">Bình thường</div>
+                </div>
+                <div>
                   <span class="text-muted">Ngày khởi tạo:</span>
                   <div id="docNgaySoan">...</div>
                 </div>
                 <div>
-                  <span class="text-muted">Ngày ban hành:</span>
+                  <span class="text-muted">Ngày ban hành chính thức:</span>
                   <div id="docNgayBanHanh">...</div>
+                </div>
+                <div>
+                  <span class="text-muted">Văn thư xử lý:</span>
+                  <div id="docVanThu">...</div>
                 </div>
                 <div style="grid-column: span 2;">
                   <span class="text-muted">Nơi nhận văn bản:</span>
@@ -111,19 +130,34 @@
                 </div>
               </div>
 
+              <!-- Hộp hiển thị ý kiến phản hồi nếu có -->
               <div id="correctionBox" style="margin-top: 20px; display: none; background-color: #fef2f2; border: 1px solid #fecaca; padding: 14px; border-radius: 6px;">
-                <b style="color: #991b1b;">Ý kiến phản hồi / Yêu cầu chỉnh sửa của Lãnh đạo:</b>
+                <b style="color: #991b1b;">⚠ Ý kiến phản hồi / Yêu cầu chỉnh sửa:</b>
                 <p id="docLyDoChinhSua" style="font-size: 13px; color: #7f1d1d; margin: 4px 0 0 0;"></p>
               </div>
             </div>
           </div>
 
-          <div class="card">
-            <div class="card-header">
-              <h2 class="card-title">Tệp văn bản đính kèm</h2>
+          <div class="d-flex flex-column gap-3">
+            <div class="card">
+              <div class="card-header">
+                <h2 class="card-title">Tệp văn bản đính kèm</h2>
+              </div>
+              <div class="card-body">
+                <div id="attachmentsList" style="display: flex; flex-direction: column; gap: 10px;"></div>
+              </div>
             </div>
-            <div class="card-body">
-              <div id="attachmentsList" style="display: flex; flex-direction: column; gap: 10px;"></div>
+
+            <!-- Lịch sử tiến trình xử lý văn bản -->
+            <div class="card">
+              <div class="card-header">
+                <h2 class="card-title">Lịch sử xử lý tiến trình</h2>
+              </div>
+              <div class="card-body p-2">
+                <div id="historyTimeline" style="font-size: 12.5px; display: flex; flex-direction: column; gap: 10px;">
+                  <span class="text-muted">Đang tải lịch sử...</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -136,54 +170,289 @@
     </div>
   </div>
 
+  <!-- Modal Xem trước văn bản (không cần tải về) -->
+  <div id="previewModal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px); z-index: 9999; align-items: center; justify-content: center; padding: 16px;">
+    <div style="background: #ffffff; width: 95%; max-width: 1050px; height: 92vh; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);">
+      <!-- Modal Header -->
+      <div style="background: #003366; color: #ffffff; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #0284c7;">
+        <div style="display: flex; align-items: center; gap: 12px; overflow: hidden;">
+          <span style="background: #0284c7; color: #fff; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Bản xem trước</span>
+          <div style="overflow: hidden;">
+            <div id="previewModalTitle" style="font-weight: 600; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Xem trước văn bản</div>
+            <div id="previewModalSubtitle" style="font-size: 12px; color: #cbd5e1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></div>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
+          <a id="previewDownloadBtn" href="#" class="btn btn-sm btn-outline-light" download title="Tải file về máy tính" style="display: inline-flex; align-items: center; gap: 4px;">
+            📥 Tải về máy
+          </a>
+          <button type="button" class="btn btn-sm btn-light" onclick="closePreviewModal()" title="Đóng cửa sổ xem trước (Phím ESC)" style="font-weight: 600; padding: 4px 12px;">
+            ✕ Đóng
+          </button>
+        </div>
+      </div>
+
+      <!-- Modal Body (Iframe Viewer) -->
+      <div style="flex: 1; position: relative; background: #525659; overflow: hidden;">
+        <div id="previewLoading" style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #f8fafc; z-index: 10; color: #334155;">
+          <div style="width: 36px; height: 36px; border: 3px solid #cbd5e1; border-top-color: #003366; border-radius: 50%; animation: spinPreview 0.8s linear infinite; margin-bottom: 12px;"></div>
+          <div style="font-weight: 500; font-size: 14px;">Đang tải nội dung văn bản từ máy chủ...</div>
+          <div style="font-size: 12px; color: #64748b; margin-top: 4px;">Tự động chuẩn hóa hiển thị không cần tải về máy</div>
+        </div>
+        <iframe id="previewIframe" src="" style="width: 100%; height: 100%; border: none;" onload="onPreviewLoaded()"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    @keyframes spinPreview {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+
   <script src="../../js/core/toast.js"></script>
   <script src="../../js/core/api.js"></script>
   <script src="../../js/core/menu.js"></script>
   <script src="../../js/core/auth-guard.js"></script>
   <script src="../../js/mock/du-lieu-van-ban.js"></script>
   <script>
+    function openPreviewModal(docId, fileType, fileName, trichYeu, soKyHieu) {
+      const modal = document.getElementById('previewModal');
+      const modalTitle = document.getElementById('previewModalTitle');
+      const modalSubtitle = document.getElementById('previewModalSubtitle');
+      const downloadBtn = document.getElementById('previewDownloadBtn');
+      const iframe = document.getElementById('previewIframe');
+      const loading = document.getElementById('previewLoading');
+
+      modalTitle.textContent = fileName || 'Xem trước văn bản';
+      modalSubtitle.textContent = (soKyHieu ? `[${soKyHieu}] ` : '') + (trichYeu || '');
+      downloadBtn.href = `/api/van-ban-di/${docId}/download?type=${fileType || 'goc'}`;
+      downloadBtn.download = fileName || 'van_ban';
+
+      loading.style.display = 'flex';
+      iframe.src = `/api/van-ban-di/${docId}/preview?type=${fileType || 'goc'}`;
+      modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function onPreviewLoaded() {
+      const loading = document.getElementById('previewLoading');
+      if (loading) loading.style.display = 'none';
+    }
+
+    function closePreviewModal() {
+      const modal = document.getElementById('previewModal');
+      const iframe = document.getElementById('previewIframe');
+      if (modal) modal.style.display = 'none';
+      if (iframe) iframe.src = '';
+      document.body.style.overflow = '';
+    }
+
+    window.openPreviewModal = openPreviewModal;
+    window.closePreviewModal = closePreviewModal;
+    window.onPreviewLoaded = onPreviewLoaded;
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closePreviewModal();
+    });
+
     document.addEventListener('DOMContentLoaded', async () => {
       const user = await window.AuthGuard.check();
       if (!user) return;
 
       const urlParams = new URLSearchParams(window.location.search);
-      const docId = urlParams.get('id') || 101;
-
-      try {
-        const doc = await window.vanBanDiService.getById(docId);
-        document.getElementById('docTitle').textContent = `Văn bản: ${doc.so_ky_hieu}`;
-        document.getElementById('docSubTitle').textContent = `Loại văn bản: ${doc.loai_van_ban}`;
-        document.getElementById('docTrichYeu').textContent = doc.trich_yeu;
-        document.getElementById('docDonVi').textContent = doc.don_vi_soan_thao;
-        document.getElementById('docNguoiSoan').textContent = doc.nguoi_soan_thao;
-        document.getElementById('docLanhDao').textContent = doc.lanh_dao_ky;
-        document.getElementById('docLoai').textContent = doc.loai_van_ban;
-        document.getElementById('docNgaySoan').textContent = doc.ngay_soan;
-        document.getElementById('docNgayBanHanh').textContent = doc.ngay_ban_hanh || 'Chưa ban hành chính thức';
-        document.getElementById('docNoiNhan').textContent = doc.noi_nhan || 'Các cơ quan liên quan';
-
-        if (doc.ly_do_chinh_sua) {
-          document.getElementById('docLyDoChinhSua').textContent = doc.ly_do_chinh_sua;
-          document.getElementById('correctionBox').style.display = 'block';
-        }
-
-        const attachContainer = document.getElementById('attachmentsList');
-        if (doc.tep_dinh_kem && doc.tep_dinh_kem.length) {
-          attachContainer.innerHTML = doc.tep_dinh_kem.map(f => `
-            <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px; background-color: #f1f5f9; border-radius: 6px;">
-              <div>
-                <b style="font-size: 13px;">📄 ${f.ten_tep}</b>
-                <div style="font-size: 11px; color: #64748b;">${f.dung_luong}</div>
-              </div>
-              <button class="btn btn-outline-primary btn-sm" onclick="Toast.info('Tải xuống tệp văn bản đi mô phỏng.');">
-                Tải về
-              </button>
-            </div>
-          `).join('');
-        }
-      } catch (err) {
-        window.Toast.error(err.message);
+      const docId = urlParams.get('id');
+      if (!docId) {
+        window.location.replace('danh-sach.html');
+        return;
       }
+
+      const STATUS_LABELS = {
+        'CHO_VAN_THU_KIEM_TRA': '<span class="badge badge-warning">Chờ Văn thư kiểm tra</span>',
+        'VAN_THU_TRA_LAI': '<span class="badge badge-danger">Văn thư trả lại</span>',
+        'CHO_LANH_DAO_KY': '<span class="badge badge-primary">Chờ Lãnh đạo ký</span>',
+        'CHO_LANH_DAO_DUYET': '<span class="badge badge-primary">Chờ Lãnh đạo ký</span>',
+        'LANH_DAO_TRA_LAI': '<span class="badge badge-danger">Lãnh đạo trả lại</span>',
+        'DA_KY_CHO_BAN_HANH': '<span class="badge badge-info">Đã ký (Chờ ban hành)</span>',
+        'DA_DUYET': '<span class="badge badge-info">Đã ký (Chờ ban hành)</span>',
+        'DA_BAN_HANH': '<span class="badge badge-success">Đã ban hành chính thức</span>',
+        'YEU_CAU_CHINH_SUA': '<span class="badge badge-danger">Yêu cầu sửa đổi</span>'
+      };
+
+      async function loadDetail() {
+        try {
+          const doc = await window.vanBanDiService.getById(docId);
+          document.getElementById('docTitle').textContent = `Văn bản: ${doc.so_ky_hieu}`;
+          document.getElementById('docSubTitle').textContent = `Mã văn bản #${doc.id} | Ngày tạo: ${doc.ngay_tao || doc.ngay_soan}`;
+          document.getElementById('docTrichYeu').textContent = doc.trich_yeu;
+          document.getElementById('docDonVi').textContent = doc.don_vi_soan_thao;
+          document.getElementById('docNguoiSoan').textContent = `${doc.nguoi_soan_thao} ${doc.nguoi_soan_email ? `(${doc.nguoi_soan_email})` : ''}`;
+          document.getElementById('docLanhDao').textContent = doc.lanh_dao_ky || 'Lãnh đạo Sở';
+          document.getElementById('docLoai').textContent = doc.loai_van_ban;
+          document.getElementById('docDoKhan').textContent = doc.do_khan || 'Bình thường';
+          document.getElementById('docNgaySoan').textContent = doc.ngay_soan || doc.ngay_tao || '';
+          document.getElementById('docNgayBanHanh').textContent = doc.ngay_ban_hanh || 'Chưa ban hành chính thức';
+          document.getElementById('docVanThu').textContent = doc.van_thu_ten || 'Văn phòng Sở';
+          document.getElementById('docNoiNhan').textContent = doc.noi_nhan || 'Các cơ quan liên quan';
+          document.getElementById('docStatusBadge').innerHTML = STATUS_LABELS[doc.trang_thai] || doc.trang_thai;
+
+          if (doc.ly_do_chinh_sua) {
+            document.getElementById('docLyDoChinhSua').textContent = doc.ly_do_chinh_sua;
+            document.getElementById('correctionBox').style.display = 'block';
+          } else {
+            document.getElementById('correctionBox').style.display = 'none';
+          }
+
+          // Hiển thị danh sách tệp đính kèm
+          const attachContainer = document.getElementById('attachmentsList');
+          if (doc.tep_dinh_kem && doc.tep_dinh_kem.length) {
+            attachContainer.innerHTML = doc.tep_dinh_kem.map(f => `
+              <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; background-color: #f1f5f9; border-radius: 6px; flex-wrap: wrap; gap: 8px;">
+                <div>
+                  <b style="font-size: 13.5px;">📄 ${f.ten_tep}</b>
+                  <div style="font-size: 11.5px; color: #64748b;">${f.dung_luong} | ${f.loai === 'da_ky' ? '<b style="color: #10b981;">✓ Bản có chữ ký số</b>' : 'Bản dự thảo'}</div>
+                </div>
+                <div class="d-flex gap-2">
+                  <button type="button" class="btn btn-primary btn-sm" onclick="openPreviewModal(${docId}, '${f.loai}', '${f.ten_tep.replace(/'/g, "\\'")}', '${(doc.trich_yeu || '').replace(/'/g, "\\'")}', '${doc.so_ky_hieu || ''}')" title="Xem trước tài liệu trực tiếp">
+                    👁 Xem trước
+                  </button>
+                  <a href="${f.download_url || `/api/van-ban-di/${docId}/download?type=${f.loai}`}" target="_blank" class="btn btn-outline-secondary btn-sm" download="${f.ten_tep}" title="Tải tệp về máy tính">
+                    📥 Tải về
+                  </a>
+                </div>
+              </div>
+            `).join('');
+          }
+
+          // Hiển thị lịch sử
+          const histContainer = document.getElementById('historyTimeline');
+          if (doc.lich_su && doc.lich_su.length) {
+            histContainer.innerHTML = doc.lich_su.map(h => `
+              <div style="border-left: 2px solid #0284c7; padding-left: 10px; margin-bottom: 6px;">
+                <div><b>${h.thoi_gian}</b> - <span class="badge badge-info">${h.hanh_dong}</span></div>
+                <div style="color: #334155;">${h.noi_dung || 'Thực hiện tác vụ'}</div>
+              </div>
+            `).join('');
+          } else {
+            histContainer.innerHTML = '<span class="text-muted">Chưa có lịch sử xử lý.</span>';
+          }
+
+          // Thiết lập Action Control Panel
+          setupActionPanel(user, doc);
+
+        } catch (err) {
+          window.Toast.error(err.message);
+        }
+      }
+
+      function setupActionPanel(user, doc) {
+        const panel = document.getElementById('actionControlPanel');
+        const promptText = document.getElementById('actionPromptText');
+        const buttonsContainer = document.getElementById('actionButtonsContainer');
+        panel.style.display = 'none';
+        buttonsContainer.innerHTML = '';
+
+        if (user.vai_tro === 'VAN_THU' && doc.trang_thai === 'CHO_VAN_THU_KIEM_TRA') {
+          panel.style.display = 'block';
+          promptText.textContent = 'Dự thảo mới do Chuyên viên trình. Văn thư kiểm tra thể thức và quyết định xử lý:';
+          buttonsContainer.innerHTML = `
+            <button class="btn btn-success btn-sm" id="btnForwardLeader">
+              📤 Trình Lãnh đạo ký
+            </button>
+            <button class="btn btn-danger btn-sm" id="btnRejectClerk">
+              ↩ Trả lại Chuyên viên
+            </button>
+          `;
+
+          document.getElementById('btnForwardLeader').onclick = async () => {
+            const note = prompt('Nhập ý kiến / ghi chú trình Lãnh đạo ký:', 'Văn thư đã kiểm tra thể thức đạt yêu cầu.');
+            if (note !== null) {
+              await window.api.post(`/api/van-ban-di/${doc.id}/trinh-lanh-dao`, { ghi_chu: note });
+              window.Toast.success('Đã chuyển trình Lãnh đạo ký số thành công!');
+              loadDetail();
+            }
+          };
+
+          document.getElementById('btnRejectClerk').onclick = async () => {
+            const reason = prompt('Nhập lý do hoàn trả cho Chuyên viên làm lại:');
+            if (reason && reason.trim()) {
+              await window.api.post(`/api/van-ban-di/${doc.id}/van-thu-tra-lai`, { ly_do: reason.trim() });
+              window.Toast.info('Đã trả lại văn bản cho Chuyên viên!');
+              loadDetail();
+            }
+          };
+
+        } else if (user.vai_tro === 'LANH_DAO' && (doc.trang_thai === 'CHO_LANH_DAO_KY' || doc.trang_thai === 'CHO_LANH_DAO_DUYET')) {
+          panel.style.display = 'block';
+          promptText.textContent = 'Dự thảo đã được Văn thư kiểm tra. Lãnh đạo xem xét ký số điện tử hoặc hoàn trả:';
+          buttonsContainer.innerHTML = `
+            <button class="btn btn-success btn-sm" id="btnSignDoc">
+              ✍ Ký số điện tử & Phê duyệt
+            </button>
+            <button class="btn btn-danger btn-sm" id="btnLeaderReject">
+              ✕ Yêu cầu chỉnh sửa
+            </button>
+          `;
+
+          document.getElementById('btnSignDoc').onclick = async () => {
+            if (confirm('Đồng chí đồng ý gán chữ ký số điện tử phê duyệt văn bản này?')) {
+              await window.api.post(`/api/van-ban-di/${doc.id}/ky-so`, {
+                y_kien: 'Đồng ý ban hành.',
+                is_percentage: true,
+                page: 1,
+                x: 60.0,
+                y: 75.0
+              });
+              window.Toast.success('Đã ký số điện tử thành công! Chuyển văn bản về Văn thư để cấp số ban hành.');
+              loadDetail();
+            }
+          };
+
+          document.getElementById('btnLeaderReject').onclick = async () => {
+            const reason = prompt('Nhập ý kiến chỉ đạo yêu cầu chỉnh sửa:');
+            if (reason && reason.trim()) {
+              await window.api.post(`/api/van-ban-di/${doc.id}/tu-choi`, { ly_do: reason.trim() });
+              window.Toast.info('Đã hoàn trả yêu cầu chỉnh sửa!');
+              loadDetail();
+            }
+          };
+
+        } else if (user.vai_tro === 'VAN_THU' && (doc.trang_thai === 'DA_KY_CHO_BAN_HANH' || doc.trang_thai === 'DA_DUYET')) {
+          panel.style.display = 'block';
+          promptText.textContent = 'Lãnh đạo đã ký số điện tử hoàn tất. Văn thư vào sổ lấy số và phát hành chính thức:';
+          buttonsContainer.innerHTML = `
+            <button class="btn btn-success btn-sm" id="btnPublishDoc">
+              📑 Cấp số hiệu & Ban hành chính thức
+            </button>
+          `;
+
+          document.getElementById('btnPublishDoc').onclick = async () => {
+            const defaultSo = `1225/SGDĐT-${doc.loai_van_ban === 'Kế hoạch' ? 'KH' : 'VP'}`;
+            const num = prompt('Nhập số ký hiệu chính thức vào sổ văn bản đi:', defaultSo);
+            if (num && num.trim()) {
+              await window.api.post(`/api/van-ban-di/${doc.id}/ban-hanh`, {
+                so_luu_so: num.trim(),
+                ngay_ban_hanh: new Date().toISOString().split('T')[0]
+              });
+              window.Toast.success(`Đã ban hành văn bản chính thức với số: ${num}!`);
+              loadDetail();
+            }
+          };
+
+        } else if (doc.trang_thai === 'DA_BAN_HANH') {
+          panel.style.display = 'block';
+          promptText.innerHTML = `<span style="color: #10b981;">✓ Văn bản đã được ban hành chính thức. Tất cả cán bộ có thể tải tệp có chữ ký số điện tử bên dưới.</span>`;
+          if (doc.co_file_da_ky) {
+            buttonsContainer.innerHTML = `
+              <a href="/api/van-ban-di/${doc.id}/download?type=da_ky" target="_blank" class="btn btn-success btn-sm">
+                📥 Tải văn bản đã ký số (PDF)
+              </a>
+            `;
+          }
+        }
+      }
+
+      loadDetail();
     });
   </script>
 </body>

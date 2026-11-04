@@ -1,6 +1,6 @@
 /**
  * AUTH-GUARD.JS - BẢO VỆ ĐỊNH TUYẾN & PHÂN QUYỀN TRANG PHÍA FRONTEND
- * Kiểm tra session qua API /api/auth/toi, chặn truy cập trái phép và điều hướng.
+ * Tự động kiểm tra session, kiểm tra ma trận phân quyền hệ thống và dựng giao diện.
  */
 
 (function (window) {
@@ -11,6 +11,42 @@
     'LANH_DAO': 'Lãnh đạo Sở',
     'CHUYEN_VIEN': 'Chuyên viên'
   };
+
+  /**
+   * MA TRẬN PHÂN QUYỀN TRANG (PAGE-LEVEL RBAC)
+   * Tự động áp dụng cho mọi trang trong toàn hệ thống mà không phụ thuộc vào tham số truyền vào.
+   */
+  const SYSTEM_ROUTE_PERMISSIONS = [
+    // 1. Quản trị hệ thống: Chỉ Văn thư
+    { pattern: '/pages/admin/', roles: ['VAN_THU'] },
+
+    // 2. Tiếp nhận văn bản đến ngoài Sở (Vào sổ văn bản đến): Chỉ Văn thư
+    { pattern: '/pages/van-ban-den/them.html', roles: ['VAN_THU'] },
+
+    // 3. Phân công xử lý văn bản đến: Chỉ Lãnh đạo Sở
+    { pattern: '/pages/van-ban-den/phe-duyet-phan-cong.html', roles: ['LANH_DAO'] },
+
+    // 4. Soạn thảo dự thảo văn bản đi: Chuyên viên và Văn thư
+    { pattern: '/pages/van-ban-di/soan-thao.html', roles: ['CHUYEN_VIEN', 'VAN_THU'] },
+
+    // 5. Tiếp nhận & Kiểm tra dự thảo từ Chuyên viên: Chỉ Văn thư
+    { pattern: '/pages/van-ban-di/kiem-tra.html', roles: ['VAN_THU'] },
+
+    // 6. Phê duyệt & Ký số văn bản đi: Chỉ Lãnh đạo Sở
+    { pattern: '/pages/van-ban-di/phe-duyet.html', roles: ['LANH_DAO'] },
+
+    // 7. Cấp số & Ban hành văn bản đi: Chỉ Văn thư
+    { pattern: '/pages/van-ban-di/ban-hanh.html', roles: ['VAN_THU'] },
+
+    // 8. Giao việc mới: Chỉ dành cho Văn thư (Admin)
+    { pattern: '/pages/cong-viec/giao-viec.html', roles: ['VAN_THU'] },
+
+    // 9. Nghiệm thu kết quả công việc: Chỉ Văn thư
+    { pattern: '/pages/cong-viec/phe-duyet-ket-qua.html', roles: ['VAN_THU'] },
+
+    // 10. Báo cáo xử lý công việc: Chỉ Chuyên viên
+    { pattern: '/pages/cong-viec/xu-ly.html', roles: ['CHUYEN_VIEN'] }
+  ];
 
   /**
    * Tính toán đường dẫn gốc tới thư mục frontend từ trang hiện tại.
@@ -60,18 +96,23 @@
         }
       }
 
-      // 3. Kiểm tra vai trò nếu trang yêu cầu vai trò cụ thể (VD: trang /pages/admin/...)
+      // 3. Tự động kiểm tra ma trận phân quyền hệ thống (System Route Permissions)
+      for (const rule of SYSTEM_ROUTE_PERMISSIONS) {
+        if (currentPath.includes(rule.pattern)) {
+          if (!rule.roles.includes(currentUser.vai_tro)) {
+            showForbiddenPage(rule.roles);
+            return null;
+          }
+          break;
+        }
+      }
+
+      // 4. Kiểm tra tham số requiredRoles nếu trang gọi trực tiếp
       if (options.requiredRoles && Array.isArray(options.requiredRoles)) {
         if (!options.requiredRoles.includes(currentUser.vai_tro)) {
           showForbiddenPage(options.requiredRoles);
           return null;
         }
-      }
-
-      // Tự động bảo vệ tất cả trang trong thư mục /pages/admin/ chỉ cho VAN_THU
-      if (currentPath.includes('/pages/admin/') && currentUser.vai_tro !== 'VAN_THU') {
-        showForbiddenPage(['VAN_THU']);
-        return null;
       }
 
       // Cập nhật thông tin người dùng lên thanh topbar
@@ -106,7 +147,7 @@
     nameEls.forEach(el => { el.textContent = user.ho_va_ten; });
 
     // Vai trò
-    const roleEls = document.querySelectorAll('.user-role-badge, #currentUserRole');
+    const roleEls = document.querySelectorAll('.user-role-badge, #currentUserRole, #currentUserRoleTop');
     roleEls.forEach(el => { el.textContent = ROLE_NAMES[user.vai_tro] || user.vai_tro; });
 
     // Avatar chữ cái đầu
@@ -118,6 +159,9 @@
         : user.ho_va_ten.substring(0, 2).toUpperCase();
       avatarEls.forEach(el => { el.textContent = initials; });
     }
+
+    // Khởi chạy cơ chế lắng nghe thông báo thời gian thực mỗi 2 giây
+    setupRealtimeNotifications(user);
 
     // Đăng ký sự kiện nút Đăng xuất
     const logoutBtns = document.querySelectorAll('#logoutBtn, .btn-logout');
@@ -137,6 +181,80 @@
   }
 
   /**
+   * Khởi chạy cơ chế cập nhật thông báo thời gian thực mỗi 2 giây (2000 ms).
+   * Hiển thị số lượng thông báo chưa đọc dạng số tròn màu đỏ trên icon chuông topbar.
+   */
+  function setupRealtimeNotifications(user) {
+    if (!user) return;
+
+    // Tìm nút chuông thông báo trên topbar
+    const bellBtn = document.querySelector('.topbar-icon-btn[title*="Thông báo"]') ||
+                    document.querySelector('.topbar-right a[href*="thong-bao.html"]') ||
+                    document.querySelector('.topbar-right .topbar-icon-btn');
+    if (!bellBtn) return;
+
+    // Đảm bảo nút chuông có position: relative để badge định vị chuẩn xác
+    bellBtn.style.position = 'relative';
+
+    // Đảm bảo có thẻ badge hiển thị số thông báo
+    let badge = bellBtn.querySelector('.topbar-icon-badge');
+    if (!badge) {
+      badge = document.createElement('span');
+      badge.className = 'topbar-icon-badge';
+      badge.style.display = 'none';
+      bellBtn.appendChild(badge);
+    }
+
+    // Thiết lập phong cách trực quan cho badge số
+    badge.style.position = 'absolute';
+    badge.style.top = '0px';
+    badge.style.right = '-2px';
+    badge.style.minWidth = '18px';
+    badge.style.height = '18px';
+    badge.style.padding = '0 4px';
+    badge.style.backgroundColor = '#ef4444';
+    badge.style.color = '#ffffff';
+    badge.style.borderRadius = '9px';
+    badge.style.border = '2px solid #ffffff';
+    badge.style.fontSize = '10.5px';
+    badge.style.fontWeight = '700';
+    badge.style.lineHeight = '1';
+    badge.style.boxShadow = '0 2px 4px rgba(239, 68, 68, 0.4)';
+    badge.style.alignItems = 'center';
+    badge.style.justifyContent = 'center';
+
+    // Hàm gọi API lấy số thông báo chưa đọc thời gian thực
+    async function loadRealtimeNotifications() {
+      try {
+        if (!window.api || typeof window.api.get !== 'function') return;
+        const res = await window.api.get('/api/thong-bao/dem-chua-doc');
+        if (res && res.thanh_cong) {
+          const unreadCount = res.chua_doc || 0;
+          if (unreadCount > 0) {
+            badge.style.display = 'flex';
+            badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+            badge.setAttribute('title', `${unreadCount} thông báo chưa đọc`);
+          } else {
+            badge.style.display = 'none';
+            badge.textContent = '0';
+          }
+        }
+      } catch (e) {
+        // Bỏ qua lỗi kết nối tạm thời
+      }
+    }
+
+    // Tải ngay lập tức khi vào trang
+    loadRealtimeNotifications();
+
+    // Thiết lập tự động quét mỗi 2 giây (2000 ms) theo đúng yêu cầu
+    if (window._notifRealtimeInterval) {
+      clearInterval(window._notifRealtimeInterval);
+    }
+    window._notifRealtimeInterval = setInterval(loadRealtimeNotifications, 2000);
+  }
+
+  /**
    * Hiển thị giao diện 403 Forbidden nếu không đủ quyền.
    */
   function showForbiddenPage(requiredRoles) {
@@ -145,12 +263,12 @@
       <div style="text-align: center; padding: 60px 20px;">
         <div style="font-size: 64px; color: #ef4444; font-weight: bold;">403</div>
         <h2 style="font-size: 22px; color: #003366; margin: 12px 0;">TRUY CẬP BỊ TỪ CHỐI (FORBIDDEN)</h2>
-        <p style="color: #64748b; max-width: 500px; margin: 0 auto 24px;">
-          Tài khoản của bạn (${ROLE_NAMES[currentUser?.vai_tro] || 'Không xác định'}) không có quyền truy cập trang quản trị này.
-          Chức năng này chỉ dành riêng cho: <b>${requiredRoles.map(r => ROLE_NAMES[r] || r).join(', ')}</b>.
+        <p style="color: #64748b; max-width: 550px; margin: 0 auto 24px; font-size: 14px;">
+          Tài khoản của bạn (<b>${currentUser?.ho_va_ten || ''}</b> - <span class="badge badge-info">${ROLE_NAMES[currentUser?.vai_tro] || 'Chưa xác định'}</span>) không có quyền truy cập trang nghiệp vụ này.
+          <br>Chức năng này chỉ dành riêng cho: <b>${requiredRoles.map(r => ROLE_NAMES[r] || r).join(', ')}</b>.
         </p>
         <a href="${getRootPath()}pages/dashboard.html" class="btn btn-primary">
-          Quay lại Bảng điều khiển
+          &larr; Quay lại Bảng điều khiển
         </a>
       </div>
     `;
@@ -159,6 +277,7 @@
   window.AuthGuard = {
     check: checkAuth,
     getUser: () => currentUser,
-    getRootPath: getRootPath
+    getRootPath: getRootPath,
+    getRoleName: (role) => ROLE_NAMES[role] || role
   };
 })(window);

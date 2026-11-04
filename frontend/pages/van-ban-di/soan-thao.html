@@ -52,13 +52,7 @@
       </header>
 
       <main class="content-wrapper">
-        <div class="mock-data-banner">
-          <div>
-            <span class="banner-icon">📌</span>
-            <b>DỮ LIỆU MẪU (MOCK DATA)</b> - Sau khi lưu, dự thảo sẽ vào trạng thái "Chờ Lãnh đạo duyệt" trên mảng mock.
-          </div>
-          <span class="badge badge-info">Mock Active</span>
-        </div>
+
 
         <div class="page-header">
           <div>
@@ -74,8 +68,29 @@
               <h2 class="card-title">Phiếu trình dự thảo văn bản đi</h2>
             </div>
             <div class="card-body">
+              <div id="linkedTaskBanner" style="display: none; background: #f0fdf4; border: 1px solid #86efac; border-left: 4px solid #22c55e; border-radius: 8px; padding: 14px 18px; margin-bottom: 20px;">
+                <div style="font-weight: 700; color: #15803d; font-size: 14px;">
+                  🎯 VĂN BẢN XỬ LÝ NHIỆM VỤ ĐƯỢC GIAO: <span id="linkedTaskName">...</span>
+                </div>
+                <div style="font-size: 12.5px; color: #166534; margin-top: 4px;">
+                  Khi gửi dự thảo này, hệ thống sẽ tự động liên kết ID công việc, cập nhật tiến độ nhiệm vụ sang <b>Đang thực hiện (50%)</b> và tự động nghiệm thu khi ban hành văn bản chính thức.
+                </div>
+              </div>
               <form id="draftForm" novalidate>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                  <div class="form-group" style="grid-column: span 2;">
+                    <label class="form-label" style="display: flex; align-items: center; justify-content: space-between;">
+                      <span style="font-weight: 600; color: #003366;">🎯 Nhiệm vụ / Công việc điều hành cần xử lý (liên kết tiến độ)</span>
+                      <span class="text-muted" style="font-size: 11.5px; font-weight: normal;">(Tùy chọn liên kết)</span>
+                    </label>
+                    <select id="select_cong_viec" class="form-select" style="font-weight: 500;">
+                      <option value="">-- Văn bản độc lập (Không gắn với nhiệm vụ cụ thể) --</option>
+                    </select>
+                    <div class="form-hint" style="color: #64748b; font-size: 11.5px; margin-top: 4px;">
+                      💡 Chọn nhiệm vụ được giao để hệ thống tự động liên kết ID và cập nhật tiến độ công việc sang <b>"Đang thực hiện (50%)"</b> khi gửi dự thảo.
+                    </div>
+                  </div>
+
                   <div class="form-group" style="grid-column: span 2;">
                     <label class="form-label required">Trích yếu nội dung văn bản</label>
                     <textarea id="trich_yeu" class="form-control" rows="3" placeholder="Tóm tắt ngắn gọn nội dung văn bản đi..." required></textarea>
@@ -160,6 +175,66 @@
 
       document.getElementById('don_vi_soan_thao').value = user.phong_ban || 'Phòng Giáo dục Trung học';
 
+      // 1. Tải danh sách công việc được giao vào Combobox
+      const selectTask = document.getElementById('select_cong_viec');
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlTaskId = urlParams.get('cong_viec_id');
+      const urlTaskName = urlParams.get('ten_cong_viec');
+
+      try {
+        const taskRes = await window.api.get('/api/cong-viec');
+        if (taskRes && taskRes.du_lieu) {
+          taskRes.du_lieu.forEach(t => {
+            const opt = document.createElement('option');
+            opt.value = t.id;
+            opt.textContent = `[#${t.id}] ${t.ten_cong_viec} (Tiến độ: ${t.tien_do}% - Hạn: ${t.han_hoan_thanh})`;
+            opt.dataset.taskName = t.ten_cong_viec;
+            opt.dataset.taskContent = t.noi_dung || '';
+            selectTask.appendChild(opt);
+          });
+        }
+      } catch (err) {
+        console.warn('Không thể nạp danh sách công việc:', err);
+      }
+
+      // Xử lý khi chọn công việc từ Combobox
+      function handleTaskSelection() {
+        const val = selectTask.value;
+        const banner = document.getElementById('linkedTaskBanner');
+        const bannerName = document.getElementById('linkedTaskName');
+        const trichYeuEl = document.getElementById('trich_yeu');
+        const noiNhanEl = document.getElementById('noi_nhan');
+
+        if (val) {
+          const opt = selectTask.options[selectTask.selectedIndex];
+          const taskName = opt.dataset.taskName || urlTaskName || opt.textContent;
+          banner.style.display = 'block';
+          bannerName.textContent = taskName;
+
+          if (!trichYeuEl.value || trichYeuEl.dataset.autofilled === '1') {
+            trichYeuEl.value = `V/v triển khai thực hiện nhiệm vụ: ${taskName}`;
+            trichYeuEl.dataset.autofilled = '1';
+          }
+          if (!noiNhanEl.value) {
+            noiNhanEl.value = 'Ban Giám đốc Sở, Văn phòng Sở';
+          }
+        } else {
+          banner.style.display = 'none';
+          if (trichYeuEl.dataset.autofilled === '1') {
+            trichYeuEl.value = '';
+            delete trichYeuEl.dataset.autofilled;
+          }
+        }
+      }
+
+      selectTask.addEventListener('change', handleTaskSelection);
+
+      // Nếu chuyển từ trang công việc sang có sẵn ID trong URL -> tự chọn trong combobox
+      if (urlTaskId) {
+        selectTask.value = urlTaskId;
+        handleTaskSelection();
+      }
+
       const form = document.getElementById('draftForm');
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -175,21 +250,41 @@
           return;
         }
 
-        await window.vanBanDiService.create({
-          trich_yeu,
-          loai_van_ban,
-          lanh_dao_ky,
-          don_vi_soan_thao,
-          nguoi_soan_thao: user.ho_va_ten,
-          noi_nhan,
-          do_khan: document.getElementById('do_khan').value,
-          ten_tep: document.getElementById('tep_dinh_kem').files[0]?.name || 'DuThaoVanBan.docx'
-        });
+        const fileInput = document.getElementById('tep_dinh_kem');
+        const file = fileInput.files[0];
 
-        window.Toast.success('Đã gửi trình dự thảo văn bản tới Lãnh đạo Sở thành công!');
-        setTimeout(() => {
-          window.location.replace('danh-sach.html');
-        }, 1000);
+        const formData = new FormData();
+        formData.append('trich_yeu', trich_yeu);
+        formData.append('loai_van_ban', loai_van_ban);
+        formData.append('lanh_dao_ky', lanh_dao_ky);
+        formData.append('don_vi_soan_thao', don_vi_soan_thao);
+        formData.append('nguoi_soan_thao', user.ho_va_ten);
+        formData.append('noi_nhan', noi_nhan);
+        formData.append('do_khan', document.getElementById('do_khan').value);
+
+        const selectedTaskId = selectTask.value;
+        if (selectedTaskId) {
+          formData.append('cong_viec_id', selectedTaskId);
+        }
+
+        if (file) {
+          formData.append('tep_dinh_kem', file);
+          formData.append('ten_tep', file.name);
+        } else {
+          formData.append('ten_tep', 'DuThaoVanBan.docx');
+        }
+
+        try {
+          await window.vanBanDiService.create(formData);
+          window.Toast.success(selectedTaskId 
+            ? 'Đã gửi trình dự thảo và liên kết cập nhật tiến độ công việc thành công!' 
+            : 'Đã gửi trình dự thảo văn bản tới Văn thư kiểm tra thành công!');
+          setTimeout(() => {
+            window.location.replace('danh-sach.html');
+          }, 1000);
+        } catch (err) {
+          window.Toast.error(err.message || 'Lỗi khi gửi dự thảo văn bản.');
+        }
       });
     });
   </script>

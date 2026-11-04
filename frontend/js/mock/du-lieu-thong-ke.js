@@ -1,9 +1,10 @@
 /**
- * DU-LIEU-THONG-KE.JS - DỮ LIỆU MẪU BÁO CÁO THỐNG KÊ BIỂU ĐỒ (CHART.JS)
+ * DU-LIEU-THONG-KE.JS - DỮ LIỆU BÁO CÁO THỐNG KÊ BIỂU ĐỒ (CHART.JS)
+ * Tích hợp dữ liệu công việc thực tế từ /api/cong-viec/thong-ke
  */
 
 (function (window) {
-  const MOCK_THONG_KE = {
+  const DEFAULT_THONG_KE = {
     van_ban_theo_thang: {
       labels: ['Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11'],
       vb_den: [45, 52, 38, 70, 85, 92, 24],
@@ -14,8 +15,8 @@
       data: [42, 18, 15, 10, 8, 7]
     },
     tinh_hinh_xu_ly_cong_viec: {
-      labels: ['Đúng hạn (82%)', 'Đang xử lý (12%)', 'Quá hạn (6%)'],
-      data: [82, 12, 6],
+      labels: ['Đúng hạn (75%)', 'Đang xử lý (15%)', 'Quá hạn (10%)'],
+      data: [75, 15, 10],
       colors: ['#10b981', '#0284c7', '#ef4444']
     },
     van_ban_theo_phong_ban: {
@@ -25,9 +26,33 @@
   };
 
   const thongKeService = {
-    // TODO(nhóm): thay bằng api.get('/api/thong-ke')
     getOverview: async function () {
-      return JSON.parse(JSON.stringify(MOCK_THONG_KE));
+      const data = JSON.parse(JSON.stringify(DEFAULT_THONG_KE));
+      try {
+        if (window.api) {
+          const cvRes = await window.api.get('/api/cong-viec/thong-ke');
+          if (cvRes && cvRes.du_lieu) {
+            const st = cvRes.du_lieu.theo_trang_thai;
+            const tong = cvRes.du_lieu.tong_so || 1;
+            const pctDone = Math.round((st.HOAN_THANH / tong) * 100);
+            const pctDoing = Math.round(((st.DANG_THUC_HIEN + st.CHO_DANH_GIA + st.CHUA_THUC_HIEN) / tong) * 100);
+            const pctOver = Math.round((st.QUA_HAN / tong) * 100);
+
+            data.tinh_hinh_xu_ly_cong_viec = {
+              labels: [
+                `Đúng hạn (${pctDone}%)`,
+                `Đang xử lý (${pctDoing}%)`,
+                `Quá hạn (${pctOver}%)`
+              ],
+              data: [st.HOAN_THANH, st.DANG_THUC_HIEN + st.CHO_DANH_GIA + st.CHUA_THUC_HIEN, st.QUA_HAN],
+              colors: ['#10b981', '#0284c7', '#ef4444']
+            };
+          }
+        }
+      } catch (err) {
+        console.warn('Không thể nạp thống kê công việc thời gian thực, dùng dữ liệu mặc định.');
+      }
+      return data;
     }
   };
 

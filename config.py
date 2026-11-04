@@ -28,3 +28,8 @@ class Config:
     SESSION_COOKIE_SAMESITE = 'Lax'
     SESSION_COOKIE_SECURE = False  # Đổi True nếu chạy trên HTTPS production
     PERMANENT_SESSION_LIFETIME = 86400  # 24 giờ
+
+    # Cấu hình lưu trữ tài liệu tải lên
+    UPLOAD_FOLDER = str((BASE_DIR / 'uploads' / 'documents').resolve())
+    MAX_CONTENT_LENGTH = 50 * 1024 * 1024  # 50 MB
+    ALLOWED_EXTENSIONS = {'pdf', 'doc', 'docx'}

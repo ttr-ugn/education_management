@@ -38,13 +38,19 @@
           <span class="system-header-title">HỆ THỐNG QUẢN LÝ VĂN BẢN VÀ ĐIỀU HÀNH NỘI BỘ</span>
         </div>
         <div class="topbar-right">
-          <div class="user-profile-widget">
+          <a href="../thong-bao.html" class="topbar-icon-btn" title="Thông báo">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+          </a>
+          <a href="../ho-so-ca-nhan.html" class="user-profile-widget" style="text-decoration: none;">
             <div class="user-avatar" id="currentUserAvatar">CB</div>
             <div class="user-details">
-              <span class="user-name" id="currentUserName">...</span>
-              <span class="user-role-badge">Cán bộ</span>
+              <span class="user-name" id="currentUserName">Đang nạp...</span>
+              <span class="user-role-badge" id="currentUserRoleTop">Cán bộ</span>
             </div>
-          </div>
+          </a>
           <button class="btn btn-outline-primary btn-sm btn-logout" id="logoutBtn" title="Đăng xuất">
             Đăng xuất
           </button>
@@ -52,24 +58,19 @@
       </header>
 
       <main class="content-wrapper">
-        <div class="mock-data-banner">
-          <div>
-            <span class="banner-icon">📌</span>
-            <b>DỮ LIỆU MẪU (MOCK DATA)</b> - Phân hệ Hồ sơ lưu trữ hoạt động qua <code>hoSoService</code>.
-          </div>
-          <span class="badge badge-info">Mock Active</span>
-        </div>
-
         <div class="page-header">
           <div>
             <h1 class="page-title">Danh mục hồ sơ lưu trữ cơ quan</h1>
-            <p class="page-subtitle">Quản lý hồ sơ công việc, tài liệu lưu trữ vĩnh viễn và có thời hạn của Sở GD&ĐT</p>
+            <p class="page-subtitle">Quản lý hồ sơ công việc, tài liệu lưu trữ vĩnh viễn và có thời hạn của Sở GD&ĐT TP. Đà Nẵng</p>
           </div>
-          <a href="them-sua.html" class="btn btn-primary">
-            + Lập hồ sơ mới
-          </a>
+          <div class="d-flex gap-2" id="headerActions">
+            <a href="them-sua.html" class="btn btn-primary" id="btnThemHoSo">
+              + Lập hồ sơ mới
+            </a>
+          </div>
         </div>
 
+        <!-- Thanh tìm kiếm và bộ lọc -->
         <div class="filter-bar">
           <div class="search-box">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -88,9 +89,19 @@
             </select>
           </div>
 
+          <div style="min-width: 150px;">
+            <select id="filterYear" class="form-select">
+              <option value="">-- Năm tài liệu --</option>
+              <option value="2026">Năm 2026</option>
+              <option value="2025">Năm 2025</option>
+              <option value="2024">Năm 2024</option>
+            </select>
+          </div>
+
           <button class="btn btn-secondary" id="reloadBtn">🔄 Làm mới</button>
         </div>
 
+        <!-- Bảng danh sách hồ sơ -->
         <div class="card">
           <div class="card-body p-0">
             <div class="table-responsive">
@@ -105,11 +116,11 @@
                     <th>Thời hạn</th>
                     <th>Số lượng VB</th>
                     <th>Tình trạng</th>
-                    <th style="text-align: center;">Thao tác</th>
+                    <th style="text-align: center; width: 140px;">Thao tác</th>
                   </tr>
                 </thead>
                 <tbody id="hoSoTableBody">
-                  <tr><td colspan="9" class="text-center p-4 text-muted">Đang tải...</td></tr>
+                  <tr><td colspan="9" class="text-center p-4 text-muted">Đang tải danh mục hồ sơ...</td></tr>
                 </tbody>
               </table>
             </div>
@@ -134,9 +145,16 @@
       const user = await window.AuthGuard.check();
       if (!user) return;
 
+      // Nếu là Lãnh đạo -> Ẩn nút tạo hồ sơ (Lãnh đạo chỉ xem)
+      if (user.vai_tro === 'LANH_DAO') {
+        const btnThem = document.getElementById('btnThemHoSo');
+        if (btnThem) btnThem.style.display = 'none';
+      }
+
       const tbody = document.getElementById('hoSoTableBody');
       const searchInput = document.getElementById('searchInput');
       const filterStatus = document.getElementById('filterStatus');
+      const filterYear = document.getElementById('filterYear');
       const reloadBtn = document.getElementById('reloadBtn');
 
       const STATUS_LABELS = {
@@ -146,36 +164,47 @@
       };
 
       async function loadData() {
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center p-4 text-muted">Đang tải dữ liệu hồ sơ...</td></tr>';
         const filters = {
           q: searchInput.value.trim(),
-          tinh_trang: filterStatus.value
+          tinh_trang: filterStatus.value,
+          nam_tai_lieu: filterYear.value
         };
-        const list = await window.hoSoService.getAll(filters);
 
-        if (list.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="9" class="text-center p-4 text-muted">Không tìm thấy hồ sơ nào.</td></tr>';
-          return;
+        try {
+          const list = await window.hoSoService.getAll(filters);
+
+          if (!list || list.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="9" class="text-center p-4 text-muted">Không tìm thấy hồ sơ lưu trữ nào phù hợp.</td></tr>';
+            return;
+          }
+
+          tbody.innerHTML = list.map(item => `
+            <tr>
+              <td><code>${item.ma_ho_so}</code></td>
+              <td style="max-width: 320px;">
+                <b>${item.tieu_de}</b>
+                ${item.mo_ta ? `<div style="font-size: 11.5px; color: #64748b; margin-top: 3px; max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.mo_ta}</div>` : ''}
+              </td>
+              <td><b>${item.don_vi || 'Sở GD&ĐT'}</b></td>
+              <td>${item.nguoi_lap || 'Cán bộ Sở'}</td>
+              <td>${item.nam_tai_lieu || '2026'}</td>
+              <td><span class="badge badge-info">${item.thoi_han_bao_quan || 'Vĩnh viễn'}</span></td>
+              <td><center><b>${item.so_luong_van_ban || 0}</b> VB</center></td>
+              <td>${STATUS_LABELS[item.tinh_trang] || item.tinh_trang}</td>
+              <td style="text-align: center;">
+                <a href="chi-tiet.html?id=${item.id}" class="btn btn-outline-primary btn-sm">Xem chi tiết</a>
+              </td>
+            </tr>
+          `).join('');
+        } catch (err) {
+          tbody.innerHTML = `<tr><td colspan="9" class="text-center p-4 text-danger">Lỗi nạp dữ liệu hồ sơ: ${err.message}</td></tr>`;
         }
-
-        tbody.innerHTML = list.map(item => `
-          <tr>
-            <td><code>${item.ma_ho_so}</code></td>
-            <td style="max-width: 320px;"><b>${item.tieu_de}</b></td>
-            <td>${item.don_vi}</td>
-            <td>${item.nguoi_lap}</td>
-            <td>${item.nam_tai_lieu}</td>
-            <td><span class="badge badge-info">${item.thoi_han_bao_quan}</span></td>
-            <td><center>${item.so_luong_van_ban} VB</center></td>
-            <td>${STATUS_LABELS[item.tinh_trang] || item.tinh_trang}</td>
-            <td style="text-align: center;">
-              <a href="chi-tiet.html?id=${item.id}" class="btn btn-outline-primary btn-sm">Xem chi tiết</a>
-            </td>
-          </tr>
-        `).join('');
       }
 
       searchInput.addEventListener('input', loadData);
       filterStatus.addEventListener('change', loadData);
+      filterYear.addEventListener('change', loadData);
       reloadBtn.addEventListener('click', loadData);
 
       loadData();
