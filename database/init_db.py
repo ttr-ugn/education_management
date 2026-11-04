@@ -15,9 +15,10 @@ if str(BASE_DIR) not in sys.path:
     sys.path.insert(0, str(BASE_DIR))
 
 from config import Config
+from database.seed_mau_van_ban import seed_mau_van_ban
 
 def init_database():
-    """Khởi tạo file CSDL SQLite và nạp bảng nguoi_dung."""
+    """Khởi tạo file CSDL SQLite và nạp bảng nguoi_dung cùng kho mẫu văn bản."""
     db_path = Path(Config.DATABASE_PATH)
     db_path.parent.mkdir(parents=True, exist_ok=True)
     
@@ -82,6 +83,13 @@ def init_database():
         print(f"[INFO] Tài khoản Văn thư '{admin_username}' đã tồn tại sẵn trong CSDL.")
 
     conn.close()
+
+    # Tự động nạp kho mẫu văn bản
+    try:
+        seed_mau_van_ban()
+    except Exception as e:
+        print(f"[CẢNH BÁO] Không thể nạp kho mẫu văn bản: {e}")
+
     return True
 
 if __name__ == '__main__':
