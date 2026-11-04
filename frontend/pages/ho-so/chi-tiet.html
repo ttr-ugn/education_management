@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
@@ -38,13 +38,19 @@
           <span class="system-header-title">HỆ THỐNG QUẢN LÝ VĂN BẢN VÀ ĐIỀU HÀNH NỘI BỘ</span>
         </div>
         <div class="topbar-right">
-          <div class="user-profile-widget">
+          <a href="../thong-bao.html" class="topbar-icon-btn" title="Thông báo">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+          </a>
+          <a href="../ho-so-ca-nhan.html" class="user-profile-widget" style="text-decoration: none;">
             <div class="user-avatar" id="currentUserAvatar">CB</div>
             <div class="user-details">
-              <span class="user-name" id="currentUserName">...</span>
-              <span class="user-role-badge">Cán bộ</span>
+              <span class="user-name" id="currentUserName">Đang nạp...</span>
+              <span class="user-role-badge" id="currentUserRoleTop">Cán bộ</span>
             </div>
-          </div>
+          </a>
           <button class="btn btn-outline-primary btn-sm btn-logout" id="logoutBtn" title="Đăng xuất">
             Đăng xuất
           </button>
@@ -52,12 +58,15 @@
       </header>
 
       <main class="content-wrapper">
-        <div class="mock-data-banner" style="background: rgba(16, 185, 129, 0.1); border-color: #10b981; color: #065f46;">
+        <div class="page-header">
           <div>
-            <span class="banner-icon">📁</span>
-            <b>PHÂN HỆ KHO LƯU TRỮ</b> - Đã kết nối CSDL SQLite & Backend Flask API <code>/api/ho-so</code>.
+            <h1 class="page-title" id="hsTitle">Chi tiết hồ sơ lưu trữ</h1>
+            <p class="page-subtitle" id="hsMa">Mã hồ sơ: Đang nạp...</p>
           </div>
-          <span class="badge badge-success">API Live</span>
+          <div class="d-flex gap-2">
+            <a href="danh-sach.html" class="btn btn-secondary">Quay lại danh mục</a>
+            <button class="btn btn-success" id="btnNopLuuTru">📦 Nộp lưu trữ cơ quan</button>
+          </div>
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 24px;">
@@ -100,7 +109,7 @@
           <div class="card">
             <div class="card-header">
               <h2 class="card-title">Danh sách văn bản tài liệu trong hồ sơ</h2>
-              <button class="btn btn-outline-primary btn-sm" onclick="Toast.info('Thêm văn bản vào hồ sơ (Tính năng mock).');">
+              <button class="btn btn-outline-primary btn-sm" id="btnAddDocToHs" onclick="window.Toast.info('Chọn văn bản đã ban hành để bổ sung vào hồ sơ.');">
                 + Thêm văn bản vào hồ sơ
               </button>
             </div>
@@ -120,23 +129,23 @@
                     <tr>
                       <td>01</td>
                       <td><b>142/BGDĐT-GDTrH</b></td>
-                      <td>25/10/2026</td>
+                      <td>2026-10-25</td>
                       <td>Hướng dẫn tổ chức Kỳ thi tốt nghiệp THPT năm 2026</td>
-                      <td><a href="javascript:void(0)" onclick="Toast.info('Xem tệp');">142_BGDDT.pdf</a></td>
+                      <td><span class="badge badge-light">📄 142_BGDDT.pdf</span></td>
                     </tr>
                     <tr>
                       <td>02</td>
                       <td><b>1205/SGDĐT-VP</b></td>
-                      <td>24/10/2026</td>
+                      <td>2026-10-24</td>
                       <td>Kế hoạch tổ chức Tuần lễ hưởng ứng học tập suốt đời năm 2026</td>
-                      <td><a href="javascript:void(0)" onclick="Toast.info('Xem tệp');">KH_1205.pdf</a></td>
+                      <td><span class="badge badge-light">📄 KH_1205.pdf</span></td>
                     </tr>
                     <tr>
                       <td>03</td>
                       <td><b>88/UBND-VX</b></td>
-                      <td>28/10/2026</td>
+                      <td>2026-10-28</td>
                       <td>Phân bổ kinh phí đầu tư trường chuẩn quốc gia</td>
-                      <td><a href="javascript:void(0)" onclick="Toast.info('Xem tệp');">QD_88.pdf</a></td>
+                      <td><span class="badge badge-light">📄 QD_88.pdf</span></td>
                     </tr>
                   </tbody>
                 </table>
@@ -163,30 +172,57 @@
       const user = await window.AuthGuard.check();
       if (!user) return;
 
+      if (user.vai_tro === 'LANH_DAO') {
+        const btnNop = document.getElementById('btnNopLuuTru');
+        if (btnNop) btnNop.style.display = 'none';
+        const btnAdd = document.getElementById('btnAddDocToHs');
+        if (btnAdd) btnAdd.style.display = 'none';
+      }
+
       const urlParams = new URLSearchParams(window.location.search);
       const hsId = urlParams.get('id') || 1;
 
       try {
         const hs = await window.hoSoService.getById(hsId);
+        if (!hs) {
+          window.Toast.error('Không tìm thấy hồ sơ lưu trữ.');
+          return;
+        }
+
         document.getElementById('hsTitle').textContent = hs.tieu_de;
         document.getElementById('hsMa').textContent = `Mã hồ sơ: ${hs.ma_ho_so}`;
-        document.getElementById('hsDonVi').textContent = hs.don_vi;
-        document.getElementById('hsNguoiLap').textContent = hs.nguoi_lap;
-        document.getElementById('hsNam').textContent = hs.nam_tai_lieu;
-        document.getElementById('hsThoiHan').textContent = hs.thoi_han_bao_quan;
-        document.getElementById('hsStatus').textContent = hs.tinh_trang === 'DA_NOP_LUU_TRU' ? 'Đã nộp lưu trữ' : 'Đang thu thập';
+        document.getElementById('hsDonVi').textContent = hs.don_vi || 'Sở GD&ĐT';
+        document.getElementById('hsNguoiLap').textContent = hs.nguoi_lap || 'Cán bộ';
+        document.getElementById('hsNam').textContent = hs.nam_tai_lieu || '2026';
+        document.getElementById('hsThoiHan').textContent = hs.thoi_han_bao_quan || 'Vĩnh viễn';
+
+        const isNop = (hs.tinh_trang === 'DA_NOP_LUU_TRU');
+        document.getElementById('hsStatus').textContent = isNop ? 'Đã nộp lưu trữ' : 'Đang thu thập';
+        document.getElementById('hsStatus').className = isNop ? 'badge badge-success' : 'badge badge-warning';
         document.getElementById('hsMoTa').textContent = hs.mo_ta || 'Không có ghi chú thêm.';
 
-        document.getElementById('btnNopLuuTru').addEventListener('click', async () => {
-          if (confirm('Đồng chí có chắc chắn muốn đóng hồ sơ và nộp vào Kho lưu trữ cơ quan Sở GD&ĐT?')) {
-            await window.hoSoService.submitToArchive(hsId);
-            window.Toast.success('Đã nộp hồ sơ vào Kho lưu trữ cơ quan thành công!');
-            document.getElementById('hsStatus').textContent = 'Đã nộp lưu trữ';
-            document.getElementById('hsStatus').className = 'badge badge-success';
-          }
-        });
+        const btnNopLuuTru = document.getElementById('btnNopLuuTru');
+        if (isNop && btnNopLuuTru) {
+          btnNopLuuTru.style.display = 'none';
+        }
+
+        if (btnNopLuuTru) {
+          btnNopLuuTru.addEventListener('click', async () => {
+            if (confirm('Đồng chí có chắc chắn muốn đóng hồ sơ và nộp vào Kho lưu trữ cơ quan Sở GD&ĐT?')) {
+              try {
+                await window.hoSoService.submitToArchive(hsId);
+                window.Toast.success('Đã nộp hồ sơ vào Kho lưu trữ cơ quan thành công!');
+                document.getElementById('hsStatus').textContent = 'Đã nộp lưu trữ';
+                document.getElementById('hsStatus').className = 'badge badge-success';
+                btnNopLuuTru.style.display = 'none';
+              } catch (err) {
+                window.Toast.error(err.message || 'Lỗi khi nộp lưu trữ');
+              }
+            }
+          });
+        }
       } catch (err) {
-        window.Toast.error(err.message);
+        window.Toast.error(err.message || 'Lỗi nạp chi tiết hồ sơ');
       }
     });
   </script>
