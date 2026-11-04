@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
@@ -52,66 +52,13 @@
       </header>
 
       <main class="content-wrapper">
-        <div class="mock-data-banner">
+        <div class="mock-data-banner" style="background: rgba(16, 185, 129, 0.1); border-color: #10b981; color: #065f46;">
           <div>
-            <span class="banner-icon">📌</span>
-            <b>DỮ LIỆU MẪU (MOCK DATA)</b> - Tạo hồ sơ mới ghi nhận qua <code>hoSoService</code>.
+            <span class="banner-icon">📁</span>
+            <b>PHÂN HỆ KHO LƯU TRỮ</b> - Đã kết nối CSDL SQLite & Backend Flask API <code>/api/ho-so</code>.
           </div>
-          <span class="badge badge-info">Mock Active</span>
+          <span class="badge badge-success">API Live</span>
         </div>
-
-        <div class="page-header">
-          <div>
-            <h1 class="page-title">Lập mới hồ sơ lưu trữ tài liệu</h1>
-            <p class="page-subtitle">Tạo danh mục hồ sơ công việc theo danh mục hồ sơ hàng năm của Sở GD&ĐT</p>
-          </div>
-          <a href="danh-sach.html" class="btn btn-secondary">Quay lại danh sách</a>
-        </div>
-
-        <div style="max-width: 800px; margin: 0 auto;">
-          <div class="card">
-            <div class="card-header">
-              <h2 class="card-title">Thông tin hồ sơ lưu trữ</h2>
-            </div>
-            <div class="card-body">
-              <form id="createHoSoForm">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                  <div class="form-group" style="grid-column: span 2;">
-                    <label class="form-label required">Tiêu đề hồ sơ</label>
-                    <input type="text" id="tieu_de" class="form-control" placeholder="Ví dụ: Hồ sơ thanh tra chuyên đề các trường THPT ngoài công lập..." required>
-                  </div>
-
-                  <div class="form-group">
-                    <label class="form-label required">Mã số hồ sơ</label>
-                    <input type="text" id="ma_ho_so" class="form-control" placeholder="Ví dụ: HS-2026-TTr-02" required>
-                  </div>
-
-                  <div class="form-group">
-                    <label class="form-label required">Năm tài liệu</label>
-                    <input type="number" id="nam_tai_lieu" class="form-control" value="2026" required>
-                  </div>
-
-                  <div class="form-group">
-                    <label class="form-label required">Thời hạn bảo quản</label>
-                    <select id="thoi_han_bao_quan" class="form-select" required>
-                      <option value="Vĩnh viễn">Vĩnh viễn</option>
-                      <option value="70 năm">70 năm</option>
-                      <option value="20 năm">20 năm</option>
-                      <option value="10 năm">10 năm</option>
-                      <option value="5 năm">5 năm</option>
-                    </select>
-                  </div>
-
-                  <div class="form-group">
-                    <label class="form-label required">Đơn vị chủ trì lập hồ sơ</label>
-                    <input type="text" id="don_vi" class="form-control" required>
-                  </div>
-
-                  <div class="form-group" style="grid-column: span 2;">
-                    <label class="form-label">Mô tả nội dung hồ sơ</label>
-                    <textarea id="mo_ta" class="form-control" rows="3" placeholder="Ghi chú về các nhóm văn bản cấu thành hồ sơ..."></textarea>
-                  </div>
-                </div>
 
                 <div class="d-flex justify-content-end gap-2 mt-4">
                   <a href="danh-sach.html" class="btn btn-secondary">Hủy</a>
