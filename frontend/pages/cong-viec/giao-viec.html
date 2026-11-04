@@ -1,241 +1,241 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Giao việc mới & Điều phối nhiệm vụ - Sở GD&ĐT Đà Nẵng</title>
-  <link rel="icon" type="image/svg+xml" href="../../assets/logo-sodad.svg">
-  <link rel="stylesheet" href="../../css/base.css">
-  <link rel="stylesheet" href="../../css/layout.css">
-  <link rel="stylesheet" href="../../css/components.css">
-</head>
-<body>
-  <div class="app-wrapper">
-    <aside class="app-sidebar" id="appSidebar">
-      <div class="sidebar-brand">
-        <img src="../../assets/logo-sodad.svg" alt="Logo Sở GD&ĐT">
-        <div class="brand-text">
-          <span class="brand-title">Sở GD&ĐT Đà Nẵng</span>
-          <span class="brand-subtitle">Quản lý văn bản điều hành</span>
-        </div>
-      </div>
-      <div class="sidebar-nav" id="sidebarNav"></div>
-      <div class="sidebar-footer">
-        Đang đăng nhập: <b id="currentUserRole">Cán bộ</b>
-      </div>
-    </aside>
-
-    <div class="app-main">
-      <header class="app-topbar">
-        <div class="topbar-left">
-          <button class="sidebar-toggle-btn" id="sidebarToggle" aria-label="Toggle Menu">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="3" y1="12" x2="21" y2="12"></line>
-              <line x1="3" y1="6" x2="21" y2="6"></line>
-              <line x1="3" y1="18" x2="21" y2="18"></line>
-            </svg>
-          </button>
-          <span class="system-header-title">HỆ THỐNG QUẢN LÝ VĂN BẢN VÀ ĐIỀU HÀNH NỘI BỘ</span>
-        </div>
-        <div class="topbar-right">
-          <div class="user-profile-widget">
-            <div class="user-avatar" id="currentUserAvatar">CB</div>
-            <div class="user-details">
-              <span class="user-name" id="currentUserName">...</span>
-              <span class="user-role-badge">Cán bộ</span>
-            </div>
-          </div>
-          <button class="btn btn-outline-primary btn-sm btn-logout" id="logoutBtn" title="Đăng xuất">
-            Đăng xuất
-          </button>
-        </div>
-      </header>
-
-      <main class="content-wrapper">
-        <div class="page-header">
-          <div>
-            <h1 class="page-title">Giao nhiệm vụ & Điều phối công việc</h1>
-            <p class="page-subtitle">Dành cho Văn thư & Lãnh đạo Sở: lập phiếu giao nhiệm vụ gắn liền căn cứ văn bản</p>
-          </div>
-          <a href="danh-sach.html" class="btn btn-secondary">Quay lại danh sách</a>
-        </div>
-
-        <div style="max-width: 840px; margin: 0 auto;">
-          <div class="card">
-            <div class="card-header">
-              <h2 class="card-title">Phiếu giao nhiệm vụ công việc</h2>
-            </div>
-            <div class="card-body">
-              <form id="createJobForm" novalidate>
-                <!-- THÔNG TIN VĂN BẢN LIÊN KẾT (CĂN CỨ PHÁP LÝ) -->
-                <div style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: var(--radius-md); padding: 16px; margin-bottom: 20px;">
-                  <h3 style="font-size: 13px; text-transform: uppercase; font-weight: 700; color: #0284c7; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
-                    📄 Căn cứ văn bản điều hành / Văn bản đến liên quan
-                  </h3>
-                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                    <div class="form-group mb-2">
-                      <label class="form-label">Số / Ký hiệu văn bản</label>
-                      <input type="text" id="so_ky_hieu_vb" class="form-control" placeholder="Ví dụ: 452/BGDĐT-GDTrH hoặc 89/UBND-VX">
-                    </div>
-                    <div class="form-group mb-2">
-                      <label class="form-label">Ngày văn bản</label>
-                      <input type="date" id="ngay_van_ban" class="form-control">
-                    </div>
-                  </div>
-                  <div class="form-group mb-0">
-                    <label class="form-label">Trích yếu nội dung văn bản</label>
-                    <input type="text" id="trich_yeu_vb" class="form-control" placeholder="Tóm tắt nội dung văn bản chỉ đạo của cấp trên...">
-                  </div>
-                </div>
-
-                <!-- THÔNG TIN NHIỆM VỤ GIAO -->
-                <div class="form-group">
-                  <label class="form-label required">Tên nhiệm vụ / Tiêu đề công việc</label>
-                  <input type="text" id="ten_cong_viec" class="form-control" placeholder="Ví dụ: Rà soát cơ sở vật chất phòng học tin học cấp THCS..." required>
-                </div>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                  <div class="form-group">
-                    <label class="form-label required">Cán bộ / Chuyên viên xử lý</label>
-                    <select id="nguoi_xu_ly" class="form-select" required>
-                      <option value="">-- Đang nạp danh sách chuyên viên --</option>
-                    </select>
-                  </div>
-
-                  <div class="form-group">
-                    <label class="form-label required">Hạn hoàn thành</label>
-                    <input type="date" id="han_hoan_thanh" class="form-control" required>
-                  </div>
-
-                  <div class="form-group">
-                    <label class="form-label required">Độ ưu tiên</label>
-                    <select id="do_uu_tien" class="form-select" required>
-                      <option value="KHAN_CAP">Khẩn cấp</option>
-                      <option value="CAO">Ưu tiên cao</option>
-                      <option value="TRUNG_BINH" selected>Trung bình</option>
-                      <option value="THAP">Thấp</option>
-                    </select>
-                  </div>
-
-                  <div class="form-group">
-                    <label class="form-label">Phòng ban phụ trách</label>
-                    <input type="text" id="phong_ban" class="form-control" placeholder="Tự động điền theo chuyên viên">
-                  </div>
-                </div>
-
-                <div class="form-group">
-                  <label class="form-label required">Nội dung yêu cầu chi tiết</label>
-                  <textarea id="noi_dung" class="form-control" rows="4" placeholder="Mô tả cụ thể mục tiêu, sản phẩm đầu ra, yêu cầu thời gian và các phòng ban phối hợp..." required></textarea>
-                </div>
-
-                <div class="d-flex justify-content-end gap-2 mt-4">
-                  <a href="danh-sach.html" class="btn btn-secondary">Hủy bỏ</a>
-                  <button type="submit" class="btn btn-primary">
-                    📤 Ban hành nhiệm vụ
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      </main>
-
-      <footer class="app-footer">
-        <span>© 2026 Sở Giáo dục và Đào tạo thành phố Đà Nẵng</span>
-        <span>Hệ thống Quản lý văn bản điều hành nội bộ</span>
-      </footer>
-    </div>
-  </div>
-
-  <script src="../../js/core/toast.js"></script>
-  <script src="../../js/core/api.js"></script>
-  <script src="../../js/core/menu.js"></script>
-  <script src="../../js/core/auth-guard.js"></script>
-  <script src="../../js/mock/du-lieu-cong-viec.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', async () => {
-      const user = await window.AuthGuard.check();
-      if (!user) return;
-
-      if (user.vai_tro === 'CHUYEN_VIEN') {
-        window.Toast.warning('Chuyên viên không có quyền giao nhiệm vụ mới.');
-        setTimeout(() => window.location.replace('danh-sach.html'), 1200);
-        return;
-      }
-
-      const selectUser = document.getElementById('nguoi_xu_ly');
-      const phongBanInput = document.getElementById('phong_ban');
-
-      // Tải danh sách chuyên viên từ backend
-      try {
-        const res = await window.api.get('/api/users', { vai_tro: 'CHUYEN_VIEN', trang_thai: 'HOAT_DONG' });
-        const users = res.du_lieu || [];
-        if (users.length > 0) {
-          selectUser.innerHTML = '<option value="">-- Chọn cán bộ phụ trách --</option>' +
-            users.map(u => `<option value="${u.ho_va_ten}" data-id="${u.nguoi_dung_id}" data-dept="${u.phong_ban || ''}">${u.ho_va_ten} (${u.phong_ban || 'Phòng CM'})</option>`).join('');
-        } else {
-          selectUser.innerHTML = `
-            <option value="">-- Chọn cán bộ phụ trách --</option>
-            <option value="Trần Văn Nam" data-dept="Phòng Giáo dục Trung học">Trần Văn Nam (Phòng GD Trung học)</option>
-            <option value="Hoàng Minh Tuấn" data-dept="Phòng Giáo dục Tiểu học">Hoàng Minh Tuấn (Phòng GD Tiểu học)</option>
-            <option value="Lê Thị Thảo" data-dept="Phòng Kế hoạch - Tài chính">Lê Thị Thảo (Phòng Kế hoạch - Tài chính)</option>
-          `;
-        }
-      } catch (e) {
-        selectUser.innerHTML = `
-          <option value="">-- Chọn cán bộ phụ trách --</option>
-          <option value="Trần Văn Nam" data-dept="Phòng Giáo dục Trung học">Trần Văn Nam (Phòng GD Trung học)</option>
-          <option value="Hoàng Minh Tuấn" data-dept="Phòng Giáo dục Tiểu học">Hoàng Minh Tuấn (Phòng GD Tiểu học)</option>
-          <option value="Lê Thị Thảo" data-dept="Phòng Kế hoạch - Tài chính">Lê Thị Thảo (Phòng Kế hoạch - Tài chính)</option>
-        `;
-      }
-
-      selectUser.addEventListener('change', () => {
-        const opt = selectUser.selectedOptions[0];
-        if (opt && opt.dataset.dept) {
-          phongBanInput.value = opt.dataset.dept;
-        }
-      });
-
-      const form = document.getElementById('createJobForm');
-      form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const ten = document.getElementById('ten_cong_viec').value.trim();
-        const nguoi_xu_ly = selectUser.value;
-        const opt = selectUser.selectedOptions[0];
-        const nguoi_xu_ly_id = opt ? opt.dataset.id : null;
-        const han = document.getElementById('han_hoan_thanh').value;
-        const noi_dung = document.getElementById('noi_dung').value.trim();
-
-        if (!ten || !nguoi_xu_ly || !han || !noi_dung) {
-          window.Toast.warning('Vui lòng điền đầy đủ các thông tin bắt buộc.');
-          return;
-        }
-
-        try {
-          await window.congViecService.create({
-            ten_cong_viec: ten,
-            nguoi_xu_ly: nguoi_xu_ly,
-            nguoi_xu_ly_id: nguoi_xu_ly_id ? parseInt(nguoi_xu_ly_id) : null,
-            phong_ban: phongBanInput.value.trim() || 'Phòng chuyên môn',
-            han_hoan_thanh: han,
-            do_uu_tien: document.getElementById('do_uu_tien').value,
-            noi_dung: noi_dung,
-            so_ky_hieu_vb: document.getElementById('so_ky_hieu_vb').value.trim(),
-            trich_yeu_vb: document.getElementById('trich_yeu_vb').value.trim(),
-            ngay_van_ban: document.getElementById('ngay_van_ban').value
-          });
-
-          window.Toast.success('Đã ban hành nhiệm vụ thành công!');
-          setTimeout(() => {
-            window.location.replace('danh-sach.html');
-          }, 800);
-        } catch (err) {
-          // Handled by service toast
-        }
-      });
-    });
-  </script>
-</body>
-</html>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Giao việc mới & Điều phối nhiệm vụ - Sở GD&ĐT Đà Nẵng</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/logo-sodad.svg">
+  <link rel="stylesheet" href="../../css/base.css">
+  <link rel="stylesheet" href="../../css/layout.css">
+  <link rel="stylesheet" href="../../css/components.css">
+</head>
+<body>
+  <div class="app-wrapper">
+    <aside class="app-sidebar" id="appSidebar">
+      <div class="sidebar-brand">
+        <img src="../../assets/logo-sodad.svg" alt="Logo Sở GD&ĐT">
+        <div class="brand-text">
+          <span class="brand-title">Sở GD&ĐT Đà Nẵng</span>
+          <span class="brand-subtitle">Quản lý văn bản điều hành</span>
+        </div>
+      </div>
+      <div class="sidebar-nav" id="sidebarNav"></div>
+      <div class="sidebar-footer">
+        Đang đăng nhập: <b id="currentUserRole">Cán bộ</b>
+      </div>
+    </aside>
+
+    <div class="app-main">
+      <header class="app-topbar">
+        <div class="topbar-left">
+          <button class="sidebar-toggle-btn" id="sidebarToggle" aria-label="Toggle Menu">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <span class="system-header-title">HỆ THỐNG QUẢN LÝ VĂN BẢN VÀ ĐIỀU HÀNH NỘI BỘ</span>
+        </div>
+        <div class="topbar-right">
+          <div class="user-profile-widget">
+            <div class="user-avatar" id="currentUserAvatar">CB</div>
+            <div class="user-details">
+              <span class="user-name" id="currentUserName">...</span>
+              <span class="user-role-badge">Cán bộ</span>
+            </div>
+          </div>
+          <button class="btn btn-outline-primary btn-sm btn-logout" id="logoutBtn" title="Đăng xuất">
+            Đăng xuất
+          </button>
+        </div>
+      </header>
+
+      <main class="content-wrapper">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Giao nhiệm vụ & Điều phối công việc</h1>
+            <p class="page-subtitle">Dành cho Văn thư & Lãnh đạo Sở: lập phiếu giao nhiệm vụ gắn liền căn cứ văn bản</p>
+          </div>
+          <a href="danh-sach.html" class="btn btn-secondary">Quay lại danh sách</a>
+        </div>
+
+        <div style="max-width: 840px; margin: 0 auto;">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Phiếu giao nhiệm vụ công việc</h2>
+            </div>
+            <div class="card-body">
+              <form id="createJobForm" novalidate>
+                <!-- THÔNG TIN VĂN BẢN LIÊN KẾT (CĂN CỨ PHÁP LÝ) -->
+                <div style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: var(--radius-md); padding: 16px; margin-bottom: 20px;">
+                  <h3 style="font-size: 13px; text-transform: uppercase; font-weight: 700; color: #0284c7; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
+                    📄 Căn cứ văn bản điều hành / Văn bản đến liên quan
+                  </h3>
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="form-group mb-2">
+                      <label class="form-label">Số / Ký hiệu văn bản</label>
+                      <input type="text" id="so_ky_hieu_vb" class="form-control" placeholder="Ví dụ: 452/BGDĐT-GDTrH hoặc 89/UBND-VX">
+                    </div>
+                    <div class="form-group mb-2">
+                      <label class="form-label">Ngày văn bản</label>
+                      <input type="date" id="ngay_van_ban" class="form-control">
+                    </div>
+                  </div>
+                  <div class="form-group mb-0">
+                    <label class="form-label">Trích yếu nội dung văn bản</label>
+                    <input type="text" id="trich_yeu_vb" class="form-control" placeholder="Tóm tắt nội dung văn bản chỉ đạo của cấp trên...">
+                  </div>
+                </div>
+
+                <!-- THÔNG TIN NHIỆM VỤ GIAO -->
+                <div class="form-group">
+                  <label class="form-label required">Tên nhiệm vụ / Tiêu đề công việc</label>
+                  <input type="text" id="ten_cong_viec" class="form-control" placeholder="Ví dụ: Rà soát cơ sở vật chất phòng học tin học cấp THCS..." required>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                  <div class="form-group">
+                    <label class="form-label required">Cán bộ / Chuyên viên xử lý</label>
+                    <select id="nguoi_xu_ly" class="form-select" required>
+                      <option value="">-- Đang nạp danh sách chuyên viên --</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label required">Hạn hoàn thành</label>
+                    <input type="date" id="han_hoan_thanh" class="form-control" required>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label required">Độ ưu tiên</label>
+                    <select id="do_uu_tien" class="form-select" required>
+                      <option value="KHAN_CAP">Khẩn cấp</option>
+                      <option value="CAO">Ưu tiên cao</option>
+                      <option value="TRUNG_BINH" selected>Trung bình</option>
+                      <option value="THAP">Thấp</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">Phòng ban phụ trách</label>
+                    <input type="text" id="phong_ban" class="form-control" placeholder="Tự động điền theo chuyên viên">
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label required">Nội dung yêu cầu chi tiết</label>
+                  <textarea id="noi_dung" class="form-control" rows="4" placeholder="Mô tả cụ thể mục tiêu, sản phẩm đầu ra, yêu cầu thời gian và các phòng ban phối hợp..." required></textarea>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                  <a href="danh-sach.html" class="btn btn-secondary">Hủy bỏ</a>
+                  <button type="submit" class="btn btn-primary">
+                    📤 Ban hành nhiệm vụ
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer class="app-footer">
+        <span>© 2026 Sở Giáo dục và Đào tạo thành phố Đà Nẵng</span>
+        <span>Hệ thống Quản lý văn bản điều hành nội bộ</span>
+      </footer>
+    </div>
+  </div>
+
+  <script src="../../js/core/toast.js"></script>
+  <script src="../../js/core/api.js"></script>
+  <script src="../../js/core/menu.js"></script>
+  <script src="../../js/core/auth-guard.js"></script>
+  <script src="../../js/mock/du-lieu-cong-viec.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = await window.AuthGuard.check({ requiredRoles: ['VAN_THU'] });
+      if (!user) return;
+
+      if (user.vai_tro !== 'VAN_THU') {
+        window.Toast.warning('Chỉ Văn thư mới có quyền phân công giao nhiệm vụ mới.');
+        setTimeout(() => window.location.replace('danh-sach.html'), 1200);
+        return;
+      }
+
+      const selectUser = document.getElementById('nguoi_xu_ly');
+      const phongBanInput = document.getElementById('phong_ban');
+
+      // Tải danh sách chuyên viên từ backend
+      try {
+        const res = await window.api.get('/api/users', { vai_tro: 'CHUYEN_VIEN', trang_thai: 'HOAT_DONG' });
+        const users = res.du_lieu || [];
+        if (users.length > 0) {
+          selectUser.innerHTML = '<option value="">-- Chọn cán bộ phụ trách --</option>' +
+            users.map(u => `<option value="${u.ho_va_ten}" data-id="${u.nguoi_dung_id}" data-dept="${u.phong_ban || ''}">${u.ho_va_ten} (${u.phong_ban || 'Phòng CM'})</option>`).join('');
+        } else {
+          selectUser.innerHTML = `
+            <option value="">-- Chọn cán bộ phụ trách --</option>
+            <option value="Trần Văn Nam" data-dept="Phòng Giáo dục Trung học">Trần Văn Nam (Phòng GD Trung học)</option>
+            <option value="Hoàng Minh Tuấn" data-dept="Phòng Giáo dục Tiểu học">Hoàng Minh Tuấn (Phòng GD Tiểu học)</option>
+            <option value="Lê Thị Thảo" data-dept="Phòng Kế hoạch - Tài chính">Lê Thị Thảo (Phòng Kế hoạch - Tài chính)</option>
+          `;
+        }
+      } catch (e) {
+        selectUser.innerHTML = `
+          <option value="">-- Chọn cán bộ phụ trách --</option>
+          <option value="Trần Văn Nam" data-dept="Phòng Giáo dục Trung học">Trần Văn Nam (Phòng GD Trung học)</option>
+          <option value="Hoàng Minh Tuấn" data-dept="Phòng Giáo dục Tiểu học">Hoàng Minh Tuấn (Phòng GD Tiểu học)</option>
+          <option value="Lê Thị Thảo" data-dept="Phòng Kế hoạch - Tài chính">Lê Thị Thảo (Phòng Kế hoạch - Tài chính)</option>
+        `;
+      }
+
+      selectUser.addEventListener('change', () => {
+        const opt = selectUser.selectedOptions[0];
+        if (opt && opt.dataset.dept) {
+          phongBanInput.value = opt.dataset.dept;
+        }
+      });
+
+      const form = document.getElementById('createJobForm');
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const ten = document.getElementById('ten_cong_viec').value.trim();
+        const nguoi_xu_ly = selectUser.value;
+        const opt = selectUser.selectedOptions[0];
+        const nguoi_xu_ly_id = opt ? opt.dataset.id : null;
+        const han = document.getElementById('han_hoan_thanh').value;
+        const noi_dung = document.getElementById('noi_dung').value.trim();
+
+        if (!ten || !nguoi_xu_ly || !han || !noi_dung) {
+          window.Toast.warning('Vui lòng điền đầy đủ các thông tin bắt buộc.');
+          return;
+        }
+
+        try {
+          await window.congViecService.create({
+            ten_cong_viec: ten,
+            nguoi_xu_ly: nguoi_xu_ly,
+            nguoi_xu_ly_id: nguoi_xu_ly_id ? parseInt(nguoi_xu_ly_id) : null,
+            phong_ban: phongBanInput.value.trim() || 'Phòng chuyên môn',
+            han_hoan_thanh: han,
+            do_uu_tien: document.getElementById('do_uu_tien').value,
+            noi_dung: noi_dung,
+            so_ky_hieu_vb: document.getElementById('so_ky_hieu_vb').value.trim(),
+            trich_yeu_vb: document.getElementById('trich_yeu_vb').value.trim(),
+            ngay_van_ban: document.getElementById('ngay_van_ban').value
+          });
+
+          window.Toast.success('Đã ban hành nhiệm vụ thành công!');
+          setTimeout(() => {
+            window.location.replace('danh-sach.html');
+          }, 800);
+        } catch (err) {
+          // Handled by service toast
+        }
+      });
+    });
+  </script>
+</body>
+</html>

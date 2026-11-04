@@ -48,7 +48,8 @@
           title: 'Nghiệp vụ lưu trữ & điều hành',
           items: [
             { label: 'Hồ sơ tài liệu', href: `${root}pages/ho-so/danh-sach.html`, icon: ICONS.folder, id: 'nav-ho-so' },
-            { label: 'Theo dõi công việc', href: `${root}pages/cong-viec/danh-sach.html`, icon: ICONS.tasks, id: 'nav-cong-viec' },
+            { label: '+ Giao nhiệm vụ mới', href: `${root}pages/cong-viec/giao-viec.html`, icon: ICONS.tasks, id: 'nav-giao-viec' },
+            { label: 'Theo dõi tiến độ công việc', href: `${root}pages/cong-viec/danh-sach.html`, icon: ICONS.tasks, id: 'nav-cong-viec' },
             { label: 'Thông báo điều hành', href: `${root}pages/thong-bao.html`, icon: ICONS.notify, id: 'nav-thong-bao' },
             { label: 'Báo cáo thống kê', href: `${root}pages/thong-ke.html`, icon: ICONS.chart, id: 'nav-thong-ke' },
             { label: 'Trợ lý ảo Chatbot', href: `${root}pages/chatbot.html`, icon: ICONS.bot, id: 'nav-chatbot' }
@@ -72,20 +73,18 @@
           ]
         },
         {
-          title: 'Phê duyệt & Ký số văn bản',
+          title: 'Ký duyệt văn bản',
           items: [
             { label: '✍ Ký số & Duyệt văn bản', href: `${root}pages/van-ban-di/phe-duyet.html`, icon: ICONS.signDoc, id: 'nav-vb-phe-duyet' },
             { label: 'Sổ theo dõi Văn bản đi', href: `${root}pages/van-ban-di/danh-sach.html`, icon: ICONS.docOut, id: 'nav-vb-di' }
           ]
         },
         {
-          title: 'Chỉ đạo & Điều hành',
+          title: 'Lưu trữ & Báo cáo thống kê',
           items: [
-            { label: 'Giao việc mới', href: `${root}pages/cong-viec/giao-viec.html`, icon: ICONS.tasks, id: 'nav-giao-viec' },
-            { label: 'Theo dõi tiến độ công việc', href: `${root}pages/cong-viec/danh-sach.html`, icon: ICONS.tasks, id: 'nav-cong-viec' },
-            { label: 'Hồ sơ lưu trữ', href: `${root}pages/ho-so/danh-sach.html`, icon: ICONS.folder, id: 'nav-ho-so' },
-            { label: 'Thông báo điều hành', href: `${root}pages/thong-bao.html`, icon: ICONS.notify, id: 'nav-thong-bao' },
+            { label: 'Hồ sơ tài liệu', href: `${root}pages/ho-so/danh-sach.html`, icon: ICONS.folder, id: 'nav-ho-so' },
             { label: 'Báo cáo thống kê', href: `${root}pages/thong-ke.html`, icon: ICONS.chart, id: 'nav-thong-ke' },
+            { label: 'Thông báo điều hành', href: `${root}pages/thong-bao.html`, icon: ICONS.notify, id: 'nav-thong-bao' },
             { label: 'Trợ lý ảo Chatbot', href: `${root}pages/chatbot.html`, icon: ICONS.bot, id: 'nav-chatbot' }
           ]
         }

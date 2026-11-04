@@ -38,14 +38,14 @@
     // 7. Cấp số & Ban hành văn bản đi: Chỉ Văn thư
     { pattern: '/pages/van-ban-di/ban-hanh.html', roles: ['VAN_THU'] },
 
-    // 8. Giao việc: Lãnh đạo Sở và Văn thư
-    { pattern: '/pages/cong-viec/giao-viec.html', roles: ['LANH_DAO', 'VAN_THU'] },
+    // 8. Giao việc mới: Chỉ dành cho Văn thư (Admin)
+    { pattern: '/pages/cong-viec/giao-viec.html', roles: ['VAN_THU'] },
 
-    // 9. Phê duyệt kết quả công việc: Chỉ Lãnh đạo
-    { pattern: '/pages/cong-viec/phe-duyet-ket-qua.html', roles: ['LANH_DAO'] },
+    // 9. Nghiệm thu kết quả công việc: Chỉ Văn thư
+    { pattern: '/pages/cong-viec/phe-duyet-ket-qua.html', roles: ['VAN_THU'] },
 
-    // 10. Báo cáo xử lý công việc: Chuyên viên và Văn thư
-    { pattern: '/pages/cong-viec/xu-ly.html', roles: ['CHUYEN_VIEN', 'VAN_THU'] }
+    // 10. Báo cáo xử lý công việc: Chỉ Chuyên viên
+    { pattern: '/pages/cong-viec/xu-ly.html', roles: ['CHUYEN_VIEN'] }
   ];
 
   /**

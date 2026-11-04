@@ -1,677 +1,693 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quản lý công việc & Báo cáo thống kê - Sở GD&ĐT Đà Nẵng</title>
-  <link rel="icon" type="image/svg+xml" href="../../assets/logo-sodad.svg">
-  <link rel="stylesheet" href="../../css/base.css">
-  <link rel="stylesheet" href="../../css/layout.css">
-  <link rel="stylesheet" href="../../css/components.css">
-  <!-- Chart.js CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px;
-      margin-bottom: 24px;
-    }
-    .stat-card {
-      background: #ffffff;
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-md);
-      padding: 16px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-      transition: transform 0.15s ease;
-    }
-    .stat-card:hover {
-      transform: translateY(-2px);
-    }
-    .stat-card .stat-value {
-      font-size: 26px;
-      font-weight: 700;
-      line-height: 1.2;
-    }
-    .stat-card .stat-label {
-      font-size: 12.5px;
-      color: #64748b;
-      margin-top: 2px;
-      font-weight: 500;
-    }
-    .stat-card .stat-icon {
-      width: 44px;
-      height: 44px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .charts-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-      margin-bottom: 24px;
-    }
-    @media (max-width: 992px) {
-      .charts-grid { grid-template-columns: 1fr; }
-    }
-    .chart-card {
-      background: #ffffff;
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-md);
-      padding: 20px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    }
-    .chart-card-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 16px;
-      border-bottom: 1px solid #f1f5f9;
-      padding-bottom: 10px;
-    }
-    .chart-card-title {
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--primary-dark);
-    }
-    .doc-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      background: #e0f2fe;
-      color: #0369a1;
-      padding: 3px 8px;
-      border-radius: 4px;
-      font-size: 11.5px;
-      font-weight: 600;
-      margin-bottom: 3px;
-    }
-    .badge-urgent {
-      background-color: #fee2e2;
-      color: #b91c1c;
-      border: 1px solid #fca5a5;
-      animation: pulse 2s infinite;
-    }
-    @keyframes pulse {
-      0% { opacity: 1; }
-      50% { opacity: 0.6; }
-      100% { opacity: 1; }
-    }
-    /* Modal styles */
-    .modal-backdrop {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(15, 23, 42, 0.6);
-      z-index: 9999;
-      align-items: center;
-      justify-content: center;
-      backdrop-filter: blur(2px);
-    }
-    .modal-dialog {
-      background: #fff;
-      border-radius: 10px;
-      max-width: 720px;
-      width: 90%;
-      max-height: 90vh;
-      overflow-y: auto;
-      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);
-    }
-    .timeline-item {
-      position: relative;
-      padding-left: 24px;
-      margin-bottom: 16px;
-      border-left: 2px solid #e2e8f0;
-    }
-    .timeline-item::before {
-      content: '';
-      position: absolute;
-      left: -6px;
-      top: 4px;
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: var(--primary-color);
-    }
-  </style>
-</head>
-<body>
-  <div class="app-wrapper">
-    <aside class="app-sidebar" id="appSidebar">
-      <div class="sidebar-brand">
-        <img src="../../assets/logo-sodad.svg" alt="Logo Sở GD&ĐT">
-        <div class="brand-text">
-          <span class="brand-title">Sở GD&ĐT Đà Nẵng</span>
-          <span class="brand-subtitle">Quản lý văn bản điều hành</span>
-        </div>
-      </div>
-      <div class="sidebar-nav" id="sidebarNav"></div>
-      <div class="sidebar-footer">
-        Đang đăng nhập: <b id="currentUserRole">Cán bộ</b>
-      </div>
-    </aside>
-
-    <div class="app-main">
-      <header class="app-topbar">
-        <div class="topbar-left">
-          <button class="sidebar-toggle-btn" id="sidebarToggle" aria-label="Toggle Menu">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="3" y1="12" x2="21" y2="12"></line>
-              <line x1="3" y1="6" x2="21" y2="6"></line>
-              <line x1="3" y1="18" x2="21" y2="18"></line>
-            </svg>
-          </button>
-          <span class="system-header-title">HỆ THỐNG QUẢN LÝ VĂN BẢN VÀ ĐIỀU HÀNH NỘI BỘ</span>
-        </div>
-        <div class="topbar-right">
-          <div class="user-profile-widget">
-            <div class="user-avatar" id="currentUserAvatar">CB</div>
-            <div class="user-details">
-              <span class="user-name" id="currentUserName">...</span>
-              <span class="user-role-badge">Cán bộ</span>
-            </div>
-          </div>
-          <button class="btn btn-outline-primary btn-sm btn-logout" id="logoutBtn" title="Đăng xuất">
-            Đăng xuất
-          </button>
-        </div>
-      </header>
-
-      <main class="content-wrapper">
-        <div class="page-header">
-          <div>
-            <h1 class="page-title">Theo dõi tiến độ & Điều hành công việc</h1>
-            <p class="page-subtitle" id="pageSubtitle">Giám sát khối lượng công việc, căn cứ văn bản và tiến độ thực hiện</p>
-          </div>
-          <div class="d-flex gap-2">
-            <a href="giao-viec.html" class="btn btn-primary" id="btnGiaoViec">
-              + Giao nhiệm vụ mới
-            </a>
-            <a href="xu-ly.html" class="btn btn-warning" id="btnBaoCao">
-              Báo cáo tiến độ
-            </a>
-            <a href="phe-duyet-ket-qua.html" class="btn btn-success" id="btnNghiemThu">
-              Nghiệm thu kết quả
-            </a>
-            <button class="btn btn-secondary" onclick="window.print()" title="In danh sách phục vụ giao ban">
-              🖨 In báo cáo
-            </button>
-          </div>
-        </div>
-
-        <!-- KPI SUMMARY CARDS -->
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div>
-              <div class="stat-value text-primary" id="statTongSo">0</div>
-              <div class="stat-label">Tổng nhiệm vụ</div>
-            </div>
-            <div class="stat-icon" style="background: #e0f2fe; color: #0284c7;">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
-            </div>
-          </div>
-
-          <div class="stat-card">
-            <div>
-              <div class="stat-value text-info" id="statDangLam">0</div>
-              <div class="stat-label">Đang thực hiện</div>
-            </div>
-            <div class="stat-icon" style="background: #e0f2fe; color: #0284c7;">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            </div>
-          </div>
-
-          <div class="stat-card">
-            <div>
-              <div class="stat-value text-warning" id="statChoDuyet">0</div>
-              <div class="stat-label">Chờ nghiệm thu</div>
-            </div>
-            <div class="stat-icon" style="background: #fef3c7; color: #d97706;">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-            </div>
-          </div>
-
-          <div class="stat-card">
-            <div>
-              <div class="stat-value text-danger" id="statQuaHan">0</div>
-              <div class="stat-label">Quá hạn (Đôn đốc)</div>
-            </div>
-            <div class="stat-icon" style="background: #fee2e2; color: #dc2626;">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-            </div>
-          </div>
-
-          <div class="stat-card">
-            <div>
-              <div class="stat-value text-success" id="statTyLeDungHan">0%</div>
-              <div class="stat-label">Tỷ lệ đúng hạn</div>
-            </div>
-            <div class="stat-icon" style="background: #dcfce7; color: #16a34a;">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-            </div>
-          </div>
-        </div>
-
-        <!-- VISUAL CHARTS (KHỐI LƯỢNG TRẠNG THÁI & PHÒNG BAN) -->
-        <div class="charts-grid">
-          <div class="chart-card">
-            <div class="chart-card-header">
-              <span class="chart-card-title">Biểu đồ khối lượng theo trạng thái</span>
-              <span class="badge badge-info" id="chartRoleScope">Toàn cơ quan</span>
-            </div>
-            <div style="height: 250px; position: relative;">
-              <canvas id="statusDoughnutChart"></canvas>
-            </div>
-          </div>
-
-          <div class="chart-card">
-            <div class="chart-card-header">
-              <span class="chart-card-title">Khối lượng công việc theo Phòng ban</span>
-              <span class="badge badge-secondary">Cột phân bổ</span>
-            </div>
-            <div style="height: 250px; position: relative;">
-              <canvas id="deptBarChart"></canvas>
-            </div>
-          </div>
-        </div>
-
-        <!-- FILTER BAR -->
-        <div class="filter-bar">
-          <div class="search-box">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="11" cy="11" r="8"></circle>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-            <input type="text" id="searchInput" class="form-control" placeholder="Tìm theo tên nhiệm vụ, số hiệu văn bản, cán bộ...">
-          </div>
-
-          <div style="min-width: 170px;">
-            <select id="filterStatus" class="form-select">
-              <option value="">-- Tất cả trạng thái --</option>
-              <option value="DANG_THUC_HIEN">Đang thực hiện</option>
-              <option value="CHO_DANH_GIA">Chờ nghiệm thu</option>
-              <option value="HOAN_THANH">Đã hoàn thành</option>
-              <option value="CHUA_THUC_HIEN">Chưa thực hiện</option>
-              <option value="QUA_HAN">Quá hạn</option>
-            </select>
-          </div>
-
-          <div style="min-width: 160px;">
-            <select id="filterPriority" class="form-select">
-              <option value="">-- Mức ưu tiên --</option>
-              <option value="KHAN_CAP">Khẩn cấp</option>
-              <option value="CAO">Cao</option>
-              <option value="TRUNG_BINH">Trung bình</option>
-              <option value="THAP">Thấp</option>
-            </select>
-          </div>
-
-          <button class="btn btn-secondary" id="reloadBtn">🔄 Làm mới</button>
-        </div>
-
-        <!-- DATA TABLE -->
-        <div class="card">
-          <div class="card-body p-0">
-            <div class="table-responsive">
-              <table class="data-table">
-                <thead>
-                  <tr>
-                    <th>STT</th>
-                    <th>Tên nhiệm vụ / Nội dung</th>
-                    <th>Văn bản liên kết</th>
-                    <th>Lãnh đạo giao</th>
-                    <th>Cán bộ xử lý</th>
-                    <th>Hạn chót</th>
-                    <th>Ưu tiên</th>
-                    <th>Tiến độ</th>
-                    <th>Trạng thái</th>
-                    <th style="text-align: center;">Chi tiết</th>
-                  </tr>
-                </thead>
-                <tbody id="congViecTableBody">
-                  <tr><td colspan="10" class="text-center p-4 text-muted">Đang tải dữ liệu nhiệm vụ...</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </main>
-
-      <footer class="app-footer">
-        <span>© 2026 Sở Giáo dục và Đào tạo thành phố Đà Nẵng</span>
-        <span>Phân hệ Quản lý công việc điều hành & Báo cáo thống kê</span>
-      </footer>
-    </div>
-  </div>
-
-  <!-- MODAL CHI TIẾT CÔNG VIỆC & THÔNG TIN VĂN BẢN -->
-  <div class="modal-backdrop" id="detailModal">
-    <div class="modal-dialog">
-      <div style="padding: 20px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
-        <h3 style="margin: 0; font-size: 17px; color: var(--primary-dark);" id="modalTaskTitle">Chi tiết nhiệm vụ</h3>
-        <button style="border: none; background: none; font-size: 22px; cursor: pointer; color: #64748b;" id="closeModalBtn">&times;</button>
-      </div>
-
-      <div style="padding: 20px;" id="modalBodyContent">
-        <!-- Thông tin văn bản liên kết -->
-        <div style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 14px; margin-bottom: 16px;">
-          <div style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: #0284c7; margin-bottom: 4px;">
-            📄 Căn cứ văn bản điều hành
-          </div>
-          <div style="font-weight: 700; color: #0369a1; font-size: 14px;" id="modalDocNumber">Số: 125/SGDĐT-GDTrH</div>
-          <div style="font-size: 13px; color: #334155; margin-top: 4px;" id="modalDocSummary">Trích yếu nội dung văn bản</div>
-          <div style="font-size: 12px; color: #64748b; margin-top: 4px;" id="modalDocDate">Ngày văn bản: 2026-10-20</div>
-        </div>
-
-        <!-- Thông tin giao việc -->
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 13px; margin-bottom: 16px;">
-          <div>Người giao: <strong id="modalAssigner">...</strong></div>
-          <div>Người xử lý: <strong id="modalAssignee">...</strong></div>
-          <div>Phòng ban: <strong id="modalDept">...</strong></div>
-          <div>Hạn hoàn thành: <span class="text-danger fw-bold" id="modalDeadline">...</span></div>
-          <div>Mức ưu tiên: <span id="modalPriority">...</span></div>
-          <div>Trạng thái: <span id="modalStatus">...</span></div>
-        </div>
-
-        <div style="margin-bottom: 16px;">
-          <div style="font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 4px;">Nội dung yêu cầu chi tiết:</div>
-          <div style="background: #f8fafc; padding: 10px; border-radius: 6px; font-size: 13px; color: #334155;" id="modalContent">...</div>
-        </div>
-
-        <div style="margin-bottom: 16px;">
-          <div style="font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 4px;">Báo cáo kết quả:</div>
-          <div style="background: #f1f5f9; padding: 10px; border-radius: 6px; font-size: 13px; color: #1e293b;" id="modalResult">Chưa có báo cáo</div>
-        </div>
-
-        <div style="margin-bottom: 16px;" id="modalFeedbackBox">
-          <div style="font-size: 12px; font-weight: 600; color: #15803d; margin-bottom: 4px;">Đánh giá của Lãnh đạo:</div>
-          <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 10px; border-radius: 6px; font-size: 13px; color: #166534;" id="modalFeedback">...</div>
-        </div>
-
-        <!-- Nhật ký tiến độ -->
-        <div>
-          <div style="font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 8px;">Nhật ký cập nhật tiến độ:</div>
-          <div id="modalTimeline"></div>
-        </div>
-      </div>
-
-      <div style="padding: 14px 20px; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; gap: 8px;">
-        <div>
-          <a id="btnTaskActionDraft" class="btn btn-primary btn-sm" href="#" style="display: none; font-weight: 600;">
-            ✍ Xử lý / Soạn thảo văn bản đi &rarr;
-          </a>
-        </div>
-        <button class="btn btn-secondary btn-sm" id="closeModalBtn2">Đóng</button>
-      </div>
-    </div>
-  </div>
-
-  <script src="../../js/core/toast.js"></script>
-  <script src="../../js/core/api.js"></script>
-  <script src="../../js/core/menu.js"></script>
-  <script src="../../js/core/auth-guard.js"></script>
-  <script src="../../js/mock/du-lieu-cong-viec.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', async () => {
-      const user = await window.AuthGuard.check();
-      if (!user) return;
-
-      const role = user.vai_tro;
-      const isSpecialist = role === 'CHUYEN_VIEN';
-
-      // Điều chỉnh giao diện theo phân quyền:
-      if (isSpecialist) {
-        document.getElementById('pageSubtitle').innerText = 'Danh sách nhiệm vụ cá nhân được phân công và báo cáo tiến độ';
-        document.getElementById('chartRoleScope').innerText = 'Việc cá nhân';
-        // Chuyên viên không giao việc
-        const btnGiaoViec = document.getElementById('btnGiaoViec');
-        if (btnGiaoViec) btnGiaoViec.style.display = 'none';
-        const btnNghiemThu = document.getElementById('btnNghiemThu');
-        if (btnNghiemThu) btnNghiemThu.style.display = 'none';
-      }
-
-      const tbody = document.getElementById('congViecTableBody');
-      const searchInput = document.getElementById('searchInput');
-      const filterStatus = document.getElementById('filterStatus');
-      const filterPriority = document.getElementById('filterPriority');
-      const reloadBtn = document.getElementById('reloadBtn');
-
-      let doughnutChart = null;
-      let barChart = null;
-
-      const STATUS_LABELS = {
-        'CHUA_THUC_HIEN': '<span class="badge badge-secondary">Chưa thực hiện</span>',
-        'DANG_THUC_HIEN': '<span class="badge badge-info">Đang thực hiện</span>',
-        'CHO_DANH_GIA': '<span class="badge badge-warning">Chờ nghiệm thu</span>',
-        'HOAN_THANH': '<span class="badge badge-success">Đã hoàn thành</span>',
-        'QUA_HAN': '<span class="badge badge-danger badge-urgent">Quá hạn</span>'
-      };
-
-      const PRIORITY_LABELS = {
-        'KHAN_CAP': '<span class="badge badge-danger">Khẩn cấp</span>',
-        'CAO': '<span class="badge badge-danger">Cao</span>',
-        'TRUNG_BINH': '<span class="badge badge-warning">Trung bình</span>',
-        'THAP': '<span class="badge badge-secondary">Thấp</span>'
-      };
-
-      // Tải và vẽ Biểu đồ & KPI
-      async function loadStatistics() {
-        const stats = await window.congViecService.getStatistics();
-        if (!stats) return;
-
-        document.getElementById('statTongSo').innerText = stats.tong_so || 0;
-        document.getElementById('statDangLam').innerText = stats.theo_trang_thai?.DANG_THUC_HIEN || 0;
-        document.getElementById('statChoDuyet').innerText = stats.theo_trang_thai?.CHO_DANH_GIA || 0;
-        document.getElementById('statQuaHan').innerText = stats.theo_trang_thai?.QUA_HAN || 0;
-        document.getElementById('statTyLeDungHan').innerText = `${stats.ty_le_dung_han || 0}%`;
-
-        // Render Biểu đồ tròn (Doughnut)
-        const ctxDoughnut = document.getElementById('statusDoughnutChart').getContext('2d');
-        if (doughnutChart) doughnutChart.destroy();
-        doughnutChart = new Chart(ctxDoughnut, {
-          type: 'doughnut',
-          data: {
-            labels: stats.chart_doughnut.labels,
-            datasets: [{
-              data: stats.chart_doughnut.data,
-              backgroundColor: stats.chart_doughnut.colors,
-              borderWidth: 2,
-              borderColor: '#ffffff'
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }
-            }
-          }
-        });
-
-        // Render Biểu đồ cột (Bar)
-        const ctxBar = document.getElementById('deptBarChart').getContext('2d');
-        if (barChart) barChart.destroy();
-        barChart = new Chart(ctxBar, {
-          type: 'bar',
-          data: {
-            labels: stats.chart_bar.labels,
-            datasets: [
-              {
-                label: 'Được giao',
-                data: stats.chart_bar.duoc_giao,
-                backgroundColor: '#0d6efd',
-                borderRadius: 4
-              },
-              {
-                label: 'Đã xong',
-                data: stats.chart_bar.da_xong,
-                backgroundColor: '#10b981',
-                borderRadius: 4
-              },
-              {
-                label: 'Trễ hạn',
-                data: stats.chart_bar.qua_han,
-                backgroundColor: '#ef4444',
-                borderRadius: 4
-              }
-            ]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-              y: { beginAtZero: true, ticks: { precision: 0 } }
-            },
-            plugins: {
-              legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }
-            }
-          }
-        });
-      }
-
-      // Tải bảng danh sách
-      async function loadData() {
-        const filters = {
-          q: searchInput.value.trim(),
-          trang_thai: filterStatus.value,
-          do_uu_tien: filterPriority.value
-        };
-        const list = await window.congViecService.getAll(filters);
-
-        if (!list || list.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="10" class="text-center p-4 text-muted">Không tìm thấy công việc nào phù hợp.</td></tr>';
-          return;
-        }
-
-        tbody.innerHTML = list.map((item, index) => {
-          const docHtml = item.so_ky_hieu_vb ? `
-            <div>
-              <span class="doc-badge">📄 ${item.so_ky_hieu_vb}</span>
-              <div style="font-size: 11px; color: #64748b; max-width: 190px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${item.trich_yeu_vb || ''}">
-                ${item.trich_yeu_vb || 'Văn bản chỉ đạo'}
-              </div>
-            </div>
-          ` : '<span class="text-muted" style="font-size: 11.5px;">Chỉ đạo trực tiếp</span>';
-
-          const progressColor = item.tien_do >= 100 ? '#10b981' : (item.trang_thai === 'QUA_HAN' ? '#ef4444' : '#0d6efd');
-
-          return `
-            <tr>
-              <td>${index + 1}</td>
-              <td style="max-width: 260px;">
-                <b style="color: var(--primary-dark); cursor: pointer;" onclick="viewTaskDetail(${item.id})">${item.ten_cong_viec}</b>
-                <div style="font-size: 11.5px; color: #64748b; margin-top: 2px; max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                  ${item.noi_dung || ''}
-                </div>
-              </td>
-              <td>${docHtml}</td>
-              <td><small>${item.nguoi_giao}</small></td>
-              <td>
-                <strong>${item.nguoi_xu_ly}</strong>
-                <div style="font-size: 11px; color: #64748b;">${item.phong_ban}</div>
-              </td>
-              <td><small class="${item.trang_thai === 'QUA_HAN' ? 'text-danger fw-bold' : ''}">${item.han_hoan_thanh}</small></td>
-              <td>${PRIORITY_LABELS[item.do_uu_tien] || item.do_uu_tien}</td>
-              <td style="min-width: 100px;">
-                <div style="font-size: 11.5px; margin-bottom: 2px; font-weight: bold;">${item.tien_do}%</div>
-                <div style="width: 100%; height: 6px; background-color: #e2e8f0; border-radius: 3px; overflow: hidden;">
-                  <div style="width: ${item.tien_do}%; height: 100%; background-color: ${progressColor};"></div>
-                </div>
-              </td>
-              <td>${STATUS_LABELS[item.trang_thai] || item.trang_thai}</td>
-              <td style="text-align: center;">
-                <div class="d-flex justify-content-center gap-1">
-                  <button class="btn btn-outline-primary btn-sm" onclick="viewTaskDetail(${item.id})" title="Xem chi tiết & Căn cứ văn bản">
-                    👁 Xem
-                  </button>
-                  <a href="../van-ban-di/soan-thao.html?cong_viec_id=${item.id}&ten_cong_viec=${encodeURIComponent(item.ten_cong_viec)}" class="btn btn-outline-success btn-sm" title="Soạn văn bản xử lý nhiệm vụ này">
-                    ✍ Soạn VB
-                  </a>
-                </div>
-              </td>
-            </tr>
-          `;
-        }).join('');
-      }
-
-      // Xử lý modal chi tiết
-      window.viewTaskDetail = async function (id) {
-        try {
-          const task = await window.congViecService.getById(id);
-          if (!task) return;
-
-          document.getElementById('modalTaskTitle').innerText = task.ten_cong_viec;
-          document.getElementById('modalDocNumber').innerText = task.so_ky_hieu_vb ? `Số ký hiệu: ${task.so_ky_hieu_vb}` : 'Không có số hiệu văn bản';
-          document.getElementById('modalDocSummary').innerText = task.trich_yeu_vb || 'Căn cứ nhiệm vụ theo chỉ đạo nội bộ';
-          document.getElementById('modalDocDate').innerText = task.ngay_van_ban ? `Ngày văn bản: ${task.ngay_van_ban}` : '';
-          document.getElementById('modalAssigner').innerText = task.nguoi_giao || 'Lãnh đạo';
-          document.getElementById('modalAssignee').innerText = `${task.nguoi_xu_ly} (${task.phong_ban})`;
-          document.getElementById('modalDept').innerText = task.phong_ban;
-          document.getElementById('modalDeadline').innerText = task.han_hoan_thanh;
-          document.getElementById('modalPriority').innerHTML = PRIORITY_LABELS[task.do_uu_tien] || task.do_uu_tien;
-          document.getElementById('modalStatus').innerHTML = STATUS_LABELS[task.trang_thai] || task.trang_thai;
-          document.getElementById('modalContent').innerText = task.noi_dung || 'Không có mô tả chi tiết.';
-          document.getElementById('modalResult').innerText = task.ket_qua_bao_cao || 'Chưa nộp báo cáo kết quả.';
-
-          const feedbackBox = document.getElementById('modalFeedbackBox');
-          if (task.danh_gia_lanh_dao) {
-            feedbackBox.style.display = 'block';
-            document.getElementById('modalFeedback').innerText = task.danh_gia_lanh_dao;
-          } else {
-            feedbackBox.style.display = 'none';
-          }
-
-          // Lịch sử tiến độ
-          const timelineEl = document.getElementById('modalTimeline');
-          if (task.nhat_ky && task.nhat_ky.length > 0) {
-            timelineEl.innerHTML = task.nhat_ky.map(log => `
-              <div class="timeline-item">
-                <div style="font-size: 11.5px; color: #64748b;">${log.thoi_gian} - <b>${log.nguoi_cap_nhat_ten || 'Cán bộ'}</b></div>
-                <div style="font-size: 13px; margin-top: 2px;">${log.noi_dung_ghi_chu}</div>
-                <div style="font-size: 11.5px; color: #0284c7; font-weight: 600;">Tiến độ ghi nhận: ${log.tien_do_moi}%</div>
-              </div>
-            `).join('');
-          } else {
-            timelineEl.innerHTML = '<div style="font-size: 12.5px; color: #94a3b8;">Chưa có cập nhật tiến độ nào.</div>';
-          }
-
-          const btnDraft = document.getElementById('btnTaskActionDraft');
-          if (btnDraft) {
-            if (role === 'CHUYEN_VIEN' || role === 'VAN_THU') {
-              btnDraft.style.display = 'inline-flex';
-              btnDraft.href = `../van-ban-di/soan-thao.html?cong_viec_id=${task.id}&ten_cong_viec=${encodeURIComponent(task.ten_cong_viec)}&noi_dung=${encodeURIComponent(task.noi_dung || '')}&so_vb=${encodeURIComponent(task.so_ky_hieu_vb || '')}`;
-            } else {
-              btnDraft.style.display = 'none';
-            }
-          }
-
-          document.getElementById('detailModal').style.display = 'flex';
-        } catch (e) {
-          window.Toast.error('Không thể tải chi tiết công việc.');
-        }
-      };
-
-      const closeModal = () => { document.getElementById('detailModal').style.display = 'none'; };
-      document.getElementById('closeModalBtn').addEventListener('click', closeModal);
-      document.getElementById('closeModalBtn2').addEventListener('click', closeModal);
-
-      searchInput.addEventListener('input', loadData);
-      filterStatus.addEventListener('change', loadData);
-      filterPriority.addEventListener('change', loadData);
-      reloadBtn.addEventListener('click', () => {
-        loadStatistics();
-        loadData();
-      });
-
-      // Khởi tạo ban đầu
-      await loadStatistics();
-      await loadData();
-    });
-  </script>
-</body>
-</html>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý công việc & Báo cáo thống kê - Sở GD&ĐT Đà Nẵng</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/logo-sodad.svg">
+  <link rel="stylesheet" href="../../css/base.css">
+  <link rel="stylesheet" href="../../css/layout.css">
+  <link rel="stylesheet" href="../../css/components.css">
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      transition: transform 0.15s ease;
+    }
+    .stat-card:hover {
+      transform: translateY(-2px);
+    }
+    .stat-card .stat-value {
+      font-size: 26px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    .stat-card .stat-label {
+      font-size: 12.5px;
+      color: #64748b;
+      margin-top: 2px;
+      font-weight: 500;
+    }
+    .stat-card .stat-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 992px) {
+      .charts-grid { grid-template-columns: 1fr; }
+    }
+    .chart-card {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .chart-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      border-bottom: 1px solid #f1f5f9;
+      padding-bottom: 10px;
+    }
+    .chart-card-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--primary-dark);
+    }
+    .doc-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #e0f2fe;
+      color: #0369a1;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11.5px;
+      font-weight: 600;
+      margin-bottom: 3px;
+    }
+    .badge-urgent {
+      background-color: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid #fca5a5;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.6; }
+      100% { opacity: 1; }
+    }
+    /* Modal styles */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(15, 23, 42, 0.6);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(2px);
+    }
+    .modal-dialog {
+      background: #fff;
+      border-radius: 10px;
+      max-width: 720px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);
+    }
+    .timeline-item {
+      position: relative;
+      padding-left: 24px;
+      margin-bottom: 16px;
+      border-left: 2px solid #e2e8f0;
+    }
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -6px;
+      top: 4px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--primary-color);
+    }
+  </style>
+</head>
+<body>
+  <div class="app-wrapper">
+    <aside class="app-sidebar" id="appSidebar">
+      <div class="sidebar-brand">
+        <img src="../../assets/logo-sodad.svg" alt="Logo Sở GD&ĐT">
+        <div class="brand-text">
+          <span class="brand-title">Sở GD&ĐT Đà Nẵng</span>
+          <span class="brand-subtitle">Quản lý văn bản điều hành</span>
+        </div>
+      </div>
+      <div class="sidebar-nav" id="sidebarNav"></div>
+      <div class="sidebar-footer">
+        Đang đăng nhập: <b id="currentUserRole">Cán bộ</b>
+      </div>
+    </aside>
+
+    <div class="app-main">
+      <header class="app-topbar">
+        <div class="topbar-left">
+          <button class="sidebar-toggle-btn" id="sidebarToggle" aria-label="Toggle Menu">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <span class="system-header-title">HỆ THỐNG QUẢN LÝ VĂN BẢN VÀ ĐIỀU HÀNH NỘI BỘ</span>
+        </div>
+        <div class="topbar-right">
+          <div class="user-profile-widget">
+            <div class="user-avatar" id="currentUserAvatar">CB</div>
+            <div class="user-details">
+              <span class="user-name" id="currentUserName">...</span>
+              <span class="user-role-badge">Cán bộ</span>
+            </div>
+          </div>
+          <button class="btn btn-outline-primary btn-sm btn-logout" id="logoutBtn" title="Đăng xuất">
+            Đăng xuất
+          </button>
+        </div>
+      </header>
+
+      <main class="content-wrapper">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Theo dõi tiến độ & Điều hành công việc</h1>
+            <p class="page-subtitle" id="pageSubtitle">Giám sát khối lượng công việc, căn cứ văn bản và tiến độ thực hiện</p>
+          </div>
+          <div class="d-flex gap-2">
+            <a href="giao-viec.html" class="btn btn-primary" id="btnGiaoViec">
+              + Giao nhiệm vụ mới
+            </a>
+            <a href="xu-ly.html" class="btn btn-warning" id="btnBaoCao">
+              Báo cáo tiến độ
+            </a>
+            <a href="phe-duyet-ket-qua.html" class="btn btn-success" id="btnNghiemThu">
+              Nghiệm thu kết quả
+            </a>
+            <button class="btn btn-secondary" onclick="window.print()" title="In danh sách phục vụ giao ban">
+              🖨 In báo cáo
+            </button>
+          </div>
+        </div>
+
+        <!-- KPI SUMMARY CARDS -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div>
+              <div class="stat-value text-primary" id="statTongSo">0</div>
+              <div class="stat-label">Tổng nhiệm vụ</div>
+            </div>
+            <div class="stat-icon" style="background: #e0f2fe; color: #0284c7;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div>
+              <div class="stat-value text-info" id="statDangLam">0</div>
+              <div class="stat-label">Đang thực hiện</div>
+            </div>
+            <div class="stat-icon" style="background: #e0f2fe; color: #0284c7;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div>
+              <div class="stat-value text-warning" id="statChoDuyet">0</div>
+              <div class="stat-label">Chờ nghiệm thu</div>
+            </div>
+            <div class="stat-icon" style="background: #fef3c7; color: #d97706;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div>
+              <div class="stat-value text-danger" id="statQuaHan">0</div>
+              <div class="stat-label">Quá hạn (Đôn đốc)</div>
+            </div>
+            <div class="stat-icon" style="background: #fee2e2; color: #dc2626;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div>
+              <div class="stat-value text-success" id="statTyLeDungHan">0%</div>
+              <div class="stat-label">Tỷ lệ đúng hạn</div>
+            </div>
+            <div class="stat-icon" style="background: #dcfce7; color: #16a34a;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- VISUAL CHARTS (KHỐI LƯỢNG TRẠNG THÁI & PHÒNG BAN) -->
+        <div class="charts-grid">
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <span class="chart-card-title">Biểu đồ khối lượng theo trạng thái</span>
+              <span class="badge badge-info" id="chartRoleScope">Toàn cơ quan</span>
+            </div>
+            <div style="height: 250px; position: relative;">
+              <canvas id="statusDoughnutChart"></canvas>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <span class="chart-card-title">Khối lượng công việc theo Phòng ban</span>
+              <span class="badge badge-secondary">Cột phân bổ</span>
+            </div>
+            <div style="height: 250px; position: relative;">
+              <canvas id="deptBarChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- FILTER BAR -->
+        <div class="filter-bar">
+          <div class="search-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="searchInput" class="form-control" placeholder="Tìm theo tên nhiệm vụ, số hiệu văn bản, cán bộ...">
+          </div>
+
+          <div style="min-width: 170px;">
+            <select id="filterStatus" class="form-select">
+              <option value="">-- Tất cả trạng thái --</option>
+              <option value="DANG_THUC_HIEN">Đang thực hiện</option>
+              <option value="CHO_DANH_GIA">Chờ nghiệm thu</option>
+              <option value="HOAN_THANH">Đã hoàn thành</option>
+              <option value="CHUA_THUC_HIEN">Chưa thực hiện</option>
+              <option value="QUA_HAN">Quá hạn</option>
+            </select>
+          </div>
+
+          <div style="min-width: 160px;">
+            <select id="filterPriority" class="form-select">
+              <option value="">-- Mức ưu tiên --</option>
+              <option value="KHAN_CAP">Khẩn cấp</option>
+              <option value="CAO">Cao</option>
+              <option value="TRUNG_BINH">Trung bình</option>
+              <option value="THAP">Thấp</option>
+            </select>
+          </div>
+
+          <button class="btn btn-secondary" id="reloadBtn">🔄 Làm mới</button>
+        </div>
+
+        <!-- DATA TABLE -->
+        <div class="card">
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>STT</th>
+                    <th>Tên nhiệm vụ / Nội dung</th>
+                    <th>Văn bản liên kết</th>
+                    <th>Người giao việc</th>
+                    <th>Cán bộ xử lý</th>
+                    <th>Hạn chót</th>
+                    <th>Ưu tiên</th>
+                    <th>Tiến độ</th>
+                    <th>Trạng thái</th>
+                    <th style="text-align: center;">Chi tiết</th>
+                  </tr>
+                </thead>
+                <tbody id="congViecTableBody">
+                  <tr><td colspan="10" class="text-center p-4 text-muted">Đang tải dữ liệu nhiệm vụ...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer class="app-footer">
+        <span>© 2026 Sở Giáo dục và Đào tạo thành phố Đà Nẵng</span>
+        <span>Phân hệ Quản lý công việc điều hành & Báo cáo thống kê</span>
+      </footer>
+    </div>
+  </div>
+
+  <!-- MODAL CHI TIẾT CÔNG VIỆC & THÔNG TIN VĂN BẢN -->
+  <div class="modal-backdrop" id="detailModal">
+    <div class="modal-dialog">
+      <div style="padding: 20px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
+        <h3 style="margin: 0; font-size: 17px; color: var(--primary-dark);" id="modalTaskTitle">Chi tiết nhiệm vụ</h3>
+        <button style="border: none; background: none; font-size: 22px; cursor: pointer; color: #64748b;" id="closeModalBtn">&times;</button>
+      </div>
+
+      <div style="padding: 20px;" id="modalBodyContent">
+        <!-- Thông tin văn bản liên kết -->
+        <div style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 14px; margin-bottom: 16px;">
+          <div style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: #0284c7; margin-bottom: 4px;">
+            📄 Căn cứ văn bản điều hành
+          </div>
+          <div style="font-weight: 700; color: #0369a1; font-size: 14px;" id="modalDocNumber">Số: 125/SGDĐT-GDTrH</div>
+          <div style="font-size: 13px; color: #334155; margin-top: 4px;" id="modalDocSummary">Trích yếu nội dung văn bản</div>
+          <div style="font-size: 12px; color: #64748b; margin-top: 4px;" id="modalDocDate">Ngày văn bản: 2026-10-20</div>
+        </div>
+
+        <!-- Thông tin giao việc -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 13px; margin-bottom: 16px;">
+          <div>Người giao: <strong id="modalAssigner">...</strong></div>
+          <div>Người xử lý: <strong id="modalAssignee">...</strong></div>
+          <div>Phòng ban: <strong id="modalDept">...</strong></div>
+          <div>Hạn hoàn thành: <span class="text-danger fw-bold" id="modalDeadline">...</span></div>
+          <div>Mức ưu tiên: <span id="modalPriority">...</span></div>
+          <div>Trạng thái: <span id="modalStatus">...</span></div>
+        </div>
+
+        <div style="margin-bottom: 16px;">
+          <div style="font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 4px;">Nội dung yêu cầu chi tiết:</div>
+          <div style="background: #f8fafc; padding: 10px; border-radius: 6px; font-size: 13px; color: #334155;" id="modalContent">...</div>
+        </div>
+
+        <div style="margin-bottom: 16px;">
+          <div style="font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 4px;">Báo cáo kết quả:</div>
+          <div style="background: #f1f5f9; padding: 10px; border-radius: 6px; font-size: 13px; color: #1e293b;" id="modalResult">Chưa có báo cáo</div>
+        </div>
+
+        <div style="margin-bottom: 16px;" id="modalFeedbackBox">
+          <div style="font-size: 12px; font-weight: 600; color: #15803d; margin-bottom: 4px;">Đánh giá của Lãnh đạo:</div>
+          <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 10px; border-radius: 6px; font-size: 13px; color: #166534;" id="modalFeedback">...</div>
+        </div>
+
+        <!-- Nhật ký tiến độ -->
+        <div>
+          <div style="font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 8px;">Nhật ký cập nhật tiến độ:</div>
+          <div id="modalTimeline"></div>
+        </div>
+      </div>
+
+      <div style="padding: 14px 20px; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+        <div>
+          <a id="btnTaskActionDraft" class="btn btn-primary btn-sm" href="#" style="display: none; font-weight: 600;">
+            ✍ Xử lý / Soạn thảo văn bản đi &rarr;
+          </a>
+        </div>
+        <button class="btn btn-secondary btn-sm" id="closeModalBtn2">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../js/core/toast.js"></script>
+  <script src="../../js/core/api.js"></script>
+  <script src="../../js/core/menu.js"></script>
+  <script src="../../js/core/auth-guard.js"></script>
+  <script src="../../js/mock/du-lieu-cong-viec.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = await window.AuthGuard.check();
+      if (!user) return;
+
+      const role = user.vai_tro;
+      const isSpecialist = role === 'CHUYEN_VIEN';
+      const isLeader = role === 'LANH_DAO';
+      const isClerk = role === 'VAN_THU';
+
+      const btnGiaoViec = document.getElementById('btnGiaoViec');
+      const btnBaoCao = document.getElementById('btnBaoCao');
+      const btnNghiemThu = document.getElementById('btnNghiemThu');
+
+      // Điều chỉnh giao diện theo phân quyền chuẩn:
+      if (isLeader) {
+        document.getElementById('pageSubtitle').innerText = 'Theo dõi tiến độ thực hiện công việc của các phòng ban trực thuộc Sở';
+        if (btnGiaoViec) btnGiaoViec.style.display = 'none';
+        if (btnBaoCao) btnBaoCao.style.display = 'none';
+        if (btnNghiemThu) btnNghiemThu.style.display = 'none';
+      } else if (isSpecialist) {
+        document.getElementById('pageSubtitle').innerText = 'Danh sách nhiệm vụ cá nhân được phân công và báo cáo tiến độ';
+        document.getElementById('chartRoleScope').innerText = 'Việc cá nhân';
+        if (btnGiaoViec) btnGiaoViec.style.display = 'none';
+        if (btnNghiemThu) btnNghiemThu.style.display = 'none';
+        if (btnBaoCao) btnBaoCao.style.display = 'inline-flex';
+      } else if (isClerk) {
+        document.getElementById('pageSubtitle').innerText = 'Quản lý giao nhiệm vụ và điều hành công việc cơ quan';
+        if (btnGiaoViec) btnGiaoViec.style.display = 'inline-flex';
+        if (btnNghiemThu) btnNghiemThu.style.display = 'inline-flex';
+        if (btnBaoCao) btnBaoCao.style.display = 'none';
+      }
+
+      const tbody = document.getElementById('congViecTableBody');
+      const searchInput = document.getElementById('searchInput');
+      const filterStatus = document.getElementById('filterStatus');
+      const filterPriority = document.getElementById('filterPriority');
+      const reloadBtn = document.getElementById('reloadBtn');
+
+      let doughnutChart = null;
+      let barChart = null;
+
+      const STATUS_LABELS = {
+        'CHUA_THUC_HIEN': '<span class="badge badge-secondary">Chưa thực hiện</span>',
+        'DANG_THUC_HIEN': '<span class="badge badge-info">Đang thực hiện</span>',
+        'CHO_DANH_GIA': '<span class="badge badge-warning">Chờ nghiệm thu</span>',
+        'HOAN_THANH': '<span class="badge badge-success">Đã hoàn thành</span>',
+        'QUA_HAN': '<span class="badge badge-danger badge-urgent">Quá hạn</span>'
+      };
+
+      const PRIORITY_LABELS = {
+        'KHAN_CAP': '<span class="badge badge-danger">Khẩn cấp</span>',
+        'CAO': '<span class="badge badge-danger">Cao</span>',
+        'TRUNG_BINH': '<span class="badge badge-warning">Trung bình</span>',
+        'THAP': '<span class="badge badge-secondary">Thấp</span>'
+      };
+
+      // Tải và vẽ Biểu đồ & KPI
+      async function loadStatistics() {
+        const stats = await window.congViecService.getStatistics();
+        if (!stats) return;
+
+        document.getElementById('statTongSo').innerText = stats.tong_so || 0;
+        document.getElementById('statDangLam').innerText = stats.theo_trang_thai?.DANG_THUC_HIEN || 0;
+        document.getElementById('statChoDuyet').innerText = stats.theo_trang_thai?.CHO_DANH_GIA || 0;
+        document.getElementById('statQuaHan').innerText = stats.theo_trang_thai?.QUA_HAN || 0;
+        document.getElementById('statTyLeDungHan').innerText = `${stats.ty_le_dung_han || 0}%`;
+
+        // Render Biểu đồ tròn (Doughnut)
+        const ctxDoughnut = document.getElementById('statusDoughnutChart').getContext('2d');
+        if (doughnutChart) doughnutChart.destroy();
+        doughnutChart = new Chart(ctxDoughnut, {
+          type: 'doughnut',
+          data: {
+            labels: stats.chart_doughnut.labels,
+            datasets: [{
+              data: stats.chart_doughnut.data,
+              backgroundColor: stats.chart_doughnut.colors,
+              borderWidth: 2,
+              borderColor: '#ffffff'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }
+            }
+          }
+        });
+
+        // Render Biểu đồ cột (Bar)
+        const ctxBar = document.getElementById('deptBarChart').getContext('2d');
+        if (barChart) barChart.destroy();
+        barChart = new Chart(ctxBar, {
+          type: 'bar',
+          data: {
+            labels: stats.chart_bar.labels,
+            datasets: [
+              {
+                label: 'Được giao',
+                data: stats.chart_bar.duoc_giao,
+                backgroundColor: '#0d6efd',
+                borderRadius: 4
+              },
+              {
+                label: 'Đã xong',
+                data: stats.chart_bar.da_xong,
+                backgroundColor: '#10b981',
+                borderRadius: 4
+              },
+              {
+                label: 'Trễ hạn',
+                data: stats.chart_bar.qua_han,
+                backgroundColor: '#ef4444',
+                borderRadius: 4
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: { beginAtZero: true, ticks: { precision: 0 } }
+            },
+            plugins: {
+              legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }
+            }
+          }
+        });
+      }
+
+      // Tải bảng danh sách
+      async function loadData() {
+        const filters = {
+          q: searchInput.value.trim(),
+          trang_thai: filterStatus.value,
+          do_uu_tien: filterPriority.value
+        };
+        const list = await window.congViecService.getAll(filters);
+
+        if (!list || list.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="10" class="text-center p-4 text-muted">Không tìm thấy công việc nào phù hợp.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = list.map((item, index) => {
+          const docHtml = item.so_ky_hieu_vb ? `
+            <div>
+              <span class="doc-badge">📄 ${item.so_ky_hieu_vb}</span>
+              <div style="font-size: 11px; color: #64748b; max-width: 190px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${item.trich_yeu_vb || ''}">
+                ${item.trich_yeu_vb || 'Văn bản chỉ đạo'}
+              </div>
+            </div>
+          ` : '<span class="text-muted" style="font-size: 11.5px;">Chỉ đạo trực tiếp</span>';
+
+          const progressColor = item.tien_do >= 100 ? '#10b981' : (item.trang_thai === 'QUA_HAN' ? '#ef4444' : '#0d6efd');
+
+          return `
+            <tr>
+              <td>${index + 1}</td>
+              <td style="max-width: 260px;">
+                <b style="color: var(--primary-dark); cursor: pointer;" onclick="viewTaskDetail(${item.id})">${item.ten_cong_viec}</b>
+                <div style="font-size: 11.5px; color: #64748b; margin-top: 2px; max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                  ${item.noi_dung || ''}
+                </div>
+              </td>
+              <td>${docHtml}</td>
+              <td><small>${item.nguoi_giao}</small></td>
+              <td>
+                <strong>${item.nguoi_xu_ly}</strong>
+                <div style="font-size: 11px; color: #64748b;">${item.phong_ban}</div>
+              </td>
+              <td><small class="${item.trang_thai === 'QUA_HAN' ? 'text-danger fw-bold' : ''}">${item.han_hoan_thanh}</small></td>
+              <td>${PRIORITY_LABELS[item.do_uu_tien] || item.do_uu_tien}</td>
+              <td style="min-width: 100px;">
+                <div style="font-size: 11.5px; margin-bottom: 2px; font-weight: bold;">${item.tien_do}%</div>
+                <div style="width: 100%; height: 6px; background-color: #e2e8f0; border-radius: 3px; overflow: hidden;">
+                  <div style="width: ${item.tien_do}%; height: 100%; background-color: ${progressColor};"></div>
+                </div>
+              </td>
+              <td>${STATUS_LABELS[item.trang_thai] || item.trang_thai}</td>
+              <td style="text-align: center;">
+                <div class="d-flex justify-content-center gap-1">
+                  <button class="btn btn-outline-primary btn-sm" onclick="viewTaskDetail(${item.id})" title="Xem chi tiết & Căn cứ văn bản">
+                    👁 Xem
+                  </button>
+                  ${isSpecialist ? `
+                    <a href="../van-ban-di/soan-thao.html?cong_viec_id=${item.id}&ten_cong_viec=${encodeURIComponent(item.ten_cong_viec)}" class="btn btn-outline-success btn-sm" title="Soạn văn bản xử lý nhiệm vụ này">
+                      ✍ Soạn VB
+                    </a>
+                  ` : ''}
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      // Xử lý modal chi tiết
+      window.viewTaskDetail = async function (id) {
+        try {
+          const task = await window.congViecService.getById(id);
+          if (!task) return;
+
+          document.getElementById('modalTaskTitle').innerText = task.ten_cong_viec;
+          document.getElementById('modalDocNumber').innerText = task.so_ky_hieu_vb ? `Số ký hiệu: ${task.so_ky_hieu_vb}` : 'Không có số hiệu văn bản';
+          document.getElementById('modalDocSummary').innerText = task.trich_yeu_vb || 'Căn cứ nhiệm vụ theo chỉ đạo nội bộ';
+          document.getElementById('modalDocDate').innerText = task.ngay_van_ban ? `Ngày văn bản: ${task.ngay_van_ban}` : '';
+          document.getElementById('modalAssigner').innerText = task.nguoi_giao || 'Lãnh đạo';
+          document.getElementById('modalAssignee').innerText = `${task.nguoi_xu_ly} (${task.phong_ban})`;
+          document.getElementById('modalDept').innerText = task.phong_ban;
+          document.getElementById('modalDeadline').innerText = task.han_hoan_thanh;
+          document.getElementById('modalPriority').innerHTML = PRIORITY_LABELS[task.do_uu_tien] || task.do_uu_tien;
+          document.getElementById('modalStatus').innerHTML = STATUS_LABELS[task.trang_thai] || task.trang_thai;
+          document.getElementById('modalContent').innerText = task.noi_dung || 'Không có mô tả chi tiết.';
+          document.getElementById('modalResult').innerText = task.ket_qua_bao_cao || 'Chưa nộp báo cáo kết quả.';
+
+          const feedbackBox = document.getElementById('modalFeedbackBox');
+          if (task.danh_gia_lanh_dao) {
+            feedbackBox.style.display = 'block';
+            document.getElementById('modalFeedback').innerText = task.danh_gia_lanh_dao;
+          } else {
+            feedbackBox.style.display = 'none';
+          }
+
+          // Lịch sử tiến độ
+          const timelineEl = document.getElementById('modalTimeline');
+          if (task.nhat_ky && task.nhat_ky.length > 0) {
+            timelineEl.innerHTML = task.nhat_ky.map(log => `
+              <div class="timeline-item">
+                <div style="font-size: 11.5px; color: #64748b;">${log.thoi_gian} - <b>${log.nguoi_cap_nhat_ten || 'Cán bộ'}</b></div>
+                <div style="font-size: 13px; margin-top: 2px;">${log.noi_dung_ghi_chu}</div>
+                <div style="font-size: 11.5px; color: #0284c7; font-weight: 600;">Tiến độ ghi nhận: ${log.tien_do_moi}%</div>
+              </div>
+            `).join('');
+          } else {
+            timelineEl.innerHTML = '<div style="font-size: 12.5px; color: #94a3b8;">Chưa có cập nhật tiến độ nào.</div>';
+          }
+
+          const btnDraft = document.getElementById('btnTaskActionDraft');
+          if (btnDraft) {
+            if (role === 'CHUYEN_VIEN') {
+              btnDraft.style.display = 'inline-flex';
+              btnDraft.href = `../van-ban-di/soan-thao.html?cong_viec_id=${task.id}&ten_cong_viec=${encodeURIComponent(task.ten_cong_viec)}&noi_dung=${encodeURIComponent(task.noi_dung || '')}&so_vb=${encodeURIComponent(task.so_ky_hieu_vb || '')}`;
+            } else {
+              btnDraft.style.display = 'none';
+            }
+          }
+
+          document.getElementById('detailModal').style.display = 'flex';
+        } catch (e) {
+          window.Toast.error('Không thể tải chi tiết công việc.');
+        }
+      };
+
+      const closeModal = () => { document.getElementById('detailModal').style.display = 'none'; };
+      document.getElementById('closeModalBtn').addEventListener('click', closeModal);
+      document.getElementById('closeModalBtn2').addEventListener('click', closeModal);
+
+      searchInput.addEventListener('input', loadData);
+      filterStatus.addEventListener('change', loadData);
+      filterPriority.addEventListener('change', loadData);
+      reloadBtn.addEventListener('click', () => {
+        loadStatistics();
+        loadData();
+      });
+
+      // Khởi tạo ban đầu
+      await loadStatistics();
+      await loadData();
+    });
+  </script>
+</body>
+</html>
