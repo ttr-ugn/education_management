@@ -272,25 +272,29 @@
       const statRoleLabel = document.getElementById('statRoleLabel');
 
       if (user.vai_tro === 'VAN_THU') {
-        subtextEl.textContent = 'Vai trò: Văn thư cơ quan & Quản trị hệ thống. Đồng chí có thể tiếp nhận văn bản, phát hành và duyệt tài khoản cán bộ.';
-        statRoleLabel.textContent = 'Tài khoản chờ duyệt';
+        subtextEl.textContent = 'Vai trò: Văn thư cơ quan & Quản trị hệ thống. Tiếp nhận dự thảo từ Chuyên viên, chuyển Lãnh đạo ký số và ban hành văn bản chính thức.';
+        statRoleLabel.textContent = 'Dự thảo chờ kiểm tra';
         
-        // Nạp số lượng chờ duyệt thật từ API
+        let draftCount = 0;
         try {
-          const usersRes = await window.api.get('/api/users?trang_thai=CHO_DUYET');
-          if (usersRes.du_lieu) {
-            statRoleSpec.textContent = usersRes.du_lieu.length;
+          const vbRes = await window.api.get('/api/van-ban-di?trang_thai=CHO_VAN_THU_KIEM_TRA');
+          if (vbRes.du_lieu) {
+            draftCount = vbRes.du_lieu.length;
+            statRoleSpec.textContent = draftCount;
           }
         } catch (e) {}
 
         quickActionsEl.innerHTML = `
-          <a href="van-ban-den/them.html" class="btn btn-outline-primary" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3);">
-            + Tiếp nhận VB đến
+          <a href="van-ban-di/kiem-tra.html" class="btn btn-warning">
+            📥 Kiểm tra dự thảo Chuyên viên (${draftCount})
           </a>
           <a href="van-ban-di/ban-hanh.html" class="btn btn-outline-primary" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3);">
-            Đóng dấu & Ban hành
+            Cấp số & Ban hành
           </a>
-          <a href="admin/duyet-tai-khoan.html" class="btn btn-warning">
+          <a href="van-ban-den/them.html" class="btn btn-outline-primary" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3);">
+            + Vào sổ VB đến ngoài Sở
+          </a>
+          <a href="admin/duyet-tai-khoan.html" class="btn btn-outline-primary" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3);">
             Duyệt tài khoản
           </a>
         `;

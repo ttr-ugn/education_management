@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Danh sách văn bản đi - Quản lý văn bản Sở GD&ĐT Đà Nẵng</title>
+  <title>Sổ theo dõi Văn bản đi - Quản lý văn bản Sở GD&ĐT Đà Nẵng</title>
   <link rel="icon" type="image/svg+xml" href="../../assets/logo-sodad.svg">
   <link rel="stylesheet" href="../../css/base.css">
   <link rel="stylesheet" href="../../css/layout.css">
@@ -38,13 +38,19 @@
           <span class="system-header-title">HỆ THỐNG QUẢN LÝ VĂN BẢN VÀ ĐIỀU HÀNH NỘI BỘ</span>
         </div>
         <div class="topbar-right">
-          <div class="user-profile-widget">
+          <a href="../thong-bao.html" class="topbar-icon-btn" title="Thông báo">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+          </a>
+          <a href="../ho-so-ca-nhan.html" class="user-profile-widget" style="text-decoration: none;">
             <div class="user-avatar" id="currentUserAvatar">CB</div>
             <div class="user-details">
-              <span class="user-name" id="currentUserName">...</span>
-              <span class="user-role-badge">Cán bộ</span>
+              <span class="user-name" id="currentUserName">Đang nạp...</span>
+              <span class="user-role-badge" id="currentUserRoleTop">Cán bộ</span>
             </div>
-          </div>
+          </a>
           <button class="btn btn-outline-primary btn-sm btn-logout" id="logoutBtn" title="Đăng xuất">
             Đăng xuất
           </button>
@@ -52,29 +58,13 @@
       </header>
 
       <main class="content-wrapper">
-        <div class="mock-data-banner">
-          <div>
-            <span class="banner-icon">📌</span>
-            <b>DỮ LIỆU MẪU (MOCK DATA)</b> - Phân hệ Văn bản đi đang hoạt động ở chế độ mô phỏng qua <code>vanBanDiService</code>.
-          </div>
-          <span class="badge badge-info">Mock Active</span>
-        </div>
-
         <div class="page-header">
           <div>
             <h1 class="page-title">Sổ theo dõi văn bản đi & Dự thảo</h1>
-            <p class="page-subtitle">Quản lý vòng đời dự thảo, quy trình phê duyệt ký số và ban hành văn bản chính thức</p>
+            <p class="page-subtitle">Theo dõi quy trình 5 bước: Chuyên viên soạn &rarr; Văn thư kiểm tra &rarr; Lãnh đạo ký số &rarr; Văn thư ban hành &rarr; Chuyên viên nhận file</p>
           </div>
-          <div class="d-flex gap-2">
-            <a href="soan-thao.html" class="btn btn-primary">
-              + Soạn thảo dự thảo mới
-            </a>
-            <a href="phe-duyet.html" class="btn btn-warning" id="btnLDPheDuyet">
-              Ký duyệt văn bản
-            </a>
-            <a href="ban-hanh.html" class="btn btn-success" id="btnVTBanHanh">
-              Cấp số & Ban hành
-            </a>
+          <div class="d-flex gap-2" id="headerActionButtons">
+            <!-- Nút hành động tùy biến theo vai trò -->
           </div>
         </div>
 
@@ -88,13 +78,15 @@
             <input type="text" id="searchInput" class="form-control" placeholder="Tìm theo số hiệu, trích yếu, phòng ban soạn thảo...">
           </div>
 
-          <div style="min-width: 180px;">
+          <div style="min-width: 220px;">
             <select id="filterStatus" class="form-select">
               <option value="">-- Tất cả trạng thái --</option>
-              <option value="CHO_LANH_DAO_DUYET">Chờ Lãnh đạo duyệt</option>
-              <option value="DA_DUYET">Đã duyệt (Chờ ban hành)</option>
-              <option value="DA_BAN_HANH">Đã ban hành</option>
-              <option value="YEU_CAU_CHINH_SUA">Yêu cầu chỉnh sửa</option>
+              <option value="CHO_VAN_THU_KIEM_TRA">1. Chờ Văn thư kiểm tra</option>
+              <option value="CHO_LANH_DAO_KY">2. Chờ Lãnh đạo ký số</option>
+              <option value="DA_KY_CHO_BAN_HANH">3. Đã ký (Chờ ban hành)</option>
+              <option value="DA_BAN_HANH">4. Đã ban hành chính thức</option>
+              <option value="VAN_THU_TRA_LAI">Văn thư trả lại</option>
+              <option value="LANH_DAO_TRA_LAI">Lãnh đạo trả lại</option>
             </select>
           </div>
 
@@ -110,16 +102,16 @@
                   <tr>
                     <th>Số ký hiệu</th>
                     <th>Trích yếu nội dung</th>
-                    <th>Loại văn bản</th>
-                    <th>Đơn vị soạn thảo</th>
+                    <th>Loại</th>
+                    <th>Đơn vị & Người soạn</th>
                     <th>Lãnh đạo ký</th>
                     <th>Ngày soạn</th>
                     <th>Trạng thái</th>
-                    <th style="text-align: center;">Thao tác</th>
+                    <th style="text-align: center; width: 160px;">Thao tác</th>
                   </tr>
                 </thead>
                 <tbody id="vbDiTableBody">
-                  <tr><td colspan="8" class="text-center p-4 text-muted">Đang tải...</td></tr>
+                  <tr><td colspan="8" class="text-center p-4 text-muted">Đang tải danh sách văn bản đi...</td></tr>
                 </tbody>
               </table>
             </div>
@@ -144,6 +136,33 @@
       const user = await window.AuthGuard.check();
       if (!user) return;
 
+      const headerActions = document.getElementById('headerActionButtons');
+      if (user.vai_tro === 'VAN_THU') {
+        headerActions.innerHTML = `
+          <a href="kiem-tra.html" class="btn btn-warning">
+            📥 Tiếp nhận dự thảo Chuyên viên gửi
+          </a>
+          <a href="ban-hanh.html" class="btn btn-success">
+            📑 Cấp số & Ban hành
+          </a>
+          <a href="soan-thao.html" class="btn btn-primary">
+            + Soạn thảo mới
+          </a>
+        `;
+      } else if (user.vai_tro === 'LANH_DAO') {
+        headerActions.innerHTML = `
+          <a href="phe-duyet.html" class="btn btn-warning">
+            ✍ Ký số & Duyệt văn bản
+          </a>
+        `;
+      } else {
+        headerActions.innerHTML = `
+          <a href="soan-thao.html" class="btn btn-primary">
+            + Soạn thảo dự thảo mới
+          </a>
+        `;
+      }
+
       const tbody = document.getElementById('vbDiTableBody');
       const searchInput = document.getElementById('searchInput');
       const filterStatus = document.getElementById('filterStatus');
@@ -153,10 +172,10 @@
         'CHO_VAN_THU_KIEM_TRA': '<span class="badge badge-warning">Chờ Văn thư kiểm tra</span>',
         'VAN_THU_TRA_LAI': '<span class="badge badge-danger">Văn thư trả lại</span>',
         'CHO_LANH_DAO_KY': '<span class="badge badge-primary">Chờ Lãnh đạo ký</span>',
-        'CHO_LANH_DAO_DUYET': '<span class="badge badge-warning">Chờ Lãnh đạo duyệt</span>',
+        'CHO_LANH_DAO_DUYET': '<span class="badge badge-primary">Chờ Lãnh đạo ký</span>',
         'LANH_DAO_TRA_LAI': '<span class="badge badge-danger">Lãnh đạo trả lại</span>',
         'DA_KY_CHO_BAN_HANH': '<span class="badge badge-info">Đã ký (Chờ ban hành)</span>',
-        'DA_DUYET': '<span class="badge badge-info">Đã duyệt (Chờ số)</span>',
+        'DA_DUYET': '<span class="badge badge-info">Đã ký (Chờ ban hành)</span>',
         'DA_BAN_HANH': '<span class="badge badge-success">Đã ban hành</span>',
         'YEU_CAU_CHINH_SUA': '<span class="badge badge-danger">Yêu cầu sửa đổi</span>'
       };
@@ -173,28 +192,42 @@
           return;
         }
 
-        tbody.innerHTML = list.map(item => `
-          <tr>
-            <td><strong>${item.so_ky_hieu}</strong></td>
-            <td style="max-width: 300px;">
-              ${item.trich_yeu}
-              ${item.ly_do_chinh_sua ? `<div class="text-danger" style="font-size: 11.5px; margin-top: 4px;">⚠ Cần sửa: ${item.ly_do_chinh_sua}</div>` : ''}
-            </td>
-            <td>${item.loai_van_ban}</td>
-            <td>
-              <div>${item.don_vi_soan_thao}</div>
-              <small class="text-muted">${item.nguoi_soan_thao}</small>
-            </td>
-            <td>${item.lanh_dao_ky}</td>
-            <td><small>${item.ngay_soan}</small></td>
-            <td>${STATUS_LABELS[item.trang_thai] || item.trang_thai}</td>
-            <td style="text-align: center;">
-              <div class="actions justify-content-center">
-                <a href="chi-tiet.html?id=${item.id}" class="btn btn-outline-primary btn-sm">Xem</a>
-              </div>
-            </td>
-          </tr>
-        `).join('');
+        tbody.innerHTML = list.map(item => {
+          let quickBtn = '';
+          if (user.vai_tro === 'VAN_THU' && item.trang_thai === 'CHO_VAN_THU_KIEM_TRA') {
+            quickBtn = `<a href="kiem-tra.html" class="btn btn-warning btn-sm">Kiểm tra</a>`;
+          } else if (user.vai_tro === 'LANH_DAO' && (item.trang_thai === 'CHO_LANH_DAO_KY' || item.trang_thai === 'CHO_LANH_DAO_DUYET')) {
+            quickBtn = `<a href="phe-duyet.html" class="btn btn-warning btn-sm">Ký số</a>`;
+          } else if (user.vai_tro === 'VAN_THU' && (item.trang_thai === 'DA_KY_CHO_BAN_HANH' || item.trang_thai === 'DA_DUYET')) {
+            quickBtn = `<a href="ban-hanh.html" class="btn btn-success btn-sm">Ban hành</a>`;
+          } else if (item.trang_thai === 'DA_BAN_HANH' && item.co_file_da_ky) {
+            quickBtn = `<a href="/api/van-ban-di/${item.id}/download?type=da_ky" target="_blank" class="btn btn-outline-success btn-sm" title="Tải văn bản đã ký số">📥 Tải PDF</a>`;
+          }
+
+          return `
+            <tr>
+              <td><strong>${item.so_ky_hieu}</strong></td>
+              <td style="max-width: 280px;">
+                ${item.trich_yeu}
+                ${item.ly_do_chinh_sua ? `<div class="text-danger" style="font-size: 11.5px; margin-top: 4px;">⚠ Ý kiến phản hồi: ${item.ly_do_chinh_sua}</div>` : ''}
+              </td>
+              <td>${item.loai_van_ban}</td>
+              <td>
+                <div><b>${item.don_vi_soan_thao}</b></div>
+                <small class="text-muted">${item.nguoi_soan_thao}</small>
+              </td>
+              <td>${item.lanh_dao_ky || 'Lãnh đạo Sở'}</td>
+              <td><small>${item.ngay_soan || item.ngay_tao || ''}</small></td>
+              <td>${STATUS_LABELS[item.trang_thai] || item.trang_thai}</td>
+              <td style="text-align: center;">
+                <div class="actions justify-content-center gap-1">
+                  ${quickBtn}
+                  <a href="chi-tiet.html?id=${item.id}" class="btn btn-outline-primary btn-sm">Chi tiết</a>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
       }
 
       searchInput.addEventListener('input', loadData);
