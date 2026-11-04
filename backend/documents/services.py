@@ -97,26 +97,56 @@ def create_document(user: dict, form_data: dict, uploaded_file) -> tuple[bool, s
     now_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     try:
+        cong_viec_id = form_data.get('cong_viec_id')
+        cv_id_int = int(cong_viec_id) if cong_viec_id and str(cong_viec_id).isdigit() else None
+
         cursor = db.execute('''
             INSERT INTO van_ban_di (
                 so_ky_hieu, trich_yeu, loai_van_ban, do_khan,
                 don_vi_soan_thao, noi_nhan, noi_dung_tom_tat,
                 file_goc_path, file_goc_ten, file_goc_dung_luong,
                 nguoi_soan_id, lanh_dao_ky_id, lanh_dao_ky_ten,
-                trang_thai, ngay_tao, ngay_trinh_van_thu
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'CHO_VAN_THU_KIEM_TRA', ?, ?)
+                trang_thai, ngay_tao, ngay_trinh_van_thu, cong_viec_id
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'CHO_VAN_THU_KIEM_TRA', ?, ?, ?)
         ''', (
             "Dự thảo/SGDĐT", trich_yeu, loai_van_ban, do_khan,
             don_vi_soan_thao, noi_nhan, noi_dung_tom_tat,
             str(file_path), original_name, size_str,
             user['nguoi_dung_id'], lanh_dao_id, lanh_dao_ky,
-            now_str, now_str
+            now_str, now_str, cv_id_int
         ))
         new_id = cursor.lastrowid
 
         # Cập nhật mã ký hiệu dự thảo theo ID
         so_du_thao = f"Dự thảo-{new_id:03d}/SGDĐT"
         db.execute('UPDATE van_ban_di SET so_ky_hieu = ? WHERE van_ban_id = ?', (so_du_thao, new_id))
+
+        # Nếu liên kết với công việc, cập nhật tiến độ công việc sang Đang thực hiện
+        if cv_id_int:
+            cv_row = db.execute('SELECT tien_do, ten_cong_viec FROM cong_viec WHERE cong_viec_id = ?', (cv_id_int,)).fetchone()
+            if cv_row:
+                tien_do_moi = max(cv_row['tien_do'], 50)
+                db.execute('''
+                    UPDATE cong_viec
+                    SET tien_do = ?,
+                        trang_thai = 'DANG_THUC_HIEN',
+                        so_ky_hieu_vb = ?,
+                        trich_yeu_vb = ?,
+                        ket_qua_bao_cao = 'Chuyên viên đã lập và gửi trình dự thảo văn bản đi: ' || ?,
+                        ngay_cap_nhat = CURRENT_TIMESTAMP
+                    WHERE cong_viec_id = ?
+                ''', (tien_do_moi, so_du_thao, trich_yeu, so_du_thao, cv_id_int))
+
+                db.execute('''
+                    INSERT INTO nhat_ky_cong_viec (
+                        cong_viec_id, nguoi_cap_nhat_id, nguoi_cap_nhat_ten,
+                        tien_do_cu, tien_do_moi, noi_dung_ghi_chu
+                    ) VALUES (?, ?, ?, ?, ?, ?)
+                ''', (
+                    cv_id_int, user['nguoi_dung_id'], user['ho_va_ten'],
+                    cv_row['tien_do'], tien_do_moi,
+                    f"Đã lập dự thảo văn bản đi [{so_du_thao}] để xử lý nhiệm vụ: {trich_yeu}"
+                ))
 
         # Ghi lịch sử
         record_history(
@@ -550,6 +580,33 @@ def clerk_publish_document(user: dict, doc_id: int, publish_data: dict) -> tuple
         SET so_ky_hieu = ?, ngay_ban_hanh = ?, trang_thai = ?, van_thu_id = ?
         WHERE van_ban_id = ?
     ''', (so_ky_hieu, ngay_ban_hanh, new_status, user['nguoi_dung_id'], doc_id))
+
+    # Cập nhật hoàn thành công việc liên kết nếu có
+    if row['cong_viec_id']:
+        cv_id = row['cong_viec_id']
+        cv_row = db.execute('SELECT tien_do FROM cong_viec WHERE cong_viec_id = ?', (cv_id,)).fetchone()
+        if cv_row:
+            db.execute('''
+                UPDATE cong_viec
+                SET tien_do = 100,
+                    trang_thai = 'HOAN_THANH',
+                    so_ky_hieu_vb = ?,
+                    trich_yeu_vb = ?,
+                    ket_qua_bao_cao = 'Hoàn thành nhiệm vụ! Văn bản chính thức đã ban hành với số hiệu: ' || ?,
+                    ngay_cap_nhat = CURRENT_TIMESTAMP
+                WHERE cong_viec_id = ?
+            ''', (so_ky_hieu, row['trich_yeu'], so_ky_hieu, cv_id))
+
+            db.execute('''
+                INSERT INTO nhat_ky_cong_viec (
+                    cong_viec_id, nguoi_cap_nhat_id, nguoi_cap_nhat_ten,
+                    tien_do_cu, tien_do_moi, noi_dung_ghi_chu
+                ) VALUES (?, ?, ?, ?, 100, ?)
+            ''', (
+                cv_id, user['nguoi_dung_id'], user['ho_va_ten'],
+                cv_row['tien_do'],
+                f"Nhiệm vụ hoàn thành 100%! Văn bản đi đã ban hành chính thức: {so_ky_hieu}"
+            ))
 
     record_history(
         db, doc_id, user['nguoi_dung_id'],

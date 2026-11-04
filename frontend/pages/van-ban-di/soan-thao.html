@@ -74,6 +74,14 @@
               <h2 class="card-title">Phiếu trình dự thảo văn bản đi</h2>
             </div>
             <div class="card-body">
+              <div id="linkedTaskBanner" style="display: none; background: #f0fdf4; border: 1px solid #86efac; border-left: 4px solid #22c55e; border-radius: 8px; padding: 14px 18px; margin-bottom: 20px;">
+                <div style="font-weight: 700; color: #15803d; font-size: 14px;">
+                  🎯 VĂN BẢN XỬ LÝ NHIỆM VỤ ĐƯỢC GIAO: <span id="linkedTaskName">...</span>
+                </div>
+                <div style="font-size: 12.5px; color: #166534; margin-top: 4px;">
+                  Khi gửi dự thảo này, hệ thống sẽ tự động liên kết ID công việc, cập nhật tiến độ nhiệm vụ sang <b>Đang thực hiện (50%)</b> và tự động nghiệm thu khi ban hành văn bản chính thức.
+                </div>
+              </div>
               <form id="draftForm" novalidate>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
                   <div class="form-group" style="grid-column: span 2;">
@@ -160,6 +168,24 @@
 
       document.getElementById('don_vi_soan_thao').value = user.phong_ban || 'Phòng Giáo dục Trung học';
 
+      // Đọc tham số công việc từ URL nếu có
+      const urlParams = new URLSearchParams(window.location.search);
+      const congViecId = urlParams.get('cong_viec_id');
+      const tenCongViec = urlParams.get('ten_cong_viec');
+      const noiDung = urlParams.get('noi_dung');
+
+      if (congViecId) {
+        document.getElementById('linkedTaskBanner').style.display = 'block';
+        document.getElementById('linkedTaskName').textContent = tenCongViec || `Nhiệm vụ #${congViecId}`;
+        
+        if (tenCongViec && !document.getElementById('trich_yeu').value) {
+          document.getElementById('trich_yeu').value = `V/v triển khai thực hiện nhiệm vụ: ${tenCongViec}`;
+        }
+        if (!document.getElementById('noi_nhan').value) {
+          document.getElementById('noi_nhan').value = 'Ban Giám đốc Sở, Văn phòng Sở';
+        }
+      }
+
       const form = document.getElementById('draftForm');
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -186,6 +212,9 @@
         formData.append('nguoi_soan_thao', user.ho_va_ten);
         formData.append('noi_nhan', noi_nhan);
         formData.append('do_khan', document.getElementById('do_khan').value);
+        if (congViecId) {
+          formData.append('cong_viec_id', congViecId);
+        }
         if (file) {
           formData.append('tep_dinh_kem', file);
           formData.append('ten_tep', file.name);
@@ -195,7 +224,9 @@
 
         try {
           await window.vanBanDiService.create(formData);
-          window.Toast.success('Đã gửi trình dự thảo văn bản tới Văn thư kiểm tra thành công!');
+          window.Toast.success(congViecId 
+            ? 'Đã gửi trình dự thảo và liên kết cập nhật tiến độ công việc thành công!' 
+            : 'Đã gửi trình dự thảo văn bản tới Văn thư kiểm tra thành công!');
           setTimeout(() => {
             window.location.replace('danh-sach.html');
           }, 1000);

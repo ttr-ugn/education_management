@@ -400,7 +400,12 @@
         </div>
       </div>
 
-      <div style="padding: 14px 20px; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 8px;">
+      <div style="padding: 14px 20px; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+        <div>
+          <a id="btnTaskActionDraft" class="btn btn-primary btn-sm" href="#" style="display: none; font-weight: 600;">
+            ✍ Xử lý / Soạn thảo văn bản đi &rarr;
+          </a>
+        </div>
         <button class="btn btn-secondary btn-sm" id="closeModalBtn2">Đóng</button>
       </div>
     </div>
@@ -580,9 +585,14 @@
               </td>
               <td>${STATUS_LABELS[item.trang_thai] || item.trang_thai}</td>
               <td style="text-align: center;">
-                <button class="btn btn-outline-primary btn-sm" onclick="viewTaskDetail(${item.id})" title="Xem chi tiết & Căn cứ văn bản">
-                  👁 Xem
-                </button>
+                <div class="d-flex justify-content-center gap-1">
+                  <button class="btn btn-outline-primary btn-sm" onclick="viewTaskDetail(${item.id})" title="Xem chi tiết & Căn cứ văn bản">
+                    👁 Xem
+                  </button>
+                  <a href="../van-ban-di/soan-thao.html?cong_viec_id=${item.id}&ten_cong_viec=${encodeURIComponent(item.ten_cong_viec)}" class="btn btn-outline-success btn-sm" title="Soạn văn bản xử lý nhiệm vụ này">
+                    ✍ Soạn VB
+                  </a>
+                </div>
               </td>
             </tr>
           `;
@@ -628,6 +638,16 @@
             `).join('');
           } else {
             timelineEl.innerHTML = '<div style="font-size: 12.5px; color: #94a3b8;">Chưa có cập nhật tiến độ nào.</div>';
+          }
+
+          const btnDraft = document.getElementById('btnTaskActionDraft');
+          if (btnDraft) {
+            if (role === 'CHUYEN_VIEN' || role === 'VAN_THU') {
+              btnDraft.style.display = 'inline-flex';
+              btnDraft.href = `../van-ban-di/soan-thao.html?cong_viec_id=${task.id}&ten_cong_viec=${encodeURIComponent(task.ten_cong_viec)}&noi_dung=${encodeURIComponent(task.noi_dung || '')}&so_vb=${encodeURIComponent(task.so_ky_hieu_vb || '')}`;
+            } else {
+              btnDraft.style.display = 'none';
+            }
           }
 
           document.getElementById('detailModal').style.display = 'flex';

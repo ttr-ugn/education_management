@@ -84,6 +84,8 @@ CREATE TABLE IF NOT EXISTS van_ban_di (
     ngay_trinh_van_thu     TEXT,
     ngay_trinh_lanh_dao    TEXT,
     ngay_ban_hanh          TEXT,
+    cong_viec_id           INTEGER,
+    FOREIGN KEY (cong_viec_id) REFERENCES cong_viec(cong_viec_id) ON DELETE SET NULL,
     FOREIGN KEY (nguoi_soan_id) REFERENCES nguoi_dung(nguoi_dung_id) ON DELETE RESTRICT,
     FOREIGN KEY (van_thu_id) REFERENCES nguoi_dung(nguoi_dung_id) ON DELETE SET NULL,
     FOREIGN KEY (lanh_dao_ky_id) REFERENCES nguoi_dung(nguoi_dung_id) ON DELETE SET NULL
