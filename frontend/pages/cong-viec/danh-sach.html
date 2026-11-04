@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Danh mục công việc điều hành - Quản lý văn bản Sở GD&ĐT Đà Nẵng</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/logo-sodad.svg">
+  <link rel="stylesheet" href="../../css/base.css">
+  <link rel="stylesheet" href="../../css/layout.css">
+  <link rel="stylesheet" href="../../css/components.css">
+</head>
+<body>
+  <div class="app-wrapper">
+    <aside class="app-sidebar" id="appSidebar">
+      <div class="sidebar-brand">
+        <img src="../../assets/logo-sodad.svg" alt="Logo Sở GD&ĐT">
+        <div class="brand-text">
+          <span class="brand-title">Sở GD&ĐT Đà Nẵng</span>
+          <span class="brand-subtitle">Quản lý văn bản điều hành</span>
+        </div>
+      </div>
+      <div class="sidebar-nav" id="sidebarNav"></div>
+      <div class="sidebar-footer">
+        Đang đăng nhập: <b id="currentUserRole">Cán bộ</b>
+      </div>
+    </aside>
+
+    <div class="app-main">
+      <header class="app-topbar">
+        <div class="topbar-left">
+          <button class="sidebar-toggle-btn" id="sidebarToggle" aria-label="Toggle Menu">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <span class="system-header-title">HỆ THỐNG QUẢN LÝ VĂN BẢN VÀ ĐIỀU HÀNH NỘI BỘ</span>
+        </div>
+        <div class="topbar-right">
+          <div class="user-profile-widget">
+            <div class="user-avatar" id="currentUserAvatar">CB</div>
+            <div class="user-details">
+              <span class="user-name" id="currentUserName">...</span>
+              <span class="user-role-badge">Cán bộ</span>
+            </div>
+          </div>
+          <button class="btn btn-outline-primary btn-sm btn-logout" id="logoutBtn" title="Đăng xuất">
+            Đăng xuất
+          </button>
+        </div>
+      </header>
+
+      <main class="content-wrapper">
+        <div class="mock-data-banner">
+          <div>
+            <span class="banner-icon">📌</span>
+            <b>DỮ LIỆU MẪU (MOCK DATA)</b> - Phân hệ Theo dõi & Điều hành công việc qua <code>congViecService</code>.
+          </div>
+          <span class="badge badge-info">Mock Active</span>
+        </div>
+
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Theo dõi tiến độ nhiệm vụ & Công việc điều hành</h1>
+            <p class="page-subtitle">Giám sát việc giao nhiệm vụ từ Lãnh đạo Sở đến các chuyên viên phòng ban</p>
+          </div>
+          <div class="d-flex gap-2">
+            <a href="giao-viec.html" class="btn btn-primary" id="btnGiaoViec">
+              + Giao nhiệm vụ mới
+            </a>
+            <a href="xu-ly.html" class="btn btn-warning">
+              Báo cáo tiến độ
+            </a>
+            <a href="phe-duyet-ket-qua.html" class="btn btn-success">
+              Nghiệm thu kết quả
+            </a>
+          </div>
+        </div>
+
+        <div class="filter-bar">
+          <div class="search-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="searchInput" class="form-control" placeholder="Tìm theo tên nhiệm vụ, người xử lý...">
+          </div>
+
+          <div style="min-width: 170px;">
+            <select id="filterStatus" class="form-select">
+              <option value="">-- Tất cả trạng thái --</option>
+              <option value="DANG_THUC_HIEN">Đang thực hiện</option>
+              <option value="CHO_DANH_GIA">Chờ đánh giá</option>
+              <option value="HOAN_THANH">Đã hoàn thành</option>
+              <option value="CHUA_THUC_HIEN">Chưa thực hiện</option>
+            </select>
+          </div>
+
+          <button class="btn btn-secondary" id="reloadBtn">🔄 Làm mới</button>
+        </div>
+
+        <div class="card">
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>STT</th>
+                    <th>Tên nhiệm vụ / Công việc</th>
+                    <th>Lãnh đạo giao</th>
+                    <th>Cán bộ xử lý</th>
+                    <th>Hạn hoàn thành</th>
+                    <th>Ưu tiên</th>
+                    <th>Tiến độ</th>
+                    <th>Trạng thái</th>
+                  </tr>
+                </thead>
+                <tbody id="congViecTableBody">
+                  <tr><td colspan="8" class="text-center p-4 text-muted">Đang nạp dữ liệu...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer class="app-footer">
+        <span>© 2026 Sở Giáo dục và Đào tạo thành phố Đà Nẵng</span>
+        <span>Hệ thống Quản lý văn bản điều hành nội bộ</span>
+      </footer>
+    </div>
+  </div>
+
+  <script src="../../js/core/toast.js"></script>
+  <script src="../../js/core/api.js"></script>
+  <script src="../../js/core/menu.js"></script>
+  <script src="../../js/core/auth-guard.js"></script>
+  <script src="../../js/mock/du-lieu-cong-viec.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = await window.AuthGuard.check();
+      if (!user) return;
+
+      const tbody = document.getElementById('congViecTableBody');
+      const searchInput = document.getElementById('searchInput');
+      const filterStatus = document.getElementById('filterStatus');
+      const reloadBtn = document.getElementById('reloadBtn');
+
+      const STATUS_LABELS = {
+        'CHUA_THUC_HIEN': '<span class="badge badge-secondary">Chưa thực hiện</span>',
+        'DANG_THUC_HIEN': '<span class="badge badge-info">Đang thực hiện</span>',
+        'CHO_DANH_GIA': '<span class="badge badge-warning">Chờ nghiệm thu</span>',
+        'HOAN_THANH': '<span class="badge badge-success">Đã hoàn thành</span>'
+      };
+
+      const PRIORITY_LABELS = {
+        'CAO': '<span class="badge badge-danger">Cao</span>',
+        'TRUNG_BINH': '<span class="badge badge-warning">Trung bình</span>',
+        'THAP': '<span class="badge badge-secondary">Thấp</span>'
+      };
+
+      async function loadData() {
+        const filters = {
+          q: searchInput.value.trim(),
+          trang_thai: filterStatus.value
+        };
+        const list = await window.congViecService.getAll(filters);
+
+        if (list.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="8" class="text-center p-4 text-muted">Không tìm thấy công việc nào.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = list.map((item, index) => `
+          <tr>
+            <td>${index + 1}</td>
+            <td style="max-width: 320px;">
+              <b>${item.ten_cong_viec}</b>
+              <div style="font-size: 11.5px; color: #64748b; margin-top: 2px;">${item.noi_dung}</div>
+            </td>
+            <td><small>${item.nguoi_giao}</small></td>
+            <td><strong>${item.nguoi_xu_ly}</strong></td>
+            <td><small class="text-danger fw-bold">${item.han_hoan_thanh}</small></td>
+            <td>${PRIORITY_LABELS[item.do_uu_tien] || item.do_uu_tien}</td>
+            <td style="min-width: 120px;">
+              <div style="font-size: 12px; margin-bottom: 3px; font-weight: bold;">${item.tien_do}%</div>
+              <div style="width: 100%; height: 6px; background-color: #e2e8f0; border-radius: 3px; overflow: hidden;">
+                <div style="width: ${item.tien_do}%; height: 100%; background-color: ${item.tien_do >= 100 ? '#10b981' : '#0d6efd'};"></div>
+              </div>
+            </td>
+            <td>${STATUS_LABELS[item.trang_thai] || item.trang_thai}</td>
+          </tr>
+        `).join('');
+      }
+
+      searchInput.addEventListener('input', loadData);
+      filterStatus.addEventListener('change', loadData);
+      reloadBtn.addEventListener('click', loadData);
+
+      loadData();
+    });
+  </script>
+</body>
+</html>

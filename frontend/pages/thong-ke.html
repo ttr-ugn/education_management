@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Báo cáo thống kê - Quản lý văn bản Sở GD&ĐT Đà Nẵng</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/logo-sodad.svg">
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <!-- Chart.js qua CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="app-wrapper">
+    <aside class="app-sidebar" id="appSidebar">
+      <div class="sidebar-brand">
+        <img src="../assets/logo-sodad.svg" alt="Logo Sở GD&ĐT">
+        <div class="brand-text">
+          <span class="brand-title">Sở GD&ĐT Đà Nẵng</span>
+          <span class="brand-subtitle">Quản lý văn bản điều hành</span>
+        </div>
+      </div>
+      <div class="sidebar-nav" id="sidebarNav"></div>
+      <div class="sidebar-footer">
+        Đang đăng nhập: <b id="currentUserRole">Cán bộ</b>
+      </div>
+    </aside>
+
+    <div class="app-main">
+      <header class="app-topbar">
+        <div class="topbar-left">
+          <button class="sidebar-toggle-btn" id="sidebarToggle" aria-label="Toggle Menu">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <span class="system-header-title">HỆ THỐNG QUẢN LÝ VĂN BẢN VÀ ĐIỀU HÀNH NỘI BỘ</span>
+        </div>
+        <div class="topbar-right">
+          <div class="user-profile-widget">
+            <div class="user-avatar" id="currentUserAvatar">CB</div>
+            <div class="user-details">
+              <span class="user-name" id="currentUserName">...</span>
+              <span class="user-role-badge">Cán bộ</span>
+            </div>
+          </div>
+          <button class="btn btn-outline-primary btn-sm btn-logout" id="logoutBtn" title="Đăng xuất">
+            Đăng xuất
+          </button>
+        </div>
+      </header>
+
+      <main class="content-wrapper">
+        <div class="mock-data-banner">
+          <div>
+            <span class="banner-icon">📌</span>
+            <b>DỮ LIỆU MẪU (MOCK DATA)</b> - Các chỉ số thống kê và biểu đồ hiển thị từ <code>thongKeService</code>.
+          </div>
+          <span class="badge badge-info">Mock Active</span>
+        </div>
+
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Báo cáo & Thống kê tổng hợp điều hành văn bản</h1>
+            <p class="page-subtitle">Số liệu phân tích lưu lượng văn bản đi - đến và hiệu suất hoàn thành nhiệm vụ toàn Sở</p>
+          </div>
+          <button class="btn btn-outline-primary" onclick="window.print();">
+            🖨 In báo cáo thống kê
+          </button>
+        </div>
+
+        <!-- 2 Biểu đồ hàng 1 -->
+        <div style="display: grid; grid-template-columns: 1.6fr 1fr; gap: 24px; margin-bottom: 24px;">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Lưu lượng văn bản đến & văn bản đi theo tháng (Năm 2026)</h2>
+            </div>
+            <div class="card-body">
+              <canvas id="chartLuuLuong" height="180"></canvas>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Tỷ lệ hoàn thành công việc</h2>
+            </div>
+            <div class="card-body d-flex justify-content-center align-items-center">
+              <div style="max-width: 260px; width: 100%;">
+                <canvas id="chartCongViec"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Biểu đồ hàng 2 -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Cơ cấu thể loại văn bản điều hành</h2>
+            </div>
+            <div class="card-body">
+              <canvas id="chartLoaiVB" height="160"></canvas>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Số lượng văn bản xử lý theo phòng ban</h2>
+            </div>
+            <div class="card-body">
+              <canvas id="chartPhongBan" height="160"></canvas>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer class="app-footer">
+        <span>© 2026 Sở Giáo dục và Đào tạo thành phố Đà Nẵng</span>
+        <span>Hệ thống Quản lý văn bản điều hành nội bộ</span>
+      </footer>
+    </div>
+  </div>
+
+  <script src="../js/core/toast.js"></script>
+  <script src="../js/core/api.js"></script>
+  <script src="../js/core/menu.js"></script>
+  <script src="../js/core/auth-guard.js"></script>
+  <script src="../js/mock/du-lieu-thong-ke.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = await window.AuthGuard.check();
+      if (!user) return;
+
+      const data = await window.thongKeService.getOverview();
+
+      // 1. Biểu đồ lưu lượng tháng (Bar & Line kết hợp)
+      new Chart(document.getElementById('chartLuuLuong'), {
+        type: 'bar',
+        data: {
+          labels: data.van_ban_theo_thang.labels,
+          datasets: [
+            {
+              label: 'Văn bản đến',
+              data: data.van_ban_theo_thang.vb_den,
+              backgroundColor: '#004b91',
+              borderRadius: 4
+            },
+            {
+              label: 'Văn bản đi',
+              data: data.van_ban_theo_thang.vb_di,
+              backgroundColor: '#10b981',
+              borderRadius: 4
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { position: 'top' } }
+        }
+      });
+
+      // 2. Biểu đồ Doughnut công việc
+      new Chart(document.getElementById('chartCongViec'), {
+        type: 'doughnut',
+        data: {
+          labels: data.tinh_hinh_xu_ly_cong_viec.labels,
+          datasets: [{
+            data: data.tinh_hinh_xu_ly_cong_viec.data,
+            backgroundColor: data.tinh_hinh_xu_ly_cong_viec.colors
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { position: 'bottom' } }
+        }
+      });
+
+      // 3. Biểu đồ phân bổ loại văn bản
+      new Chart(document.getElementById('chartLoaiVB'), {
+        type: 'pie',
+        data: {
+          labels: data.co_cau_loai_van_ban.labels,
+          datasets: [{
+            data: data.co_cau_loai_van_ban.data,
+            backgroundColor: ['#004b91', '#1e70bf', '#0284c7', '#f59e0b', '#10b981', '#64748b']
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { position: 'right' } }
+        }
+      });
+
+      // 4. Biểu đồ phòng ban
+      new Chart(document.getElementById('chartPhongBan'), {
+        type: 'bar',
+        data: {
+          labels: data.van_ban_theo_phong_ban.labels,
+          datasets: [{
+            label: 'Số văn bản phụ trách',
+            data: data.van_ban_theo_phong_ban.data,
+            backgroundColor: '#1e70bf',
+            borderRadius: 4
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          plugins: { legend: { display: false } }
+        }
+      });
+    });
+  </script>
+</body>
+</html>

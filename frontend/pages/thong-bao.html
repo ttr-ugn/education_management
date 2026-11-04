@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thông báo điều hành nội bộ - Sở GD&ĐT Đà Nẵng</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/logo-sodad.svg">
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/components.css">
+</head>
+<body>
+  <div class="app-wrapper">
+    <aside class="app-sidebar" id="appSidebar">
+      <div class="sidebar-brand">
+        <img src="../assets/logo-sodad.svg" alt="Logo Sở GD&ĐT">
+        <div class="brand-text">
+          <span class="brand-title">Sở GD&ĐT Đà Nẵng</span>
+          <span class="brand-subtitle">Quản lý văn bản điều hành</span>
+        </div>
+      </div>
+      <div class="sidebar-nav" id="sidebarNav"></div>
+      <div class="sidebar-footer">
+        Đang đăng nhập: <b id="currentUserRole">Cán bộ</b>
+      </div>
+    </aside>
+
+    <div class="app-main">
+      <header class="app-topbar">
+        <div class="topbar-left">
+          <button class="sidebar-toggle-btn" id="sidebarToggle" aria-label="Toggle Menu">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <span class="system-header-title">HỆ THỐNG QUẢN LÝ VĂN BẢN VÀ ĐIỀU HÀNH NỘI BỘ</span>
+        </div>
+        <div class="topbar-right">
+          <div class="user-profile-widget">
+            <div class="user-avatar" id="currentUserAvatar">CB</div>
+            <div class="user-details">
+              <span class="user-name" id="currentUserName">...</span>
+              <span class="user-role-badge">Cán bộ</span>
+            </div>
+          </div>
+          <button class="btn btn-outline-primary btn-sm btn-logout" id="logoutBtn" title="Đăng xuất">
+            Đăng xuất
+          </button>
+        </div>
+      </header>
+
+      <main class="content-wrapper">
+        <div class="mock-data-banner">
+          <div>
+            <span class="banner-icon">📌</span>
+            <b>DỮ LIỆU MẪU (MOCK DATA)</b> - Thông báo điều hành nội bộ hiển thị từ <code>thongBaoService</code>.
+          </div>
+          <span class="badge badge-info">Mock Active</span>
+        </div>
+
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Bảng tin & Thông báo điều hành cơ quan</h1>
+            <p class="page-subtitle">Nhận thông tin cuộc họp, phân công đột xuất và thông báo từ Văn phòng Sở</p>
+          </div>
+        </div>
+
+        <div style="max-width: 900px;" id="notificationsContainer">
+          <!-- Danh sách thông báo -->
+        </div>
+      </main>
+
+      <footer class="app-footer">
+        <span>© 2026 Sở Giáo dục và Đào tạo thành phố Đà Nẵng</span>
+        <span>Hệ thống Quản lý văn bản điều hành nội bộ</span>
+      </footer>
+    </div>
+  </div>
+
+  <script src="../js/core/toast.js"></script>
+  <script src="../js/core/api.js"></script>
+  <script src="../js/core/menu.js"></script>
+  <script src="../js/core/auth-guard.js"></script>
+  <script src="../js/mock/du-lieu-thong-bao.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = await window.AuthGuard.check();
+      if (!user) return;
+
+      const container = document.getElementById('notificationsContainer');
+
+      async function loadData() {
+        const list = await window.thongBaoService.getAll();
+        container.innerHTML = list.map(item => `
+          <div class="card" style="border-left: 4px solid ${item.da_doc ? '#94a3b8' : 'var(--primary-color)'};">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <div>
+                  <span class="badge ${item.muc_do === 'Quan trọng' ? 'badge-danger' : 'badge-info'}">${item.loai}</span>
+                  ${!item.da_doc ? '<span class="badge badge-warning ml-1">Mới</span>' : ''}
+                </div>
+                <small class="text-muted">${item.thoi_gian}</small>
+              </div>
+              <h3 style="font-size: 16px; font-weight: 700; color: #1e293b; margin-bottom: 8px;">
+                ${item.tieu_de}
+              </h3>
+              <p style="font-size: 13.5px; color: #475569; line-height: 1.5; margin-bottom: 12px;">
+                ${item.noi_dung}
+              </p>
+              <div class="d-flex justify-content-between align-items-center text-muted" style="font-size: 12px; border-top: 1px solid var(--border-color); padding-top: 8px;">
+                <span>Nguồn gửi: <b>${item.nguoi_gui}</b></span>
+                ${!item.da_doc ? `
+                  <button class="btn btn-outline-primary btn-sm btn-mark-read" data-id="${item.id}">
+                    Đánh dấu đã đọc
+                  </button>
+                ` : '<span class="text-muted">✓ Đã đọc</span>'}
+              </div>
+            </div>
+          </div>
+        `).join('');
+
+        container.querySelectorAll('.btn-mark-read').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            await window.thongBaoService.markAsRead(btn.dataset.id);
+            window.Toast.success('Đã đánh dấu thông báo là đã đọc.');
+            loadData();
+          });
+        });
+      }
+
+      loadData();
+    });
+  </script>
+</body>
+</html>

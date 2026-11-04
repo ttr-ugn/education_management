@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Báo cáo xử lý công việc - Quản lý văn bản Sở GD&ĐT Đà Nẵng</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/logo-sodad.svg">
+  <link rel="stylesheet" href="../../css/base.css">
+  <link rel="stylesheet" href="../../css/layout.css">
+  <link rel="stylesheet" href="../../css/components.css">
+</head>
+<body>
+  <div class="app-wrapper">
+    <aside class="app-sidebar" id="appSidebar">
+      <div class="sidebar-brand">
+        <img src="../../assets/logo-sodad.svg" alt="Logo Sở GD&ĐT">
+        <div class="brand-text">
+          <span class="brand-title">Sở GD&ĐT Đà Nẵng</span>
+          <span class="brand-subtitle">Quản lý văn bản điều hành</span>
+        </div>
+      </div>
+      <div class="sidebar-nav" id="sidebarNav"></div>
+      <div class="sidebar-footer">
+        Đang đăng nhập: <b id="currentUserRole">Chuyên viên</b>
+      </div>
+    </aside>
+
+    <div class="app-main">
+      <header class="app-topbar">
+        <div class="topbar-left">
+          <button class="sidebar-toggle-btn" id="sidebarToggle" aria-label="Toggle Menu">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <span class="system-header-title">HỆ THỐNG QUẢN LÝ VĂN BẢN VÀ ĐIỀU HÀNH NỘI BỘ</span>
+        </div>
+        <div class="topbar-right">
+          <div class="user-profile-widget">
+            <div class="user-avatar" id="currentUserAvatar">CV</div>
+            <div class="user-details">
+              <span class="user-name" id="currentUserName">...</span>
+              <span class="user-role-badge">Chuyên viên</span>
+            </div>
+          </div>
+          <button class="btn btn-outline-primary btn-sm btn-logout" id="logoutBtn" title="Đăng xuất">
+            Đăng xuất
+          </button>
+        </div>
+      </header>
+
+      <main class="content-wrapper">
+        <div class="mock-data-banner">
+          <div>
+            <span class="banner-icon">📌</span>
+            <b>DỮ LIỆU MẪU (MOCK DATA)</b> - Báo cáo tiến độ cập nhật vào mảng mock JS qua <code>congViecService</code>.
+          </div>
+          <span class="badge badge-info">Mock Active</span>
+        </div>
+
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Cập nhật tiến độ & Báo cáo kết quả xử lý nhiệm vụ</h1>
+            <p class="page-subtitle">Dành cho Chuyên viên: cập nhật % tiến độ thực hiện và trình kết quả lên Lãnh đạo</p>
+          </div>
+          <a href="danh-sach.html" class="btn btn-secondary">Quay lại danh sách</a>
+        </div>
+
+        <div style="max-width: 840px; margin: 0 auto;">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Cập nhật tiến độ nhiệm vụ đang thực hiện</h2>
+            </div>
+            <div class="card-body">
+              <form id="progressForm">
+                <div class="form-group">
+                  <label class="form-label required">Chọn nhiệm vụ đang xử lý</label>
+                  <select id="selectTask" class="form-select" required>
+                    <option value="">-- Đang nạp danh sách công việc --</option>
+                  </select>
+                </div>
+
+                <div id="taskDetailBox" style="background-color: #f8fafc; padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-bottom: 20px; display: none;">
+                  <div class="d-flex justify-content-between mb-2">
+                    <span class="badge badge-danger" id="taskPriority">...</span>
+                    <span class="text-danger fw-bold" id="taskDeadline">...</span>
+                  </div>
+                  <h4 style="font-size: 14.5px; color: var(--primary-dark); margin-bottom: 6px;" id="taskName">...</h4>
+                  <p style="font-size: 13px; color: #64748b; margin-bottom: 10px;" id="taskContent">...</p>
+                  <div style="font-size: 12px; color: #0284c7;">
+                    Lãnh đạo giao: <b id="taskAssigner">...</b>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label required">Tỷ lệ tiến độ hoàn thành (%)</label>
+                  <div class="d-flex align-items-center gap-3">
+                    <input type="range" id="progressRange" min="0" max="100" step="5" value="50" style="flex-grow: 1;">
+                    <span id="progressValue" style="font-size: 18px; font-weight: bold; color: var(--primary-color); min-width: 50px;">50%</span>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label required">Báo cáo tóm tắt kết quả thực hiện</label>
+                  <textarea id="reportNote" class="form-control" rows="4" placeholder="Nhập các đầu việc đã hoàn thành, khó khăn vướng mắc nếu có..." required></textarea>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                  <a href="danh-sach.html" class="btn btn-secondary">Hủy bỏ</a>
+                  <button type="submit" class="btn btn-primary">
+                    📤 Cập nhật tiến độ nhiệm vụ
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer class="app-footer">
+        <span>© 2026 Sở Giáo dục và Đào tạo thành phố Đà Nẵng</span>
+        <span>Hệ thống Quản lý văn bản điều hành nội bộ</span>
+      </footer>
+    </div>
+  </div>
+
+  <script src="../../js/core/toast.js"></script>
+  <script src="../../js/core/api.js"></script>
+  <script src="../../js/core/menu.js"></script>
+  <script src="../../js/core/auth-guard.js"></script>
+  <script src="../../js/mock/du-lieu-cong-viec.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = await window.AuthGuard.check();
+      if (!user) return;
+
+      const selectTask = document.getElementById('selectTask');
+      const detailBox = document.getElementById('taskDetailBox');
+      const progressRange = document.getElementById('progressRange');
+      const progressValue = document.getElementById('progressValue');
+      const reportNote = document.getElementById('reportNote');
+      const form = document.getElementById('progressForm');
+
+      progressRange.addEventListener('input', () => {
+        progressValue.textContent = `${progressRange.value}%`;
+      });
+
+      const tasks = await window.congViecService.getAll();
+      selectTask.innerHTML = '<option value="">-- Chọn nhiệm vụ cần báo cáo --</option>' +
+        tasks.map(t => `<option value="${t.id}">${t.ten_cong_viec} (Tiến độ: ${t.tien_do}%)</option>`).join('');
+
+      selectTask.addEventListener('change', () => {
+        const id = selectTask.value;
+        if (!id) {
+          detailBox.style.display = 'none';
+          return;
+        }
+        const task = tasks.find(t => t.id === parseInt(id));
+        if (task) {
+          document.getElementById('taskPriority').textContent = task.do_uu_tien;
+          document.getElementById('taskDeadline').textContent = `Hạn: ${task.han_hoan_thanh}`;
+          document.getElementById('taskName').textContent = task.ten_cong_viec;
+          document.getElementById('taskContent').textContent = task.noi_dung;
+          document.getElementById('taskAssigner').textContent = task.nguoi_giao;
+          progressRange.value = task.tien_do;
+          progressValue.textContent = `${task.tien_do}%`;
+          reportNote.value = task.ket_qua_bao_cao || '';
+          detailBox.style.display = 'block';
+        }
+      });
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = selectTask.value;
+        if (!id) {
+          window.Toast.warning('Vui lòng chọn nhiệm vụ.');
+          return;
+        }
+
+        await window.congViecService.updateProgress(id, progressRange.value, reportNote.value);
+        window.Toast.success('Cập nhật tiến độ công việc thành công!');
+        setTimeout(() => {
+          window.location.replace('danh-sach.html');
+        }, 800);
+      });
+    });
+  </script>
+</body>
+</html>

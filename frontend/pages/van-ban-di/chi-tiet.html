@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chi tiết văn bản đi - Quản lý văn bản Sở GD&ĐT Đà Nẵng</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/logo-sodad.svg">
+  <link rel="stylesheet" href="../../css/base.css">
+  <link rel="stylesheet" href="../../css/layout.css">
+  <link rel="stylesheet" href="../../css/components.css">
+</head>
+<body>
+  <div class="app-wrapper">
+    <aside class="app-sidebar" id="appSidebar">
+      <div class="sidebar-brand">
+        <img src="../../assets/logo-sodad.svg" alt="Logo Sở GD&ĐT">
+        <div class="brand-text">
+          <span class="brand-title">Sở GD&ĐT Đà Nẵng</span>
+          <span class="brand-subtitle">Quản lý văn bản điều hành</span>
+        </div>
+      </div>
+      <div class="sidebar-nav" id="sidebarNav"></div>
+      <div class="sidebar-footer">
+        Đang đăng nhập: <b id="currentUserRole">Cán bộ</b>
+      </div>
+    </aside>
+
+    <div class="app-main">
+      <header class="app-topbar">
+        <div class="topbar-left">
+          <button class="sidebar-toggle-btn" id="sidebarToggle" aria-label="Toggle Menu">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <span class="system-header-title">HỆ THỐNG QUẢN LÝ VĂN BẢN VÀ ĐIỀU HÀNH NỘI BỘ</span>
+        </div>
+        <div class="topbar-right">
+          <div class="user-profile-widget">
+            <div class="user-avatar" id="currentUserAvatar">CB</div>
+            <div class="user-details">
+              <span class="user-name" id="currentUserName">...</span>
+              <span class="user-role-badge">Cán bộ</span>
+            </div>
+          </div>
+          <button class="btn btn-outline-primary btn-sm btn-logout" id="logoutBtn" title="Đăng xuất">
+            Đăng xuất
+          </button>
+        </div>
+      </header>
+
+      <main class="content-wrapper">
+        <div class="mock-data-banner">
+          <div>
+            <span class="banner-icon">📌</span>
+            <b>DỮ LIỆU MẪU (MOCK DATA)</b> - Thông tin văn bản đi tải từ <code>vanBanDiService</code>.
+          </div>
+          <span class="badge badge-info">Mock Active</span>
+        </div>
+
+        <div class="page-header">
+          <div>
+            <h1 class="page-title" id="docTitle">Chi tiết văn bản đi</h1>
+            <p class="page-subtitle" id="docSubTitle">Số ký hiệu: ...</p>
+          </div>
+          <a href="danh-sach.html" class="btn btn-secondary">Quay lại danh sách</a>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Thông tin thể thức & Trích yếu văn bản</h2>
+              <span id="docStatusBadge"></span>
+            </div>
+            <div class="card-body">
+              <div style="background-color: #f8fafc; padding: 16px; border-radius: var(--radius-md); border-left: 4px solid var(--primary-color); margin-bottom: 20px;">
+                <span class="text-muted" style="font-size: 12px; text-transform: uppercase;">Trích yếu văn bản:</span>
+                <p style="font-size: 16px; font-weight: 600; color: #1e293b; margin-top: 4px;" id="docTrichYeu">...</p>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; font-size: 13.5px;">
+                <div>
+                  <span class="text-muted">Đơn vị soạn thảo:</span>
+                  <div class="fw-bold" id="docDonVi">...</div>
+                </div>
+                <div>
+                  <span class="text-muted">Chuyên viên soạn:</span>
+                  <div class="fw-bold" id="docNguoiSoan">...</div>
+                </div>
+                <div>
+                  <span class="text-muted">Lãnh đạo ký duyệt:</span>
+                  <div class="fw-bold" id="docLanhDao">...</div>
+                </div>
+                <div>
+                  <span class="text-muted">Hình thức văn bản:</span>
+                  <div id="docLoai">...</div>
+                </div>
+                <div>
+                  <span class="text-muted">Ngày khởi tạo:</span>
+                  <div id="docNgaySoan">...</div>
+                </div>
+                <div>
+                  <span class="text-muted">Ngày ban hành:</span>
+                  <div id="docNgayBanHanh">...</div>
+                </div>
+                <div style="grid-column: span 2;">
+                  <span class="text-muted">Nơi nhận văn bản:</span>
+                  <div id="docNoiNhan">...</div>
+                </div>
+              </div>
+
+              <div id="correctionBox" style="margin-top: 20px; display: none; background-color: #fef2f2; border: 1px solid #fecaca; padding: 14px; border-radius: 6px;">
+                <b style="color: #991b1b;">Ý kiến phản hồi / Yêu cầu chỉnh sửa của Lãnh đạo:</b>
+                <p id="docLyDoChinhSua" style="font-size: 13px; color: #7f1d1d; margin: 4px 0 0 0;"></p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Tệp văn bản đính kèm</h2>
+            </div>
+            <div class="card-body">
+              <div id="attachmentsList" style="display: flex; flex-direction: column; gap: 10px;"></div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer class="app-footer">
+        <span>© 2026 Sở Giáo dục và Đào tạo thành phố Đà Nẵng</span>
+        <span>Hệ thống Quản lý văn bản điều hành nội bộ</span>
+      </footer>
+    </div>
+  </div>
+
+  <script src="../../js/core/toast.js"></script>
+  <script src="../../js/core/api.js"></script>
+  <script src="../../js/core/menu.js"></script>
+  <script src="../../js/core/auth-guard.js"></script>
+  <script src="../../js/mock/du-lieu-van-ban.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = await window.AuthGuard.check();
+      if (!user) return;
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const docId = urlParams.get('id') || 101;
+
+      try {
+        const doc = await window.vanBanDiService.getById(docId);
+        document.getElementById('docTitle').textContent = `Văn bản: ${doc.so_ky_hieu}`;
+        document.getElementById('docSubTitle').textContent = `Loại văn bản: ${doc.loai_van_ban}`;
+        document.getElementById('docTrichYeu').textContent = doc.trich_yeu;
+        document.getElementById('docDonVi').textContent = doc.don_vi_soan_thao;
+        document.getElementById('docNguoiSoan').textContent = doc.nguoi_soan_thao;
+        document.getElementById('docLanhDao').textContent = doc.lanh_dao_ky;
+        document.getElementById('docLoai').textContent = doc.loai_van_ban;
+        document.getElementById('docNgaySoan').textContent = doc.ngay_soan;
+        document.getElementById('docNgayBanHanh').textContent = doc.ngay_ban_hanh || 'Chưa ban hành chính thức';
+        document.getElementById('docNoiNhan').textContent = doc.noi_nhan || 'Các cơ quan liên quan';
+
+        if (doc.ly_do_chinh_sua) {
+          document.getElementById('docLyDoChinhSua').textContent = doc.ly_do_chinh_sua;
+          document.getElementById('correctionBox').style.display = 'block';
+        }
+
+        const attachContainer = document.getElementById('attachmentsList');
+        if (doc.tep_dinh_kem && doc.tep_dinh_kem.length) {
+          attachContainer.innerHTML = doc.tep_dinh_kem.map(f => `
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px; background-color: #f1f5f9; border-radius: 6px;">
+              <div>
+                <b style="font-size: 13px;">📄 ${f.ten_tep}</b>
+                <div style="font-size: 11px; color: #64748b;">${f.dung_luong}</div>
+              </div>
+              <button class="btn btn-outline-primary btn-sm" onclick="Toast.info('Tải xuống tệp văn bản đi mô phỏng.');">
+                Tải về
+              </button>
+            </div>
+          `).join('');
+        }
+      } catch (err) {
+        window.Toast.error(err.message);
+      }
+    });
+  </script>
+</body>
+</html>

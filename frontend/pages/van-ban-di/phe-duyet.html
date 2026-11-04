@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Phê duyệt dự thảo văn bản đi - Quản lý văn bản Sở GD&ĐT Đà Nẵng</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/logo-sodad.svg">
+  <link rel="stylesheet" href="../../css/base.css">
+  <link rel="stylesheet" href="../../css/layout.css">
+  <link rel="stylesheet" href="../../css/components.css">
+</head>
+<body>
+  <div class="app-wrapper">
+    <aside class="app-sidebar" id="appSidebar">
+      <div class="sidebar-brand">
+        <img src="../../assets/logo-sodad.svg" alt="Logo Sở GD&ĐT">
+        <div class="brand-text">
+          <span class="brand-title">Sở GD&ĐT Đà Nẵng</span>
+          <span class="brand-subtitle">Quản lý văn bản điều hành</span>
+        </div>
+      </div>
+      <div class="sidebar-nav" id="sidebarNav"></div>
+      <div class="sidebar-footer">
+        Đang đăng nhập: <b id="currentUserRole">Lãnh đạo</b>
+      </div>
+    </aside>
+
+    <div class="app-main">
+      <header class="app-topbar">
+        <div class="topbar-left">
+          <button class="sidebar-toggle-btn" id="sidebarToggle" aria-label="Toggle Menu">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <span class="system-header-title">HỆ THỐNG QUẢN LÝ VĂN BẢN VÀ ĐIỀU HÀNH NỘI BỘ</span>
+        </div>
+        <div class="topbar-right">
+          <div class="user-profile-widget">
+            <div class="user-avatar" id="currentUserAvatar">LĐ</div>
+            <div class="user-details">
+              <span class="user-name" id="currentUserName">...</span>
+              <span class="user-role-badge">Lãnh đạo</span>
+            </div>
+          </div>
+          <button class="btn btn-outline-primary btn-sm btn-logout" id="logoutBtn" title="Đăng xuất">
+            Đăng xuất
+          </button>
+        </div>
+      </header>
+
+      <main class="content-wrapper">
+        <div class="mock-data-banner">
+          <div>
+            <span class="banner-icon">📌</span>
+            <b>DỮ LIỆU MẪU (MOCK DATA)</b> - Thao tác Ký duyệt / Hoàn trả cập nhật trạng thái trên <code>vanBanDiService</code>.
+          </div>
+          <span class="badge badge-info">Mock Active</span>
+        </div>
+
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Phê duyệt & Ký số dự thảo văn bản đi</h1>
+            <p class="page-subtitle">Dành cho Ban Giám đốc Sở: xem xét các dự thảo do chuyên viên trình ký</p>
+          </div>
+          <a href="danh-sach.html" class="btn btn-secondary">Quay lại danh sách</a>
+        </div>
+
+        <!-- Bảng danh sách chờ duyệt -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Dự thảo đang chờ Lãnh đạo phê duyệt</h2>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Mã dự thảo</th>
+                    <th>Trích yếu nội dung</th>
+                    <th>Loại</th>
+                    <th>Phòng ban soạn thảo</th>
+                    <th>Người soạn</th>
+                    <th>Ngày trình</th>
+                    <th style="text-align: center;">Hành động phê duyệt</th>
+                  </tr>
+                </thead>
+                <tbody id="pendingDraftsTable">
+                  <tr><td colspan="7" class="text-center p-4 text-muted">Đang tải danh sách...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer class="app-footer">
+        <span>© 2026 Sở Giáo dục và Đào tạo thành phố Đà Nẵng</span>
+        <span>Hệ thống Quản lý văn bản điều hành nội bộ</span>
+      </footer>
+    </div>
+  </div>
+
+  <script src="../../js/core/toast.js"></script>
+  <script src="../../js/core/api.js"></script>
+  <script src="../../js/core/menu.js"></script>
+  <script src="../../js/core/auth-guard.js"></script>
+  <script src="../../js/mock/du-lieu-van-ban.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = await window.AuthGuard.check();
+      if (!user) return;
+
+      const tbody = document.getElementById('pendingDraftsTable');
+
+      async function loadData() {
+        const list = await window.vanBanDiService.getAll({ trang_thai: 'CHO_LANH_DAO_DUYET' });
+        if (list.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="7" class="text-center p-4 text-muted">Hiện không có dự thảo nào đang chờ phê duyệt.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = list.map(d => `
+          <tr>
+            <td><code>${d.so_ky_hieu}</code></td>
+            <td style="max-width: 320px;">
+              <b>${d.trich_yeu}</b>
+              <div style="font-size: 11.5px; color: #0284c7; margin-top: 2px;">
+                📎 Tệp đính kèm: ${d.tep_dinh_kem[0]?.ten_tep || 'BanThao.docx'}
+              </div>
+            </td>
+            <td>${d.loai_van_ban}</td>
+            <td>${d.don_vi_soan_thao}</td>
+            <td>${d.nguoi_soan_thao}</td>
+            <td><small>${d.ngay_soan}</small></td>
+            <td style="text-align: center;">
+              <div class="actions justify-content-center">
+                <button class="btn btn-success btn-sm btn-approve" data-id="${d.id}" data-title="${d.trich_yeu}">
+                  ✓ Phê duyệt
+                </button>
+                <button class="btn btn-danger btn-sm btn-reject" data-id="${d.id}" data-title="${d.trich_yeu}">
+                  ✕ Yêu cầu sửa
+                </button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+
+        tbody.querySelectorAll('.btn-approve').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const id = btn.dataset.id;
+            if (confirm(`Đồng chí đồng ý KÝ DUYỆT dự thảo này?`)) {
+              await window.vanBanDiService.approve(id, 'Đã ký số phê duyệt.');
+              window.Toast.success('Đã phê duyệt dự thảo văn bản đi thành công!');
+              loadData();
+            }
+          });
+        });
+
+        tbody.querySelectorAll('.btn-reject').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const id = btn.dataset.id;
+            const reason = prompt('Vui lòng nhập lý do yêu cầu chuyên viên chỉnh sửa lại dự thảo:');
+            if (reason && reason.trim()) {
+              await window.vanBanDiService.reject(id, reason.trim());
+              window.Toast.info('Đã hoàn trả dự thảo và gửi yêu cầu chỉnh sửa cho chuyên viên.');
+              loadData();
+            }
+          });
+        });
+      }
+
+      loadData();
+    });
+  </script>
+</body>
+</html>
