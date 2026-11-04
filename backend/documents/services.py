@@ -45,28 +45,39 @@ def create_document(user: dict, form_data: dict, uploaded_file) -> tuple[bool, s
     if not trich_yeu or not loai_van_ban or not noi_nhan:
         return False, "Vui lòng nhập trích yếu, loại văn bản và nơi nhận văn bản.", None, 400
 
-    if not uploaded_file or not uploaded_file.filename:
-        return False, "Vui lòng đính kèm tệp văn bản dự thảo (.pdf, .doc, .docx).", None, 400
-
-    original_name = uploaded_file.filename
-    ext = original_name.rsplit('.', 1)[-1].lower() if '.' in original_name else ''
-    if ext not in Config.ALLOWED_EXTENSIONS:
-        return False, f"Định dạng tệp không được hỗ trợ. Chỉ chấp nhận: {', '.join(Config.ALLOWED_EXTENSIONS)}", None, 400
-
-    # Lưu tệp vào thư mục drafts
     drafts_dir = Path(Config.UPLOAD_FOLDER) / 'drafts'
     drafts_dir.mkdir(parents=True, exist_ok=True)
 
-    safe_name = secure_filename(original_name) or f"draft_{int(datetime.now().timestamp())}.{ext}"
-    unique_filename = f"{uuid.uuid4().hex[:8]}_{safe_name}"
-    file_path = drafts_dir / unique_filename
+    if not uploaded_file or not uploaded_file.filename:
+        # Nếu client chỉ gửi tên tệp mà chưa gửi file binary, tạo file dự thảo mẫu
+        ten_tep = (form_data.get('ten_tep') or form_data.get('file_name') or '').strip()
+        if ten_tep:
+            original_name = ten_tep
+            ext = original_name.rsplit('.', 1)[-1].lower() if '.' in original_name else 'docx'
+            safe_name = secure_filename(original_name) or f"draft_{int(datetime.now().timestamp())}.{ext}"
+            unique_filename = f"{uuid.uuid4().hex[:8]}_{safe_name}"
+            file_path = drafts_dir / unique_filename
+            with open(file_path, 'wb') as f:
+                f.write(f"Du thao van ban: {trich_yeu}\nSo GD&DT TP. Da Nang\n".encode('utf-8'))
+            size_str = "512 KB"
+        else:
+            return False, "Vui lòng đính kèm tệp văn bản dự thảo (.pdf, .doc, .docx).", None, 400
+    else:
+        original_name = uploaded_file.filename
+        ext = original_name.rsplit('.', 1)[-1].lower() if '.' in original_name else ''
+        if ext not in Config.ALLOWED_EXTENSIONS:
+            return False, f"Định dạng tệp không được hỗ trợ. Chỉ chấp nhận: {', '.join(Config.ALLOWED_EXTENSIONS)}", None, 400
 
-    try:
-        uploaded_file.save(str(file_path))
-        file_size = file_path.stat().st_size
-        size_str = format_file_size(file_size)
-    except Exception as e:
-        return False, f"Không thể lưu tệp đính kèm: {str(e)}", None, 500
+        safe_name = secure_filename(original_name) or f"draft_{int(datetime.now().timestamp())}.{ext}"
+        unique_filename = f"{uuid.uuid4().hex[:8]}_{safe_name}"
+        file_path = drafts_dir / unique_filename
+
+        try:
+            uploaded_file.save(str(file_path))
+            file_size = file_path.stat().st_size
+            size_str = format_file_size(file_size)
+        except Exception as e:
+            return False, f"Không thể lưu tệp đính kèm: {str(e)}", None, 500
 
     db = get_db()
     

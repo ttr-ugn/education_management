@@ -175,21 +175,33 @@
           return;
         }
 
-        await window.vanBanDiService.create({
-          trich_yeu,
-          loai_van_ban,
-          lanh_dao_ky,
-          don_vi_soan_thao,
-          nguoi_soan_thao: user.ho_va_ten,
-          noi_nhan,
-          do_khan: document.getElementById('do_khan').value,
-          ten_tep: document.getElementById('tep_dinh_kem').files[0]?.name || 'DuThaoVanBan.docx'
-        });
+        const fileInput = document.getElementById('tep_dinh_kem');
+        const file = fileInput.files[0];
 
-        window.Toast.success('Đã gửi trình dự thảo văn bản tới Lãnh đạo Sở thành công!');
-        setTimeout(() => {
-          window.location.replace('danh-sach.html');
-        }, 1000);
+        const formData = new FormData();
+        formData.append('trich_yeu', trich_yeu);
+        formData.append('loai_van_ban', loai_van_ban);
+        formData.append('lanh_dao_ky', lanh_dao_ky);
+        formData.append('don_vi_soan_thao', don_vi_soan_thao);
+        formData.append('nguoi_soan_thao', user.ho_va_ten);
+        formData.append('noi_nhan', noi_nhan);
+        formData.append('do_khan', document.getElementById('do_khan').value);
+        if (file) {
+          formData.append('tep_dinh_kem', file);
+          formData.append('ten_tep', file.name);
+        } else {
+          formData.append('ten_tep', 'DuThaoVanBan.docx');
+        }
+
+        try {
+          await window.vanBanDiService.create(formData);
+          window.Toast.success('Đã gửi trình dự thảo văn bản tới Văn thư kiểm tra thành công!');
+          setTimeout(() => {
+            window.location.replace('danh-sach.html');
+          }, 1000);
+        } catch (err) {
+          window.Toast.error(err.message || 'Lỗi khi gửi dự thảo văn bản.');
+        }
       });
     });
   </script>

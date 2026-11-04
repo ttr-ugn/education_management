@@ -27,3 +27,6 @@ database/*.sqlite3
 *.log
 .DS_Store
 Thumbs.db
+
+# Tệp tin tài liệu tải lên
+uploads/
