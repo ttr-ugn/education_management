@@ -1,52 +1,86 @@
 /**
- * DU-LIEU-THONG-BAO.JS - DỮ LIỆU MẪU THÔNG BÁO ĐIỀU HÀNH NỘI BỘ
+ * DU-LIEU-THONG-BAO.JS - KẾT NỐI BACKEND API THÔNG BÁO & NHẮC NHỞ
+ * Nhánh: notifications-reminders
  */
 
 (function (window) {
-  const MOCK_THONG_BAO = [
-    {
-      id: 1,
-      tieu_de: 'Thông báo lịch họp giao ban công tác tháng 11/2026 của Ban Giám đốc Sở',
-      nguoi_gui: 'Văn phòng Sở GD&ĐT',
-      thoi_gian: '2026-11-03 08:30',
-      loai: 'Cuộc họp',
-      muc_do: 'Quan trọng',
-      da_doc: false,
-      noi_dung: 'Kính mời Trưởng các Phòng chuyên môn dự buổi họp giao ban định kỳ vào lúc 08h00 ngày 06/11/2026 tại Hội trường A - Sở GD&ĐT Đà Nẵng. Các phòng chuẩn bị báo cáo tiến độ các đề án trọng điểm.'
-    },
-    {
-      id: 2,
-      tieu_de: 'Triển khai lịch bảo trì hệ thống máy chủ thư điện tử nội bộ cuối tuần',
-      nguoi_gui: 'Tổ CNTT - Văn phòng Sở',
-      thoi_gian: '2026-11-02 14:15',
-      loai: 'Hệ thống',
-      muc_do: 'Bình thường',
-      da_doc: true,
-      noi_dung: 'Hệ thống mail @danang.edu.vn sẽ tạm dừng phục vụ trong khoảng thời gian từ 22h00 thứ Bảy đến 04h00 Chủ nhật tuần này để nâng cấp đường truyền cáp quang.'
-    },
-    {
-      id: 3,
-      tieu_de: 'Chúc mừng đồng chí đạt danh hiệu Chiến sĩ thi đua cấp Thành phố',
-      nguoi_gui: 'Hội đồng Thi đua - Khen thưởng Sở',
-      thoi_gian: '2026-10-30 09:00',
-      loai: 'Khen thưởng',
-      muc_do: 'Bình thường',
-      da_doc: true,
-      noi_dung: 'Sở GD&ĐT chúc mừng 05 đồng chí cán bộ, chuyên viên các phòng ban đã vinh dự được Chủ tịch UBND TP. Đà Nẵng trao tặng danh hiệu thi đua xuất sắc năm học 2025-2026.'
-    }
-  ];
-
   const thongBaoService = {
-    // TODO(nhóm): thay bằng api.get('/api/thong-bao')
-    getAll: async function () {
-      return [...MOCK_THONG_BAO];
+    /**
+     * Lấy danh sách thông báo điều hành & nhắc nhở từ Backend Flask
+     * @param {Object} params - { loai, muc_do, chua_doc }
+     */
+    getAll: async function (params = {}) {
+      try {
+        if (window.api && typeof window.api.get === 'function') {
+          const res = await window.api.get('/api/thong-bao', params);
+          if (res && res.thanh_cong) {
+            return res.du_lieu || [];
+          }
+        }
+      } catch (err) {
+        console.warn('Không thể gọi API /api/thong-bao, chuyển sang fallback:', err.message);
+      }
+      return [];
     },
 
-    // TODO(nhóm): thay bằng api.post(`/api/thong-bao/${id}/da-doc`)
+    /**
+     * Lấy số lượng thông báo chưa đọc để hiển thị icon chuông
+     */
+    getUnreadCount: async function () {
+      try {
+        if (window.api && typeof window.api.get === 'function') {
+          const res = await window.api.get('/api/thong-bao/dem-chua-doc');
+          if (res && res.thanh_cong) {
+            return res.chua_doc || 0;
+          }
+        }
+      } catch (err) {
+        console.warn('Lỗi lấy số lượng chưa đọc:', err);
+      }
+      return 0;
+    },
+
+    /**
+     * Đánh dấu một thông báo là đã đọc
+     * @param {number|string} id 
+     */
     markAsRead: async function (id) {
-      const tb = MOCK_THONG_BAO.find(t => t.id === parseInt(id));
-      if (tb) tb.da_doc = true;
-      return tb;
+      if (window.api && typeof window.api.post === 'function') {
+        return await window.api.post(`/api/thong-bao/${id}/da-doc`);
+      }
+      return { thanh_cong: true };
+    },
+
+    /**
+     * Đánh dấu tất cả thông báo là đã đọc
+     */
+    markAllAsRead: async function () {
+      if (window.api && typeof window.api.post === 'function') {
+        return await window.api.post('/api/thong-bao/doc-tat-ca');
+      }
+      return { thanh_cong: true };
+    },
+
+    /**
+     * Tạo thông báo điều hành hoặc lời nhắc nhở mới
+     * @param {Object} data - { tieu_de, noi_dung, loai, muc_do, nguoi_nhan_id, ngay_hen_gio, lien_ket }
+     */
+    create: async function (data) {
+      if (window.api && typeof window.api.post === 'function') {
+        return await window.api.post('/api/thong-bao', data);
+      }
+      throw new Error('API chưa sẵn sàng');
+    },
+
+    /**
+     * Xóa thông báo (chỉ Văn thư hoặc người tạo)
+     * @param {number|string} id 
+     */
+    delete: async function (id) {
+      if (window.api && typeof window.api.delete === 'function') {
+        return await window.api.delete(`/api/thong-bao/${id}`);
+      }
+      return { thanh_cong: true };
     }
   };
 

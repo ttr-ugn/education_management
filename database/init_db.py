@@ -17,7 +17,7 @@ if str(BASE_DIR) not in sys.path:
 from config import Config
 
 def init_database():
-    """Khởi tạo file CSDL SQLite và nạp bảng nguoi_dung."""
+    """Khởi tạo file CSDL SQLite và nạp bảng nguoi_dung, thong_bao."""
     db_path = Path(Config.DATABASE_PATH)
     db_path.parent.mkdir(parents=True, exist_ok=True)
     
@@ -80,6 +80,59 @@ def init_database():
             return False
     else:
         print(f"[INFO] Tài khoản Văn thư '{admin_username}' đã tồn tại sẵn trong CSDL.")
+
+    # Seed dữ liệu mẫu thông báo điều hành nếu bảng còn trống
+    cursor.execute('SELECT COUNT(*) FROM thong_bao')
+    tb_count = cursor.fetchone()[0]
+    if tb_count == 0:
+        cursor.execute('SELECT nguoi_dung_id FROM nguoi_dung WHERE ten_dang_nhap = ?', (admin_username,))
+        admin_row = cursor.fetchone()
+        admin_id = admin_row[0] if admin_row else None
+
+        sample_notifications = [
+            (
+                'Thông báo lịch họp giao ban công tác tháng 11/2026 của Ban Giám đốc Sở',
+                'Kính mời Trưởng các Phòng chuyên môn dự buổi họp giao ban định kỳ vào lúc 08h00 ngày 06/11/2026 tại Hội trường A - Sở GD&ĐT Đà Nẵng. Các phòng chuẩn bị báo cáo tiến độ các đề án trọng điểm.',
+                'Cuộc họp',
+                'Quan trọng',
+                admin_id,
+                None,
+                '2026-11-06 08:00:00',
+                None,
+                '2026-11-03 08:30:00'
+            ),
+            (
+                'Triển khai lịch bảo trì hệ thống máy chủ thư điện tử nội bộ cuối tuần',
+                'Hệ thống mail @danang.edu.vn sẽ tạm dừng phục vụ trong khoảng thời gian từ 22h00 thứ Bảy đến 04h00 Chủ nhật tuần này để nâng cấp đường truyền cáp quang.',
+                'Hệ thống',
+                'Bình thường',
+                admin_id,
+                None,
+                None,
+                None,
+                '2026-11-02 14:15:00'
+            ),
+            (
+                'Chúc mừng đồng chí đạt danh hiệu Chiến sĩ thi đua cấp Thành phố',
+                'Sở GD&ĐT chúc mừng 05 đồng chí cán bộ, chuyên viên các phòng ban đã vinh dự được Chủ tịch UBND TP. Đà Nẵng trao tặng danh hiệu thi đua xuất sắc năm học 2025-2026.',
+                'Khen thưởng',
+                'Bình thường',
+                admin_id,
+                None,
+                None,
+                None,
+                '2026-10-30 09:00:00'
+            )
+        ]
+
+        cursor.executemany('''
+            INSERT INTO thong_bao (
+                tieu_de, noi_dung, loai, muc_do, nguoi_gui_id,
+                nguoi_nhan_id, ngay_hen_gio, lien_ket, ngay_tao
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', sample_notifications)
+        conn.commit()
+        print(f"[OK] Đã nạp thành công {len(sample_notifications)} thông báo điều hành mẫu.")
 
     conn.close()
     return True

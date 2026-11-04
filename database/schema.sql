@@ -31,3 +31,37 @@ CREATE INDEX IF NOT EXISTS idx_nguoi_dung_ten_dang_nhap ON nguoi_dung(ten_dang_n
 CREATE INDEX IF NOT EXISTS idx_nguoi_dung_email ON nguoi_dung(email);
 CREATE INDEX IF NOT EXISTS idx_nguoi_dung_trang_thai ON nguoi_dung(trang_thai);
 CREATE INDEX IF NOT EXISTS idx_nguoi_dung_vai_tro ON nguoi_dung(vai_tro);
+
+-- ============================================================
+-- PHÂN HỆ: THÔNG BÁO & NHẮC NHỞ ĐIỀU HÀNH NỘI BỘ
+-- Nhánh: notifications-reminders
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS thong_bao (
+    thong_bao_id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    tieu_de                TEXT NOT NULL,
+    noi_dung               TEXT NOT NULL,
+    loai                   TEXT NOT NULL DEFAULT 'Hệ thống' CHECK (loai IN ('Cuộc họp', 'Hệ thống', 'Khen thưởng', 'Văn bản', 'Công việc', 'Nhắc nhở', 'Khác')),
+    muc_do                 TEXT NOT NULL DEFAULT 'Bình thường' CHECK (muc_do IN ('Bình thường', 'Quan trọng', 'Khẩn cấp')),
+    nguoi_gui_id           INTEGER,
+    nguoi_nhan_id          INTEGER, -- NULL là gửi toàn thể cán bộ trong cơ quan
+    ngay_hen_gio           TEXT,
+    lien_ket               TEXT,
+    ngay_tao               TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (nguoi_gui_id) REFERENCES nguoi_dung(nguoi_dung_id) ON DELETE SET NULL,
+    FOREIGN KEY (nguoi_nhan_id) REFERENCES nguoi_dung(nguoi_dung_id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS thong_bao_da_doc (
+    thong_bao_id           INTEGER NOT NULL,
+    nguoi_dung_id          INTEGER NOT NULL,
+    ngay_doc               TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (thong_bao_id, nguoi_dung_id),
+    FOREIGN KEY (thong_bao_id) REFERENCES thong_bao(thong_bao_id) ON DELETE CASCADE,
+    FOREIGN KEY (nguoi_dung_id) REFERENCES nguoi_dung(nguoi_dung_id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_thong_bao_nguoi_nhan ON thong_bao(nguoi_nhan_id);
+CREATE INDEX IF NOT EXISTS idx_thong_bao_loai ON thong_bao(loai);
+CREATE INDEX IF NOT EXISTS idx_thong_bao_ngay_tao ON thong_bao(ngay_tao);
+
