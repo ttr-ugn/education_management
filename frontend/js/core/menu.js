@@ -37,18 +37,18 @@
           ]
         },
         {
-          title: 'Văn bản đi (Quy trình Sở)',
+          title: 'Văn bản đi (Quy trình nội bộ Sở)',
           items: [
-            { label: 'Kiểm tra dự thảo (CV gửi)', href: `${root}pages/van-ban-di/kiem-tra.html`, icon: ICONS.checkDraft, id: 'nav-vb-kiemtra' },
+            { label: '📥 Tiếp nhận dự thảo từ Chuyên viên', href: `${root}pages/van-ban-di/kiem-tra.html`, icon: ICONS.checkDraft, id: 'nav-vb-kiemtra' },
             { label: 'Sổ theo dõi Văn bản đi', href: `${root}pages/van-ban-di/danh-sach.html`, icon: ICONS.docOut, id: 'nav-vb-di' },
-            { label: 'Cấp số & Ban hành', href: `${root}pages/van-ban-di/ban-hanh.html`, icon: ICONS.publish, id: 'nav-vb-banhanh' }
+            { label: '📑 Cấp số & Ban hành', href: `${root}pages/van-ban-di/ban-hanh.html`, icon: ICONS.publish, id: 'nav-vb-banhanh' }
           ]
         },
         {
-          title: 'Văn bản đến (Ngoài Sở)',
+          title: 'Văn bản đến (Ngoài cơ quan gửi tới)',
           items: [
-            { label: 'Sổ Văn bản đến', href: `${root}pages/van-ban-den/danh-sach.html`, icon: ICONS.docIn, id: 'nav-vb-den' },
-            { label: 'Tiếp nhận văn bản đến', href: `${root}pages/van-ban-den/them.html`, icon: ICONS.userPlus, id: 'nav-vb-den-them' }
+            { label: 'Sổ Văn bản đến ngoài Sở', href: `${root}pages/van-ban-den/danh-sach.html`, icon: ICONS.docIn, id: 'nav-vb-den' },
+            { label: '+ Vào sổ công văn ngoài Sở gửi đến', href: `${root}pages/van-ban-den/them.html`, icon: ICONS.userPlus, id: 'nav-vb-den-them' }
           ]
         },
         {
