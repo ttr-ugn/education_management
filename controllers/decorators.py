@@ -1,3 +1,7 @@
+"""
+DECORATORS - KIỂM SOÁT PHÂN QUYỀN VÀ TRẠNG THÁI NGƯỜI DÙNG (MVC ARCHITECTURE)
+"""
+
 from functools import wraps
 from flask import session, jsonify, g
 from database.db import get_db

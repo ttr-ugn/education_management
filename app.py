@@ -29,13 +29,13 @@ from controllers.cong_viec_controller import cong_viec_bp
 from controllers.chatbot_controller import chatbot_bp
 
 def create_app():
-    """Khởi tạo và cấu hình ứng dụng Flask (MVC Architecture)."""
+    """Khởi tạo và cấu hình ứng dụng Flask theo mô hình chuẩn MVC."""
     base_dir = Path(__file__).resolve().parent
-    frontend_dir = str(base_dir / 'frontend')
+    views_dir = str(base_dir / 'views')
 
     app = Flask(
         __name__,
-        static_folder=frontend_dir,
+        static_folder=views_dir,
         static_url_path=''
     )
     app.config.from_object(Config)
@@ -53,25 +53,25 @@ def create_app():
     app.register_blueprint(cong_viec_bp, url_prefix='/api/cong-viec')
     app.register_blueprint(chatbot_bp, url_prefix='/api/chatbot')
 
-    # Định tuyến trang chủ -> phục vụ frontend/index.html (Views)
+    # Định tuyến trang chủ -> phục vụ views/index.html
     @app.route('/')
     def index():
-        return send_from_directory(frontend_dir, 'index.html')
+        return send_from_directory(views_dir, 'index.html')
 
-    # Xử lý các đường dẫn tĩnh nếu truy cập trực tiếp
+    # Xử lý các đường dẫn tĩnh (Views Layer: HTML, CSS, JS, Assets)
     @app.route('/<path:filename>')
-    def serve_frontend_files(filename):
-        file_path = Path(frontend_dir) / filename
+    def serve_views_files(filename):
+        file_path = Path(views_dir) / filename
         if file_path.is_file():
-            return send_from_directory(frontend_dir, filename)
+            return send_from_directory(views_dir, filename)
         # Nếu là request API mà không khớp route -> trả JSON 404
         if filename.startswith('api/'):
             return jsonify({
                 'thanh_cong': False,
                 'thong_bao': f"API endpoint '/{filename}' không tồn tại."
             }), 404
-        # Mặc định trả về trang chủ index.html để FE tự điều hướng
-        return send_from_directory(frontend_dir, 'index.html')
+        # Mặc định trả về trang chủ index.html để client-side router xử lý
+        return send_from_directory(views_dir, 'index.html')
 
     # Bắt lỗi toàn cục cho API
     @app.errorhandler(404)
@@ -81,7 +81,7 @@ def create_app():
                 'thanh_cong': False,
                 'thong_bao': 'Tài nguyên API yêu cầu không tồn tại.'
             }), 404
-        return send_from_directory(frontend_dir, 'index.html'), 404
+        return send_from_directory(views_dir, 'index.html'), 404
 
     @app.errorhandler(500)
     def handle_500(e):
@@ -98,10 +98,10 @@ app = create_app()
 
 if __name__ == '__main__':
     print("=" * 70)
-    print("HỆ THỐNG QUẢN LÝ VĂN BẢN ĐIỀU HÀNH - SỞ GD&ĐT TP. ĐÀ NẴNG (MVC)")
-    print("Server đang khởi động tại: http://localhost:5000")
-    print("Tài khoản Văn thư mặc định: admin_vanthu / Admin@123")
-    print("Tài khoản Lãnh đạo mẫu:     giamdoc_so   / GiamDoc@123")
-    print("Tài khoản Chuyên viên mẫu:  minhcv       / ChuyenVien@123")
+    print("HỆ THỐNG QUẢN LÝ VĂN BẢN ĐIỀU HÀNH - SỞ GD&ĐT TP. ĐÀ NẴNG (MÔ HÌNH MVC)")
+    print("Giao diện Views:   http://localhost:5000")
+    print("Tài khoản Văn thư: admin_vanthu / Admin@123")
+    print("Tài khoản Lãnh đạo: giamdoc_so   / GiamDoc@123")
+    print("Tài khoản Chuyên viên: minhcv    / ChuyenVien@123")
     print("=" * 70)
     app.run(host='0.0.0.0', port=5000, debug=True)

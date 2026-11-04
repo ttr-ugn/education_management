@@ -1,5 +1,5 @@
 """
-Module xử lý đóng dấu chữ ký số điện tử lên tệp tài liệu PDF
+Module xử lý đóng dấu chữ ký số điện tử lên tệp tài liệu PDF (MVC Architecture - Model Layer)
 Theo quy định về thể thức ký số văn bản điện tử (Nghị định 30/2020/NĐ-CP).
 """
 

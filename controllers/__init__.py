@@ -11,14 +11,17 @@ from .kho_van_ban_controller import kho_van_ban_bp
 from .thong_bao_controller import thong_bao_bp
 from .cong_viec_controller import cong_viec_bp
 from .chatbot_controller import chatbot_bp
+from .decorators import login_required, role_required
 
 __all__ = [
     'auth_bp',
     'users_bp',
     'documents_bp',
     'ho_so_bp',
-    'kho_van_ban_controller',
+    'kho_van_ban_bp',
     'thong_bao_bp',
     'cong_viec_bp',
-    'chatbot_bp'
+    'chatbot_bp',
+    'login_required',
+    'role_required'
 ]
