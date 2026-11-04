@@ -81,6 +81,64 @@
         console.error('Lỗi đóng hồ sơ:', err);
         throw err;
       }
+    },
+
+    /**
+     * Lấy danh sách văn bản thực tế có trong hồ sơ
+     */
+    getVanBanInHoSo: async function (hoSoId) {
+      try {
+        const res = await window.api.get(`/api/ho-so/${hoSoId}/van-ban`);
+        return res.du_lieu || [];
+      } catch (err) {
+        console.error('Lỗi tải danh sách văn bản trong hồ sơ:', err);
+        throw err;
+      }
+    },
+
+    /**
+     * Lấy danh sách văn bản đã ban hành có thể bổ sung vào hồ sơ
+     */
+    getAvailableVanBan: async function (hoSoId) {
+      try {
+        const res = await window.api.get(`/api/ho-so/${hoSoId}/van-ban-kha-dung`);
+        return res.du_lieu || [];
+      } catch (err) {
+        console.error('Lỗi tải danh sách văn bản khả dụng:', err);
+        throw err;
+      }
+    },
+
+    /**
+     * Bổ sung văn bản vào hồ sơ lưu trữ
+     */
+    addVanBan: async function (hoSoId, vanBanId, nguon = 'van_ban_di') {
+      try {
+        const res = await window.api.post(`/api/ho-so/${hoSoId}/them-van-ban`, {
+          van_ban_id: vanBanId,
+          nguon: nguon
+        });
+        return res;
+      } catch (err) {
+        console.error('Lỗi thêm văn bản vào hồ sơ:', err);
+        throw err;
+      }
+    },
+
+    /**
+     * Gỡ văn bản ra khỏi hồ sơ lưu trữ
+     */
+    removeVanBan: async function (hoSoId, vanBanId, nguon = 'van_ban_di') {
+      try {
+        const res = await window.api.post(`/api/ho-so/${hoSoId}/xoa-van-ban`, {
+          van_ban_id: vanBanId,
+          nguon: nguon
+        });
+        return res;
+      } catch (err) {
+        console.error('Lỗi gỡ văn bản khỏi hồ sơ:', err);
+        throw err;
+      }
     }
   };
 

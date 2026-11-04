@@ -575,11 +575,27 @@ def clerk_publish_document(user: dict, doc_id: int, publish_data: dict) -> tuple
     old_status = row['trang_thai']
     new_status = 'DA_BAN_HANH'
 
+    ho_so_id = publish_data.get('ho_so_id')
+    if ho_so_id:
+        try:
+            ho_so_id = int(ho_so_id)
+        except (ValueError, TypeError):
+            ho_so_id = None
+
     db.execute('''
         UPDATE van_ban_di
-        SET so_ky_hieu = ?, ngay_ban_hanh = ?, trang_thai = ?, van_thu_id = ?
+        SET so_ky_hieu = ?, ngay_ban_hanh = ?, trang_thai = ?, van_thu_id = ?, ho_so_id = ?
         WHERE van_ban_id = ?
-    ''', (so_ky_hieu, ngay_ban_hanh, new_status, user['nguoi_dung_id'], doc_id))
+    ''', (so_ky_hieu, ngay_ban_hanh, new_status, user['nguoi_dung_id'], ho_so_id, doc_id))
+
+    if ho_so_id:
+        count_cur = db.execute('''
+            SELECT 
+                (SELECT COUNT(*) FROM van_ban_di WHERE ho_so_id = ? AND trang_thai = 'DA_BAN_HANH') +
+                (SELECT COUNT(*) FROM van_ban_ban_hanh WHERE ho_so_id = ?)
+        ''', (ho_so_id, ho_so_id))
+        total_vb = count_cur.fetchone()[0]
+        db.execute('UPDATE ho_so_luu_tru SET so_luong_van_ban = ?, ngay_cap_nhat = CURRENT_TIMESTAMP WHERE ho_so_id = ?', (total_vb, ho_so_id))
 
     # Cập nhật hoàn thành công việc liên kết nếu có
     if row['cong_viec_id']:
