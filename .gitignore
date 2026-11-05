@@ -4,7 +4,8 @@ env/
 .venv/
 
 # PyCharm & VS Code
-.idea/
+.idea/*
+!.idea/runConfigurations/
 .vscode/
 *.swp
 *.swo
