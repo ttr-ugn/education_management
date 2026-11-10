@@ -207,8 +207,14 @@ def api_cong_viec_thong_ke(request):
         theo_trang_thai[st] = theo_trang_thai.get(st, 0) + 1
 
         dept = t.phong_ban or 'Văn phòng Sở'
-        # Rút gọn tên phòng ban cho biểu đồ hiển thị đẹp
-        short_dept = dept.replace('Phòng ', '').replace('thành phố Đà Nẵng', '').strip()
+        # Rút gọn tên phòng ban cho biểu đồ hiển thị đẹp, không bị nghiêng chữ
+        short_dept = dept.replace('Phòng Giáo dục Trung học', 'GD Trung học')\
+                         .replace('Phòng Kế hoạch - Tài chính', 'Kế hoạch - TC')\
+                         .replace('Phòng Tổ chức cán bộ', 'Tổ chức CB')\
+                         .replace('Phòng Giáo dục Mầm non - Tiểu học', 'Mầm non - TH')\
+                         .replace('Phòng Khảo thí & Quản lý chất lượng', 'Khảo thí & QLCL')\
+                         .replace('Văn phòng Sở GD&ĐT', 'Văn phòng Sở')\
+                         .replace('Phòng ', '').replace('thành phố Đà Nẵng', '').strip()
         if short_dept not in dept_stats:
             dept_stats[short_dept] = {'duoc_giao': 0, 'da_xong': 0, 'qua_han': 0}
         dept_stats[short_dept]['duoc_giao'] += 1
