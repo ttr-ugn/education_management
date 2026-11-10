@@ -44,17 +44,42 @@ class CongViec(models.Model):
         return f"{self.ten_cong_viec} ({self.trang_thai} - {self.tien_do}%)"
 
     def to_dict(self):
+        status = self.trang_thai
+        if status == 'CHO_PHE_DUYET':
+            status = 'CHO_DANH_GIA'
+        elif status == 'DA_HOAN_THANH':
+            status = 'HOAN_THANH'
+
         return {
+            'id': self.cong_viec_id,
             'cong_viec_id': self.cong_viec_id,
             'ten_cong_viec': self.ten_cong_viec,
             'noi_dung': self.noi_dung or '',
-            'nguoi_giao_ten': self.nguoi_giao.ho_va_ten if self.nguoi_giao else '',
-            'nguoi_xu_ly_ten': self.nguoi_xu_ly.ho_va_ten if self.nguoi_xu_ly else '',
-            'phong_ban': self.phong_ban,
+            'nguoi_giao': self.nguoi_giao.ho_va_ten if self.nguoi_giao else 'Lãnh đạo Sở',
+            'nguoi_giao_ten': self.nguoi_giao.ho_va_ten if self.nguoi_giao else 'Lãnh đạo Sở',
+            'nguoi_xu_ly': self.nguoi_xu_ly.ho_va_ten if self.nguoi_xu_ly else 'Cán bộ xử lý',
+            'nguoi_xu_ly_ten': self.nguoi_xu_ly.ho_va_ten if self.nguoi_xu_ly else 'Cán bộ xử lý',
+            'phong_ban': self.phong_ban or 'Văn phòng Sở',
             'han_hoan_thanh': self.han_hoan_thanh.strftime('%Y-%m-%d') if self.han_hoan_thanh else '',
-            'do_uu_tien': self.do_uu_tien,
-            'tien_do': self.tien_do,
-            'trang_thai': self.trang_thai,
+            'do_uu_tien': self.do_uu_tien or 'TRUNG_BINH',
+            'tien_do': self.tien_do if self.tien_do is not None else 0,
+            'trang_thai': status,
+            'ket_qua_bao_cao': self.ket_qua_bao_cao or '',
+            'danh_gia_lanh_dao': self.danh_gia_lanh_dao or '',
+            'tep_dinh_kem_ket_qua': self.tep_dinh_kem_ket_qua or '',
+            'so_ky_hieu_vb': self.so_ky_hieu_vb or '',
+            'trich_yeu_vb': self.trich_yeu_vb or '',
+            'ngay_tao': self.ngay_tao.strftime('%Y-%m-%d %H:%M:%S') if self.ngay_tao else '',
+            'nhat_ky': [
+                {
+                    'thoi_gian': nk.thoi_gian.strftime('%d/%m/%Y %H:%M'),
+                    'nguoi_cap_nhat_ten': nk.nguoi_cap_nhat.ho_va_ten if nk.nguoi_cap_nhat else 'Cán bộ',
+                    'tien_do_cu': nk.tien_do_cu,
+                    'tien_do_moi': nk.tien_do_moi,
+                    'noi_dung_ghi_chu': nk.noi_dung_ghi_chu
+                }
+                for nk in self.nhat_ky.all().order_by('-thoi_gian')
+            ]
         }
 
 class NhatKyCongViec(models.Model):
