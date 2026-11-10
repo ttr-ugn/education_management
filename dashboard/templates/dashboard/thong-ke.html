@@ -3,13 +3,116 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Báo cáo thống kê - Quản lý văn bản Sở GD&ĐT Đà Nẵng</title>
+  <title>Báo cáo & Thống kê tổng hợp điều hành - Sở GD&ĐT Đà Nẵng</title>
   <link rel="icon" type="image/svg+xml" href="../assets/logo-sodad.svg">
   <link rel="stylesheet" href="../css/base.css">
-  <link rel="stylesheet" href="../css/layout.css">
-  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/layout.css?v=20261111_15">
+  <link rel="stylesheet" href="../css/components.css?v=20261111_09">
   <!-- Chart.js qua CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    }
+    .stat-card .stat-value {
+      font-size: 26px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    .stat-card .stat-label {
+      font-size: 12.5px;
+      color: #64748b;
+      margin-top: 3px;
+      font-weight: 500;
+    }
+    .stat-card .stat-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .charts-grid-top {
+      display: grid;
+      grid-template-columns: 1.6fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    .charts-grid-bottom {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 992px) {
+      .charts-grid-top, .charts-grid-bottom {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .chart-card {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      display: flex;
+      flex-direction: column;
+    }
+    .chart-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      border-bottom: 1px solid #f1f5f9;
+      padding-bottom: 12px;
+    }
+    .chart-card-title {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--primary-dark);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .chart-wrapper {
+      position: relative;
+      width: 100%;
+      flex-grow: 1;
+    }
+    .badge-soft {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 9px;
+      border-radius: 20px;
+      font-size: 11.5px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+  </style>
 </head>
 <body>
   <div class="app-wrapper">
@@ -54,64 +157,134 @@
       </header>
 
       <main class="content-wrapper">
-        <div class="mock-data-banner">
-          <div>
-            <span class="banner-icon">📌</span>
-            <b>DỮ LIỆU MẪU (MOCK DATA)</b> - Các chỉ số thống kê và biểu đồ hiển thị từ <code>thongKeService</code>.
-          </div>
-          <span class="badge badge-info">Mock Active</span>
-        </div>
-
         <div class="page-header">
           <div>
             <h1 class="page-title">Báo cáo & Thống kê tổng hợp điều hành văn bản</h1>
             <p class="page-subtitle">Số liệu phân tích lưu lượng văn bản đi - đến và hiệu suất hoàn thành nhiệm vụ toàn Sở</p>
           </div>
-          <button class="btn btn-outline-primary" onclick="window.print();">
-            🖨 In báo cáo thống kê
-          </button>
-        </div>
-
-        <!-- 2 Biểu đồ hàng 1 -->
-        <div style="display: grid; grid-template-columns: 1.6fr 1fr; gap: 24px; margin-bottom: 24px;">
-          <div class="card">
-            <div class="card-header">
-              <h2 class="card-title">Lưu lượng văn bản đến & văn bản đi theo tháng (Năm 2026)</h2>
-            </div>
-            <div class="card-body">
-              <canvas id="chartLuuLuong" height="180"></canvas>
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="card-header">
-              <h2 class="card-title">Tỷ lệ hoàn thành công việc</h2>
-            </div>
-            <div class="card-body d-flex justify-content-center align-items-center">
-              <div style="max-width: 260px; width: 100%;">
-                <canvas id="chartCongViec"></canvas>
-              </div>
-            </div>
+          <div class="d-flex align-items-center gap-2">
+            <select class="form-select" id="periodSelect" style="width: auto; padding: 7px 14px; font-size: 13px; font-weight: 500; border-radius: 8px;">
+              <option value="2026">Năm 2026 (Toàn năm)</option>
+              <option value="Q4">Quý IV / 2026</option>
+              <option value="Q3">Quý III / 2026</option>
+              <option value="T11">Tháng 11 / 2026</option>
+            </select>
+            <button class="btn btn-primary" onclick="window.print();" style="display: inline-flex; align-items: center; gap: 6px;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+              <span>In báo cáo</span>
+            </button>
           </div>
         </div>
 
-        <!-- Biểu đồ hàng 2 -->
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
-          <div class="card">
-            <div class="card-header">
-              <h2 class="card-title">Cơ cấu thể loại văn bản điều hành</h2>
+        <!-- 4 KPI SUMMARY CARDS -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div>
+              <div class="stat-value text-primary" id="kpiTongVB">1,285</div>
+              <div class="stat-label">Tổng văn bản tiếp nhận</div>
             </div>
-            <div class="card-body">
-              <canvas id="chartLoaiVB" height="160"></canvas>
+            <div class="stat-icon" style="background: #e0f2fe; color: #0284c7;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
             </div>
           </div>
 
-          <div class="card">
-            <div class="card-header">
-              <h2 class="card-title">Số lượng văn bản xử lý theo phòng ban</h2>
+          <div class="stat-card">
+            <div>
+              <div class="stat-value" style="color: #2563eb;" id="kpiVbDen">742</div>
+              <div class="stat-label">Văn bản đến các cấp</div>
             </div>
-            <div class="card-body">
-              <canvas id="chartPhongBan" height="160"></canvas>
+            <div class="stat-icon" style="background: #dbeafe; color: #2563eb;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path></svg>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div>
+              <div class="stat-value text-success" id="kpiVbDi">543</div>
+              <div class="stat-label">Văn bản đi & phát hành</div>
+            </div>
+            <div class="stat-icon" style="background: #dcfce7; color: #16a34a;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path></svg>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div>
+              <div class="stat-value" style="color: #059669;" id="kpiTyLeDungHan">96.8%</div>
+              <div class="stat-label">Tỷ lệ xử lý đúng hạn</div>
+            </div>
+            <div class="stat-icon" style="background: #d1fae5; color: #059669;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2 BIỂU ĐỒ HÀNG 1 -->
+        <div class="charts-grid-top">
+          <!-- Biểu đồ 1: Lưu lượng văn bản -->
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <span class="chart-card-title">
+                <span>📈</span>
+                <span>Lưu lượng văn bản đến & văn bản đi theo tháng (Năm 2026)</span>
+              </span>
+              <span class="badge-soft" style="background: #e0f2fe; color: #0284c7; border: 1px solid #bae6fd;">
+                Tháng 5 - Tháng 11
+              </span>
+            </div>
+            <div class="chart-wrapper" style="height: 290px;">
+              <canvas id="chartLuuLuong"></canvas>
+            </div>
+          </div>
+
+          <!-- Biểu đồ 2: Tỷ lệ hoàn thành công việc -->
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <span class="chart-card-title">
+                <span>🎯</span>
+                <span>Tình hình tiến độ & hoàn thành công việc</span>
+              </span>
+              <span class="badge-soft" style="background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0;">
+                Nhiệm vụ Sở
+              </span>
+            </div>
+            <div class="chart-wrapper" style="height: 290px; display: flex; align-items: center; justify-content: center;">
+              <canvas id="chartCongViec"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2 BIỂU ĐỒ HÀNG 2 -->
+        <div class="charts-grid-bottom">
+          <!-- Biểu đồ 3: Phân loại văn bản -->
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <span class="chart-card-title">
+                <span>📑</span>
+                <span>Cơ cấu thể loại văn bản điều hành</span>
+              </span>
+              <span class="badge-soft" style="background: #faf5ff; color: #7e22ce; border: 1px solid #e9d5ff;">
+                6 thể loại chính
+              </span>
+            </div>
+            <div class="chart-wrapper" style="height: 270px; display: flex; align-items: center; justify-content: center;">
+              <canvas id="chartLoaiVB"></canvas>
+            </div>
+          </div>
+
+          <!-- Biểu đồ 4: Phân bổ phòng ban -->
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <span class="chart-card-title">
+                <span>🏢</span>
+                <span>Số lượng văn bản xử lý theo phòng ban</span>
+              </span>
+              <span class="badge-soft" style="background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0;">
+                Khối phòng ban
+              </span>
+            </div>
+            <div class="chart-wrapper" style="height: 270px;">
+              <canvas id="chartPhongBan"></canvas>
             </div>
           </div>
         </div>
@@ -119,24 +292,37 @@
 
       <footer class="app-footer">
         <span>© 2026 Sở Giáo dục và Đào tạo thành phố Đà Nẵng</span>
-        <span>Hệ thống Quản lý văn bản điều hành nội bộ</span>
+        <span>Phân hệ Báo cáo thống kê & Phân tích dữ liệu văn bản điều hành</span>
       </footer>
     </div>
   </div>
 
-  <script src="../js/core/toast.js"></script>
-  <script src="../js/core/api.js"></script>
-  <script src="../js/core/menu.js"></script>
-  <script src="../js/core/auth-guard.js"></script>
-  <script src="../js/mock/du-lieu-thong-ke.js"></script>
+  <script src="../js/core/toast.js?v=20261111_07"></script>
+  <script src="../js/core/api.js?v=20261111_07"></script>
+  <script src="../js/core/menu.js?v=20261111_15"></script>
+  <script src="../js/core/auth-guard.js?v=20261111_07"></script>
+  <script src="../js/mock/du-lieu-thong-ke.js?v=20261111_19"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
       const user = await window.AuthGuard.check();
       if (!user) return;
 
       const data = await window.thongKeService.getOverview();
+      if (!data) return;
 
-      // 1. Biểu đồ lưu lượng tháng (Bar & Line kết hợp)
+      // Cập nhật số liệu KPI tóm tắt nếu có
+      if (data.summary) {
+        if (document.getElementById('kpiTongVB')) document.getElementById('kpiTongVB').innerText = data.summary.tong_van_ban.toLocaleString();
+        if (document.getElementById('kpiVbDen')) document.getElementById('kpiVbDen').innerText = data.summary.vb_den.toLocaleString();
+        if (document.getElementById('kpiVbDi')) document.getElementById('kpiVbDi').innerText = data.summary.vb_di.toLocaleString();
+        if (document.getElementById('kpiTyLeDungHan')) document.getElementById('kpiTyLeDungHan').innerText = `${data.summary.ty_le_dung_han}%`;
+      }
+
+      // Font chung và tùy chọn bảng màu
+      Chart.defaults.font.family = "system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
+      Chart.defaults.color = "#64748b";
+
+      // 1. Biểu đồ lưu lượng tháng (Bar kết hợp hiện đại)
       new Chart(document.getElementById('chartLuuLuong'), {
         type: 'bar',
         data: {
@@ -145,56 +331,200 @@
             {
               label: 'Văn bản đến',
               data: data.van_ban_theo_thang.vb_den,
-              backgroundColor: '#004b91',
-              borderRadius: 4
+              backgroundColor: '#0284c7',
+              borderRadius: 6,
+              barPercentage: 0.65,
+              categoryPercentage: 0.75
             },
             {
               label: 'Văn bản đi',
               data: data.van_ban_theo_thang.vb_di,
               backgroundColor: '#10b981',
-              borderRadius: 4
+              borderRadius: 6,
+              barPercentage: 0.65,
+              categoryPercentage: 0.75
             }
           ]
         },
         options: {
           responsive: true,
-          plugins: { legend: { position: 'top' } }
+          maintainAspectRatio: false,
+          interaction: {
+            mode: 'index',
+            intersect: false
+          },
+          plugins: {
+            legend: {
+              position: 'top',
+              align: 'end',
+              labels: {
+                usePointStyle: true,
+                pointStyle: 'circle',
+                boxWidth: 8,
+                boxHeight: 8,
+                padding: 16,
+                font: { size: 12, weight: '500' }
+              }
+            },
+            tooltip: {
+              backgroundColor: '#1e293b',
+              titleFont: { size: 12.5, weight: '600' },
+              bodyFont: { size: 12 },
+              padding: 10,
+              cornerRadius: 8
+            }
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: { font: { size: 11.5 } }
+            },
+            y: {
+              beginAtZero: true,
+              grid: { color: '#f1f5f9', drawBorder: false },
+              ticks: { font: { size: 11 }, precision: 0 }
+            }
+          }
         }
       });
 
-      // 2. Biểu đồ Doughnut công việc
+      // 2. Biểu đồ Doughnut công việc (Tỷ lệ hoàn thành với Center Text)
+      const pctValue = data.tinh_hinh_xu_ly_cong_viec.percent || '89%';
       new Chart(document.getElementById('chartCongViec'), {
         type: 'doughnut',
         data: {
           labels: data.tinh_hinh_xu_ly_cong_viec.labels,
           datasets: [{
             data: data.tinh_hinh_xu_ly_cong_viec.data,
-            backgroundColor: data.tinh_hinh_xu_ly_cong_viec.colors
+            backgroundColor: ['#10b981', '#0284c7', '#f43f5e'],
+            borderWidth: 3,
+            borderColor: '#ffffff',
+            borderRadius: 6,
+            hoverOffset: 6
           }]
         },
         options: {
           responsive: true,
-          plugins: { legend: { position: 'bottom' } }
-        }
+          maintainAspectRatio: false,
+          cutout: '72%',
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                usePointStyle: true,
+                pointStyle: 'circle',
+                boxWidth: 8,
+                boxHeight: 8,
+                padding: 14,
+                font: { size: 11.5, weight: '500' }
+              }
+            },
+            tooltip: {
+              backgroundColor: '#1e293b',
+              titleFont: { size: 12.5, weight: '600' },
+              bodyFont: { size: 12 },
+              padding: 10,
+              cornerRadius: 8
+            }
+          }
+        },
+        plugins: [{
+          id: 'centerTextTask',
+          beforeDraw(chart) {
+            const { width, height, ctx } = chart;
+            ctx.restore();
+            ctx.font = '700 24px system-ui, -apple-system, sans-serif';
+            ctx.textBaseline = 'middle';
+            ctx.fillStyle = '#0f172a';
+            const text = String(pctValue);
+            const textX = Math.round((width - ctx.measureText(text).width) / 2);
+            const textY = height / 2 - 10;
+            ctx.fillText(text, textX, textY);
+
+            ctx.font = '600 10.5px system-ui, -apple-system, sans-serif';
+            ctx.fillStyle = '#64748b';
+            const subText = 'ĐÚNG HẠN';
+            const subX = Math.round((width - ctx.measureText(subText).width) / 2);
+            const subY = height / 2 + 14;
+            ctx.fillText(subText, subX, subY);
+            ctx.save();
+          }
+        }]
       });
 
-      // 3. Biểu đồ phân bổ loại văn bản
+      // 3. Biểu đồ Doughnut phân bổ loại văn bản (Không bị cắt xén, có Center Text)
       new Chart(document.getElementById('chartLoaiVB'), {
-        type: 'pie',
+        type: 'doughnut',
         data: {
           labels: data.co_cau_loai_van_ban.labels,
           datasets: [{
             data: data.co_cau_loai_van_ban.data,
-            backgroundColor: ['#004b91', '#1e70bf', '#0284c7', '#f59e0b', '#10b981', '#64748b']
+            backgroundColor: ['#0284c7', '#6366f1', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4'],
+            borderWidth: 2,
+            borderColor: '#ffffff',
+            borderRadius: 4,
+            hoverOffset: 5
           }]
         },
         options: {
           responsive: true,
-          plugins: { legend: { position: 'right' } }
-        }
+          maintainAspectRatio: false,
+          cutout: '62%',
+          plugins: {
+            legend: {
+              position: 'right',
+              labels: {
+                usePointStyle: true,
+                pointStyle: 'circle',
+                boxWidth: 8,
+                boxHeight: 8,
+                padding: 12,
+                font: { size: 11.5, weight: '500' }
+              }
+            },
+            tooltip: {
+              backgroundColor: '#1e293b',
+              titleFont: { size: 12.5, weight: '600' },
+              bodyFont: { size: 12 },
+              padding: 10,
+              cornerRadius: 8,
+              callbacks: {
+                label: function (ctx) {
+                  return ` ${ctx.label}: ${ctx.raw}%`;
+                }
+              }
+            }
+          }
+        },
+        plugins: [{
+          id: 'centerTextDocTypes',
+          beforeDraw(chart) {
+            const chartArea = chart.chartArea;
+            if (!chartArea) return;
+            const centerX = (chartArea.left + chartArea.right) / 2;
+            const centerY = (chartArea.top + chartArea.bottom) / 2;
+            const { ctx } = chart;
+            ctx.restore();
+            ctx.font = '700 18px system-ui, -apple-system, sans-serif';
+            ctx.textBaseline = 'middle';
+            ctx.fillStyle = '#0f172a';
+            const text = '100%';
+            const textX = Math.round(centerX - (ctx.measureText(text).width / 2));
+            const textY = centerY - 8;
+            ctx.fillText(text, textX, textY);
+
+            ctx.font = '600 10px system-ui, -apple-system, sans-serif';
+            ctx.fillStyle = '#64748b';
+            const subText = 'CƠ CẤU';
+            const subX = Math.round(centerX - (ctx.measureText(subText).width / 2));
+            const subY = centerY + 12;
+            ctx.fillText(subText, subX, subY);
+            ctx.save();
+          }
+        }]
       });
 
-      // 4. Biểu đồ phòng ban
+      // 4. Biểu đồ ngang phòng ban (Horizontal Bar thanh mảnh, bo tròn)
       new Chart(document.getElementById('chartPhongBan'), {
         type: 'bar',
         data: {
@@ -202,14 +532,38 @@
           datasets: [{
             label: 'Số văn bản phụ trách',
             data: data.van_ban_theo_phong_ban.data,
-            backgroundColor: '#1e70bf',
-            borderRadius: 4
+            backgroundColor: '#3b82f6',
+            hoverBackgroundColor: '#2563eb',
+            borderRadius: 6,
+            barPercentage: 0.65,
+            categoryPercentage: 0.8
           }]
         },
         options: {
           indexAxis: 'y',
           responsive: true,
-          plugins: { legend: { display: false } }
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: '#1e293b',
+              titleFont: { size: 12.5, weight: '600' },
+              bodyFont: { size: 12 },
+              padding: 10,
+              cornerRadius: 8
+            }
+          },
+          scales: {
+            x: {
+              beginAtZero: true,
+              grid: { color: '#f1f5f9', drawBorder: false },
+              ticks: { font: { size: 11 }, precision: 0 }
+            },
+            y: {
+              grid: { display: false },
+              ticks: { font: { size: 12, weight: '500' }, color: '#334155' }
+            }
+          }
         }
       });
     });
