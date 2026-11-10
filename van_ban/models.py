@@ -96,3 +96,22 @@ class VanBanDen(models.Model):
         db_table = 'van_ban_den'
         verbose_name = 'Văn bản đến'
         verbose_name_plural = 'Danh sách Văn bản đến'
+
+    def to_dict(self):
+        return {
+            'van_ban_id': self.van_ban_id,
+            'so_den': self.so_den or '',
+            'so_ky_hieu': self.so_ky_hieu,
+            'co_quan_ban_hanh': self.co_quan_ban_hanh,
+            'ngay_ban_hanh': self.ngay_ban_hanh.strftime('%Y-%m-%d') if self.ngay_ban_hanh else '',
+            'ngay_den': self.ngay_den.strftime('%Y-%m-%d') if self.ngay_den else '',
+            'trich_yeu': self.trich_yeu,
+            'loai_van_ban': self.loai_van_ban,
+            'do_khan': self.do_khan,
+            'do_mat': self.do_mat,
+            'nguoi_chi_dao_ten': self.nguoi_chi_dao.ho_va_ten if self.nguoi_chi_dao else '',
+            'nguoi_chu_tri_ten': self.nguoi_chu_tri.ho_va_ten if self.nguoi_chu_tri else '',
+            'trang_thai': self.trang_thai,
+            'han_xu_ly': self.han_xu_ly.strftime('%Y-%m-%d') if self.han_xu_ly else '',
+            'noi_dung_chi_dao': self.noi_dung_chi_dao or '',
+        }

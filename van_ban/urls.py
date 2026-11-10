@@ -20,4 +20,5 @@ urlpatterns = [
 
     # API
     path('api/van-ban-di', views.api_van_ban_di_list, name='api_van_ban_di_list'),
+    path('api/van-ban-den', views.api_van_ban_den_list, name='api_van_ban_den_list'),
 ]
