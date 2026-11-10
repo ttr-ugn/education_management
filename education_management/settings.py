@@ -14,17 +14,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # Các module nghiệp vụ (Apps)
     'authentication',
     'van_ban',
-    'cong_viec',
-    'ho_so',
-    'thong_bao',
-    'chatbot',
     'dashboard',
 ]
 
 MIDDLEWARE = [
+    'education_management.middleware.CorsMiddleware',  # Cho phép kết nối API từ mọi port/nguồn
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
