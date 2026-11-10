@@ -6,8 +6,8 @@
   <title>Sổ theo dõi Văn bản đi - Quản lý văn bản Sở GD&ĐT Đà Nẵng</title>
   <link rel="icon" type="image/svg+xml" href="../../assets/logo-sodad.svg">
   <link rel="stylesheet" href="../../css/base.css">
-  <link rel="stylesheet" href="../../css/layout.css">
-  <link rel="stylesheet" href="../../css/components.css">
+  <link rel="stylesheet" href="../../css/layout.css?v=20261111_09">
+  <link rel="stylesheet" href="../../css/components.css?v=20261111_09">
 </head>
 <body>
   <div class="app-wrapper">
@@ -99,15 +99,15 @@
             <div class="table-responsive">
               <table class="data-table">
                 <thead>
-                  <tr>
-                    <th>Số ký hiệu</th>
-                    <th>Trích yếu nội dung</th>
-                    <th>Loại</th>
-                    <th>Đơn vị & Người soạn</th>
-                    <th>Lãnh đạo ký</th>
-                    <th>Ngày soạn</th>
-                    <th>Trạng thái</th>
-                    <th style="text-align: center; width: 160px;">Thao tác</th>
+                  <tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0;">
+                    <th style="padding: 12px 16px; font-size: 12px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; width: 160px;">SỐ KÝ HIỆU</th>
+                    <th style="padding: 12px 16px; font-size: 12px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; min-width: 250px;">TRÍCH YẾU NỘI DUNG</th>
+                    <th style="padding: 12px 16px; font-size: 12px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; width: 100px;">LOẠI</th>
+                    <th style="padding: 12px 16px; font-size: 12px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; min-width: 190px;">ĐƠN VỊ & NGƯỜI SOẠN</th>
+                    <th style="padding: 12px 16px; font-size: 12px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; width: 150px;">LÃNH ĐẠO KÝ</th>
+                    <th style="padding: 12px 16px; font-size: 12px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; width: 130px;">NGÀY SOẠN</th>
+                    <th style="padding: 12px 16px; font-size: 12px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; width: 160px;">TRẠNG THÁI</th>
+                    <th style="padding: 12px 16px; font-size: 12px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; width: 170px;">THAO TÁC</th>
                   </tr>
                 </thead>
                 <tbody id="vbDiTableBody">
@@ -171,7 +171,7 @@
 
   <script src="../../js/core/toast.js?v=20261111_07"></script>
   <script src="../../js/core/api.js?v=20261111_07"></script>
-  <script src="../../js/core/menu.js?v=20261111_07"></script>
+  <script src="../../js/core/menu.js?v=20261111_09"></script>
   <script src="../../js/core/auth-guard.js?v=20261111_07"></script>
   <script src="../../js/mock/du-lieu-van-ban.js"></script>
   <script>
@@ -286,42 +286,102 @@
         tbody.innerHTML = list.map(item => {
           let quickBtn = '';
           if (user.vai_tro === 'VAN_THU' && item.trang_thai === 'CHO_VAN_THU_KIEM_TRA') {
-            quickBtn = `<a href="kiem-tra.html" class="btn btn-warning btn-sm">Kiểm tra</a>`;
+            quickBtn = `<a href="kiem-tra.html" class="btn btn-warning btn-sm" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 9px; border-radius: 6px; font-weight: 600; font-size: 12px;">📥 Kiểm tra</a>`;
           } else if (user.vai_tro === 'LANH_DAO' && (item.trang_thai === 'CHO_LANH_DAO_KY' || item.trang_thai === 'CHO_LANH_DAO_DUYET')) {
-            quickBtn = `<a href="phe-duyet.html" class="btn btn-warning btn-sm">Ký số</a>`;
+            quickBtn = `<a href="phe-duyet.html" class="btn btn-warning btn-sm" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 9px; border-radius: 6px; font-weight: 600; font-size: 12px;">✍️ Ký số</a>`;
           } else if (user.vai_tro === 'VAN_THU' && (item.trang_thai === 'DA_KY_CHO_BAN_HANH' || item.trang_thai === 'DA_DUYET')) {
-            quickBtn = `<a href="ban-hanh.html" class="btn btn-success btn-sm">Ban hành</a>`;
+            quickBtn = `<a href="ban-hanh.html" class="btn btn-success btn-sm" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 9px; border-radius: 6px; font-weight: 600; font-size: 12px;">📑 Ban hành</a>`;
           } else if (item.trang_thai === 'DA_BAN_HANH' && item.co_file_da_ky) {
-            quickBtn = `<a href="/api/van-ban-di/${item.id}/download?type=da_ky" target="_blank" class="btn btn-outline-success btn-sm" title="Tải văn bản đã ký số">📥 Tải PDF</a>`;
+            quickBtn = `<a href="/api/van-ban-di/${item.id}/download?type=da_ky" target="_blank" class="btn btn-outline-success btn-sm" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 9px; border-radius: 6px; font-weight: 600; font-size: 12px;" title="Tải văn bản đã ký số">📥 Tải PDF</a>`;
           }
 
+          // 1. Mã số dạng pill monospace
+          const codeHtml = `
+            <div class="doc-code-pill" style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; background: #f0f7ff; border: 1px solid #bae6fd; border-radius: 6px; font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, Menlo, monospace; font-size: 12px; font-weight: 600; color: #0284c7; white-space: nowrap;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+              <span>${item.so_ky_hieu || 'Dự thảo'}</span>
+            </div>
+          `;
+
+          // 2. Trích yếu
+          const trichYeuHtml = `
+            <div style="max-width: 280px;">
+              <a href="chi-tiet.html?id=${item.id}" style="color: #0f172a; font-weight: 600; font-size: 13.5px; line-height: 1.45; text-decoration: none; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;" title="${item.trich_yeu || ''}">
+                ${item.trich_yeu || ''}
+              </a>
+              ${item.ly_do_chinh_sua ? `<div style="font-size: 11.5px; color: #dc2626; background: #fef2f2; border: 1px solid #fecaca; padding: 2px 8px; border-radius: 4px; margin-top: 5px; display: inline-flex; align-items: center; gap: 4px;">⚠️ Ý kiến: ${item.ly_do_chinh_sua}</div>` : ''}
+            </div>
+          `;
+
+          // 3. Loại văn bản
+          const loaiHtml = `
+            <span style="display: inline-flex; align-items: center; padding: 3px 8px; background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 11.5px; font-weight: 600; white-space: nowrap;">
+              ${item.loai_van_ban || 'Văn bản'}
+            </span>
+          `;
+
+          // 4. Avatar chip người soạn
+          const author = (item.nguoi_soan_ten || item.nguoi_soan_thao || 'Lê Thị Thảo').trim();
+          const words = author.split(/\s+/).filter(Boolean);
+          const initials = words.length >= 2
+            ? (words[words.length - 2][0] + words[words.length - 1][0]).toUpperCase()
+            : author.slice(0, 2).toUpperCase();
+          const donVi = item.don_vi_soan_thao || 'Phòng GD&ĐT';
+
+          const authorHtml = `
+            <div class="user-chip" style="display: flex; align-items: center; gap: 10px; min-width: 180px;">
+              <div class="user-chip-avatar" style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #ffffff; font-weight: 700; font-size: 11.5px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 1px 3px rgba(2, 132, 199, 0.3);">
+                ${initials}
+              </div>
+              <div>
+                <div class="user-chip-name" style="font-weight: 600; color: #1e293b; font-size: 13px; line-height: 1.2;">${author}</div>
+                <div class="user-chip-dept" style="font-size: 11px; color: #64748b; margin-top: 2px;">${donVi}</div>
+              </div>
+            </div>
+          `;
+
+          // 5. Lãnh đạo ký chip
+          const lanhDaoHtml = `
+            <span style="display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; background: #faf5ff; color: #7e22ce; border: 1px solid #e9d5ff; border-radius: 20px; font-size: 12px; font-weight: 600; white-space: nowrap;">
+              <span>🏛️</span>
+              <span>${item.lanh_dao_ky || 'Lãnh đạo Sở'}</span>
+            </span>
+          `;
+
+          // 6. Ngày soạn
+          const dateStr = (item.ngay_soan || item.ngay_tao || '').split(' ');
+          const datePart = dateStr[0] || '2026-11-10';
+          const timePart = dateStr[1] || '';
+          const ngaySoanHtml = `
+            <div style="white-space: nowrap;">
+              <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; color: #334155;">
+                📅 ${datePart}
+              </span>
+              ${timePart ? `<div style="font-size: 11px; color: #94a3b8; margin-top: 2px; padding-left: 18px;">${timePart}</div>` : ''}
+            </div>
+          `;
+
           return `
-            <tr>
-              <td><strong>${item.so_ky_hieu}</strong></td>
-              <td style="max-width: 280px;">
-                ${item.trich_yeu}
-                ${item.ly_do_chinh_sua ? `<div class="text-danger" style="font-size: 11.5px; margin-top: 4px;">⚠ Ý kiến phản hồi: ${item.ly_do_chinh_sua}</div>` : ''}
-              </td>
-              <td>${item.loai_van_ban}</td>
-              <td>
-                <div><b>${item.don_vi_soan_thao}</b></div>
-                <small class="text-muted">${item.nguoi_soan_thao || item.nguoi_soan_ten || "Lê Thị Thảo"}</small>
-              </td>
-              <td>${item.lanh_dao_ky || 'Lãnh đạo Sở'}</td>
-              <td><small>${item.ngay_soan || item.ngay_tao || ''}</small></td>
-              <td>${STATUS_LABELS[item.trang_thai] || item.trang_thai}</td>
-              <td style="text-align: center;">
-                <div class="actions justify-content-center gap-1">
-                  <button type="button" class="btn btn-outline-info btn-sm btn-preview-item" onclick="openPreviewModal(${item.id}, '${item.co_file_da_ky ? 'da_ky' : 'goc'}', '${(item.file_da_ky_ten || item.file_goc_ten || 'van_ban').replace(/'/g, "\\'")}', '${(item.trich_yeu || '').replace(/'/g, "\\'")}', '${(item.so_ky_hieu || '').replace(/'/g, "\\'")}')" title="Xem trước tài liệu không cần tải về">
+            <tr style="transition: background-color 0.15s ease;">
+              <td style="vertical-align: middle; padding: 12px 16px;">${codeHtml}</td>
+              <td style="vertical-align: middle; padding: 12px 16px;">${trichYeuHtml}</td>
+              <td style="vertical-align: middle; padding: 12px 16px;">${loaiHtml}</td>
+              <td style="vertical-align: middle; padding: 12px 16px;">${authorHtml}</td>
+              <td style="vertical-align: middle; padding: 12px 16px;">${lanhDaoHtml}</td>
+              <td style="vertical-align: middle; padding: 12px 16px;">${ngaySoanHtml}</td>
+              <td style="vertical-align: middle; padding: 12px 16px;">${STATUS_LABELS[item.trang_thai] || item.trang_thai}</td>
+              <td style="vertical-align: middle; padding: 12px 16px; text-align: center;">
+                <div class="actions justify-content-center gap-1" style="display: flex; align-items: center; gap: 5px; flex-wrap: wrap;">
+                  <button type="button" class="btn btn-outline-info btn-sm btn-preview-item" onclick="openPreviewModal(${item.id}, '${item.co_file_da_ky ? 'da_ky' : 'goc'}', '${(item.file_da_ky_ten || item.file_goc_ten || 'van_ban').replace(/'/g, "\\'")}', '${(item.trich_yeu || '').replace(/'/g, "\\'")}', '${(item.so_ky_hieu || '').replace(/'/g, "\\"')}')" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 6px; font-size: 11.5px; font-weight: 600;" title="Xem trước tài liệu">
                     👁 Xem
                   </button>
                   ${quickBtn}
-                  <a href="chi-tiet.html?id=${item.id}" class="btn btn-outline-primary btn-sm">Chi tiết</a>
+                  <a href="chi-tiet.html?id=${item.id}" class="btn btn-outline-primary btn-sm" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 6px; font-size: 11.5px; font-weight: 600;">Chi tiết</a>
                 </div>
               </td>
             </tr>
           `;
-        }).join('');
+        }}).join('');
       }
 
       searchInput.addEventListener('input', loadData);
