@@ -205,10 +205,10 @@
     }
   </style>
 
-  <script src="../../js/core/toast.js"></script>
-  <script src="../../js/core/api.js"></script>
-  <script src="../../js/core/menu.js"></script>
-  <script src="../../js/core/auth-guard.js"></script>
+  <script src="../../js/core/toast.js?v=20261111_07"></script>
+  <script src="../../js/core/api.js?v=20261111_07"></script>
+  <script src="../../js/core/menu.js?v=20261111_07"></script>
+  <script src="../../js/core/auth-guard.js?v=20261111_07"></script>
   <script>
     let currentFilterStatus = 'CHO_VAN_THU_KIEM_TRA';
     let allDrafts = [];
@@ -357,7 +357,7 @@
               <td>${d.loai_van_ban}</td>
               <td>
                 <div><b>${d.don_vi_soan_thao}</b></div>
-                <small class="text-muted">${d.nguoi_soan_thao}</small>
+                <small class="text-muted">${d.nguoi_soan_thao || d.nguoi_soan_ten || "Lê Thị Thảo"}</small>
               </td>
               <td>${d.lanh_dao_ky || 'Lãnh đạo Sở'}</td>
               <td>
