@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cấp số & Ban hành văn bản đi - Quản lý văn bản Sở GD&ĐT Đà Nẵng</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/logo-sodad.svg">
+  <link rel="stylesheet" href="../../css/base.css">
+  <link rel="stylesheet" href="../../css/layout.css">
+  <link rel="stylesheet" href="../../css/components.css">
+</head>
+<body>
+  <div class="app-wrapper">
+    <aside class="app-sidebar" id="appSidebar">
+      <div class="sidebar-brand">
+        <img src="../../assets/logo-sodad.svg" alt="Logo Sở GD&ĐT">
+        <div class="brand-text">
+          <span class="brand-title">Sở GD&ĐT Đà Nẵng</span>
+          <span class="brand-subtitle">Quản lý văn bản điều hành</span>
+        </div>
+      </div>
+      <div class="sidebar-nav" id="sidebarNav"></div>
+      <div class="sidebar-footer">
+        Đang đăng nhập: <b id="currentUserRole">Văn thư</b>
+      </div>
+    </aside>
+
+    <div class="app-main">
+      <header class="app-topbar">
+        <div class="topbar-left">
+          <button class="sidebar-toggle-btn" id="sidebarToggle" aria-label="Toggle Menu">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <span class="system-header-title">HỆ THỐNG QUẢN LÝ VĂN BẢN VÀ ĐIỀU HÀNH NỘI BỘ</span>
+        </div>
+        <div class="topbar-right">
+          <div class="user-profile-widget">
+            <div class="user-avatar" id="currentUserAvatar">VT</div>
+            <div class="user-details">
+              <span class="user-name" id="currentUserName">...</span>
+              <span class="user-role-badge">Văn thư</span>
+            </div>
+          </div>
+          <button class="btn btn-outline-primary btn-sm btn-logout" id="logoutBtn" title="Đăng xuất">
+            Đăng xuất
+          </button>
+        </div>
+      </header>
+
+      <main class="content-wrapper">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Vào sổ cấp số & Phát hành văn bản đi</h1>
+            <p class="page-subtitle">Dành riêng cho Văn thư Sở: lấy số chính thức, lưu vào hồ sơ lưu trữ và chính thức ban hành văn bản</p>
+          </div>
+          <a href="danh-sach.html" class="btn btn-secondary">Quay lại danh sách</a>
+        </div>
+
+        <!-- Bảng danh sách văn bản đã được Lãnh đạo duyệt -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Văn bản đã duyệt, chờ Văn thư cấp số & phát hành</h2>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Mã dự thảo</th>
+                    <th>Trích yếu nội dung</th>
+                    <th>Người ký duyệt</th>
+                    <th>Phòng soạn thảo</th>
+                    <th style="text-align: center; width: 170px;">Thực hiện phát hành</th>
+                  </tr>
+                </thead>
+                <tbody id="approvedDraftsTable">
+                  <tr><td colspan="5" class="text-center p-4 text-muted">Đang tải danh sách...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer class="app-footer">
+        <span>© 2026 Sở Giáo dục và Đào tạo thành phố Đà Nẵng</span>
+        <span>Hệ thống Quản lý văn bản điều hành nội bộ</span>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Modal Cấp số & Ban hành văn bản -->
+  <div id="publishModal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 9999; align-items: center; justify-content: center; padding: 20px;">
+    <div style="background: #ffffff; width: 95%; max-width: 580px; border-radius: 12px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3); overflow: hidden; display: flex; flex-direction: column;">
+      <div style="background: #003366; color: #ffffff; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between;">
+        <h3 style="margin: 0; font-size: 16px; font-weight: 600;">📑 Cấp số hiệu & Ban hành văn bản đi</h3>
+        <button type="button" class="btn btn-sm btn-light" onclick="closePublishModal()" style="font-weight: bold;">✕</button>
+      </div>
+      <div style="padding: 20px; display: flex; flex-direction: column; gap: 16px;">
+        <div>
+          <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #1e293b;">Trích yếu văn bản:</label>
+          <div id="modalTrichYeu" style="background: #f8fafc; padding: 10px 12px; border-radius: 6px; font-size: 13.5px; color: #334155; border: 1px solid #e2e8f0; max-height: 80px; overflow-y: auto;">
+            ...
+          </div>
+        </div>
+
+        <div>
+          <label for="modalSoKyHieu" style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #1e293b;">
+            Số ký hiệu chính thức văn bản đi <span style="color: #ef4444;">*</span>
+          </label>
+          <input type="text" id="modalSoKyHieu" class="form-control" style="font-weight: 600; color: #003366;" placeholder="Ví dụ: 1225/SGDĐT-VP">
+          <small class="text-muted" style="font-size: 11.5px; margin-top: 4px; display: block;">Quy định thể thức theo Nghị định 30/2020/NĐ-CP</small>
+        </div>
+
+        <div>
+          <label for="modalNgayBanHanh" style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #1e293b;">
+            Ngày ban hành <span style="color: #ef4444;">*</span>
+          </label>
+          <input type="date" id="modalNgayBanHanh" class="form-control">
+        </div>
+
+        <div>
+          <label for="modalHoSoSelect" style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #1e293b;">
+            📁 Đồng bộ lưu vào Hồ sơ tài liệu:
+          </label>
+          <select id="modalHoSoSelect" class="form-select">
+            <option value="">-- Không lưu vào hồ sơ (để sau) --</option>
+          </select>
+          <small class="text-muted" style="font-size: 11.5px; margin-top: 4px; display: block;">Văn bản sẽ tự động được đồng bộ vào phân hệ Hồ sơ tài liệu cơ quan</small>
+        </div>
+      </div>
+      <div style="padding: 14px 20px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 10px;">
+        <button type="button" class="btn btn-secondary" onclick="closePublishModal()">Hủy bỏ</button>
+        <button type="button" class="btn btn-success" id="btnConfirmPublish">✓ Xác nhận cấp số & Ban hành</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../js/core/toast.js"></script>
+  <script src="../../js/core/api.js"></script>
+  <script src="../../js/core/menu.js"></script>
+  <script src="../../js/core/auth-guard.js"></script>
+  <script src="../../js/mock/du-lieu-van-ban.js"></script>
+  <script>
+    let currentPublishDocId = null;
+
+    function closePublishModal() {
+      document.getElementById('publishModal').style.display = 'none';
+      currentPublishDocId = null;
+    }
+
+    async function openPublishModal(doc) {
+      currentPublishDocId = doc.id;
+      document.getElementById('modalTrichYeu').textContent = doc.trich_yeu;
+      
+      const type = doc.loai_van_ban;
+      const vietTat = type === 'Kế hoạch' ? 'KH' : (type === 'Quyết định' ? 'QĐ' : 'VP');
+      document.getElementById('modalSoKyHieu').value = `1225/SGDĐT-${vietTat}`;
+      document.getElementById('modalNgayBanHanh').value = new Date().toISOString().split('T')[0];
+
+      // Nạp danh mục hồ sơ để chọn
+      const hoSoSelect = document.getElementById('modalHoSoSelect');
+      hoSoSelect.innerHTML = '<option value="">-- Không lưu vào hồ sơ (để sau) --</option>';
+      try {
+        const hsRes = await window.api.get('/api/ho-so');
+        if (hsRes && hsRes.du_lieu) {
+          hsRes.du_lieu.forEach(hs => {
+            const opt = document.createElement('option');
+            opt.value = hs.ho_so_id || hs.id;
+            opt.textContent = `${hs.ma_ho_so}: ${hs.tieu_de}`;
+            hoSoSelect.appendChild(opt);
+          });
+        }
+      } catch (e) {}
+
+      document.getElementById('publishModal').style.display = 'flex';
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = await window.AuthGuard.check();
+      if (!user) return;
+
+      const tbody = document.getElementById('approvedDraftsTable');
+
+      async function loadData() {
+        const list = await window.vanBanDiService.getAll({ trang_thai: 'DA_DUYET' });
+        if (list.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" class="text-center p-4 text-muted">Không có văn bản nào đang chờ cấp số phát hành.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = list.map(d => `
+          <tr>
+            <td><code>${d.so_ky_hieu}</code></td>
+            <td style="max-width: 380px;">
+              <b>${d.trich_yeu}</b>
+              <div style="font-size: 11.5px; color: #10b981; margin-top: 2px;">
+                ✓ Đã được phê duyệt bởi: ${d.lanh_dao_ky}
+              </div>
+            </td>
+            <td>${d.lanh_dao_ky}</td>
+            <td>${d.don_vi_soan_thao}</td>
+            <td style="text-align: center;">
+              <button class="btn btn-success btn-sm btn-publish" data-doc='${JSON.stringify({ id: d.id, trich_yeu: d.trich_yeu, loai_van_ban: d.loai_van_ban })}'>
+                📑 Cấp số & Ban hành
+              </button>
+            </td>
+          </tr>
+        `).join('');
+
+        tbody.querySelectorAll('.btn-publish').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const doc = JSON.parse(btn.dataset.doc);
+            openPublishModal(doc);
+          });
+        });
+      }
+
+      document.getElementById('btnConfirmPublish').addEventListener('click', async () => {
+        if (!currentPublishDocId) return;
+        const soKyHieu = document.getElementById('modalSoKyHieu').value.trim();
+        const ngayBanHanh = document.getElementById('modalNgayBanHanh').value;
+        const hoSoId = document.getElementById('modalHoSoSelect').value;
+
+        if (!soKyHieu) {
+          window.Toast.error('Vui lòng nhập số ký hiệu chính thức.');
+          return;
+        }
+
+        try {
+          await window.vanBanDiService.publish(currentPublishDocId, {
+            so_ky_hieu: soKyHieu,
+            ngay_ban_hanh: ngayBanHanh,
+            ho_so_id: hoSoId ? parseInt(hoSoId) : null
+          });
+          window.Toast.success(`Đã ban hành văn bản chính thức với số: ${soKyHieu}!`);
+          closePublishModal();
+          loadData();
+        } catch (err) {
+          window.Toast.error(err.message || 'Lỗi ban hành văn bản');
+        }
+      });
+
+      // Phím ESC đóng modal
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closePublishModal();
+      });
+
+      loadData();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Duyệt tài khoản cán bộ - Quản lý văn bản Sở GD&ĐT Đà Nẵng</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/logo-sodad.svg">
+  <link rel="stylesheet" href="../../css/base.css">
+  <link rel="stylesheet" href="../../css/layout.css">
+  <link rel="stylesheet" href="../../css/components.css">
+</head>
+<body>
+  <div class="app-wrapper">
+    <!-- Sidebar -->
+    <aside class="app-sidebar" id="appSidebar">
+      <div class="sidebar-brand">
+        <img src="../../assets/logo-sodad.svg" alt="Logo Sở GD&ĐT">
+        <div class="brand-text">
+          <span class="brand-title">Sở GD&ĐT Đà Nẵng</span>
+          <span class="brand-subtitle">Quản lý văn bản điều hành</span>
+        </div>
+      </div>
+      <div class="sidebar-nav" id="sidebarNav"></div>
+      <div class="sidebar-footer">
+        Đang đăng nhập: <b id="currentUserRole">Văn thư</b>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="app-main">
+      <header class="app-topbar">
+        <div class="topbar-left">
+          <button class="sidebar-toggle-btn" id="sidebarToggle" aria-label="Toggle Menu">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <span class="system-header-title">HỆ THỐNG QUẢN LÝ VĂN BẢN VÀ ĐIỀU HÀNH NỘI BỘ</span>
+        </div>
+        <div class="topbar-right">
+          <div class="user-profile-widget">
+            <div class="user-avatar" id="currentUserAvatar">VT</div>
+            <div class="user-details">
+              <span class="user-name" id="currentUserName">Văn thư Sở</span>
+              <span class="user-role-badge">Văn thư (Admin)</span>
+            </div>
+          </div>
+          <button class="btn btn-outline-primary btn-sm btn-logout" id="logoutBtn" title="Đăng xuất">
+            Đăng xuất
+          </button>
+        </div>
+      </header>
+
+      <main class="content-wrapper">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Duyệt yêu cầu đăng ký tài khoản cán bộ</h1>
+            <p class="page-subtitle">Danh sách chuyên viên đăng ký tài khoản đang chờ Văn thư phê duyệt vào hệ thống</p>
+          </div>
+          <div>
+            <span class="badge badge-warning" style="font-size: 13px; padding: 6px 12px;" id="pendingCounter">
+              Đang chờ duyệt: 0
+            </span>
+          </div>
+        </div>
+
+        <!-- Bộ lọc và tìm kiếm -->
+        <div class="filter-bar">
+          <div class="search-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="searchInput" class="form-control" placeholder="Tìm kiếm theo họ tên, tên đăng nhập, email, phòng ban...">
+          </div>
+          <button class="btn btn-secondary" id="refreshBtn">
+            🔄 Làm mới danh sách
+          </button>
+        </div>
+
+        <!-- Bảng danh sách chờ duyệt -->
+        <div class="card">
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>STT</th>
+                    <th>Họ và tên</th>
+                    <th>Tên đăng nhập</th>
+                    <th>Email công vụ</th>
+                    <th>Số ĐT</th>
+                    <th>Phòng ban / Chức vụ</th>
+                    <th>Ngày gửi yêu cầu</th>
+                    <th style="text-align: center;">Thao tác phê duyệt</th>
+                  </tr>
+                </thead>
+                <tbody id="pendingTableBody">
+                  <tr>
+                    <td colspan="8" class="text-center p-4 text-muted">
+                      Đang tải dữ liệu từ máy chủ...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer class="app-footer">
+        <span>© 2026 Sở Giáo dục và Đào tạo thành phố Đà Nẵng</span>
+        <span>Nhánh Leader (main) - Kết nối API Backend thật</span>
+      </footer>
+    </div>
+  </div>
+
+  <script src="../../js/core/toast.js"></script>
+  <script src="../../js/core/api.js"></script>
+  <script src="../../js/core/menu.js"></script>
+  <script src="../../js/core/auth-guard.js"></script>
+  <script src="../../js/auth/admin-users.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      // 1. Phân quyền: Chỉ cho phép VAN_THU
+      const user = await window.AuthGuard.check({ requiredRoles: ['VAN_THU'] });
+      if (!user) return;
+
+      const tbody = document.getElementById('pendingTableBody');
+      const counterEl = document.getElementById('pendingCounter');
+      const searchInput = document.getElementById('searchInput');
+      const refreshBtn = document.getElementById('refreshBtn');
+
+      let allPendingUsers = [];
+
+      async function loadData() {
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center p-4 text-muted">Đang tải...</td></tr>';
+        allPendingUsers = await window.AdminUserModule.loadUsers({ trang_thai: 'CHO_DUYET' });
+        renderTable();
+      }
+
+      function renderTable() {
+        const query = searchInput.value.toLowerCase().trim();
+        const filtered = allPendingUsers.filter(u =>
+          (u.ho_va_ten && u.ho_va_ten.toLowerCase().includes(query)) ||
+          (u.ten_dang_nhap && u.ten_dang_nhap.toLowerCase().includes(query)) ||
+          (u.email && u.email.toLowerCase().includes(query)) ||
+          (u.phong_ban && u.phong_ban.toLowerCase().includes(query))
+        );
+
+        counterEl.textContent = `Đang chờ duyệt: ${filtered.length}`;
+
+        if (filtered.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="8" class="text-center p-4 text-muted">
+                ${allPendingUsers.length === 0 ? 'Hiện tại không có tài khoản nào đang chờ duyệt.' : 'Không tìm thấy kết quả phù hợp.'}
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        tbody.innerHTML = filtered.map((u, index) => `
+          <tr>
+            <td>${index + 1}</td>
+            <td><strong class="text-primary">${u.ho_va_ten}</strong></td>
+            <td><code>${u.ten_dang_nhap}</code></td>
+            <td>${u.email}</td>
+            <td>${u.sdt || '<i class="text-muted">Chưa có</i>'}</td>
+            <td>
+              <div>${u.phong_ban || 'Chưa cập nhật'}</div>
+              <small class="text-muted">${u.chuc_vu || ''}</small>
+            </td>
+            <td><small>${u.ngay_tao || ''}</small></td>
+            <td style="text-align: center;">
+              <div class="actions justify-content-center">
+                <button class="btn btn-success btn-sm btn-approve" data-id="${u.nguoi_dung_id}" data-name="${u.ho_va_ten}">
+                  ✓ Phê duyệt
+                </button>
+                <button class="btn btn-danger btn-sm btn-reject" data-id="${u.nguoi_dung_id}" data-name="${u.ho_va_ten}">
+                  ✕ Từ chối
+                </button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+
+        // Gắn sự kiện các nút
+        tbody.querySelectorAll('.btn-approve').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-id');
+            const name = btn.getAttribute('data-name');
+            window.AdminUserModule.approve(id, name, loadData);
+          });
+        });
+
+        tbody.querySelectorAll('.btn-reject').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-id');
+            const name = btn.getAttribute('data-name');
+            window.AdminUserModule.promptReject(id, name, loadData);
+          });
+        });
+      }
+
+      searchInput.addEventListener('input', renderTable);
+      refreshBtn.addEventListener('click', loadData);
+
+      // Tải dữ liệu ban đầu
+      loadData();
+    });
+  </script>
+</body>
+</html>

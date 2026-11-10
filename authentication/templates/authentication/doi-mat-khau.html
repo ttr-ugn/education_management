@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đổi mật khẩu - Quản lý văn bản điều hành Sở GD&ĐT TP. Đà Nẵng</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/logo-sodad.svg">
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/auth.css">
+</head>
+<body class="auth-page">
+
+  <header class="auth-header-bar">
+    <div class="national-header">
+      <div class="national-motto">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</div>
+      <div class="national-submotto">Độc lập - Tự do - Hạnh phúc</div>
+    </div>
+  </header>
+
+  <main class="auth-container">
+    <div class="auth-card">
+      <div class="auth-card-header">
+        <img src="../assets/logo-sodad.svg" alt="Logo Sở GD&ĐT Đà Nẵng" class="auth-logo">
+        <h1 class="auth-title">THIẾT LẬP MẬT KHẨU MỚI</h1>
+        <p class="auth-subtitle">BẢO MẬT TÀI KHOẢN ĐIỀU HÀNH NỘI BỘ</p>
+      </div>
+
+      <div class="auth-card-body">
+        <!-- Banner bắt buộc đổi mật khẩu ở lần đăng nhập đầu -->
+        <div id="requiredNotice" class="auth-alert auth-alert-warning mb-3" style="display: none;">
+          <span style="font-size: 16px;">🔒</span>
+          <div>
+            <b>Yêu cầu bảo mật bắt buộc:</b><br>
+            Đây là lần đầu tiên đồng chí đăng nhập hoặc tài khoản vừa được cấp mật khẩu tạm. Vui lòng thiết lập mật khẩu mới trước khi tiếp tục truy cập hệ thống.
+          </div>
+        </div>
+
+        <div id="alertBox" class="auth-alert">
+          <span id="alertIcon">⚠</span>
+          <span id="alertMsg"></span>
+        </div>
+
+        <form id="changePasswordForm" novalidate>
+          <div class="form-group">
+            <label for="mat_khau_cu" class="form-label required">Mật khẩu hiện tại (hoặc mật khẩu tạm)</label>
+            <input type="password" id="mat_khau_cu" name="mat_khau_cu" class="form-control" placeholder="Nhập mật khẩu cũ" required>
+          </div>
+
+          <div class="form-group">
+            <label for="mat_khau_moi" class="form-label required">Mật khẩu mới</label>
+            <input type="password" id="mat_khau_moi" name="mat_khau_moi" class="form-control" placeholder="Tối thiểu 8 ký tự, có chữ và số" required>
+            <div class="form-hint">Mật khẩu mới phải khác mật khẩu hiện tại.</div>
+          </div>
+
+          <div class="form-group">
+            <label for="xac_nhan_moi" class="form-label required">Xác nhận mật khẩu mới</label>
+            <input type="password" id="xac_nhan_moi" name="xac_nhan_moi" class="form-control" placeholder="Nhập lại mật khẩu mới" required>
+          </div>
+
+          <button type="submit" id="submitBtn" class="btn btn-primary w-100 btn-lg mt-3">
+            <span id="btnSpinner" class="spinner d-none"></span>
+            <span id="btnText">Lưu mật khẩu mới</span>
+          </button>
+        </form>
+
+        <div class="text-center mt-3">
+          <a href="dashboard.html" id="cancelLink" class="text-muted" style="font-size: 13px;">Bỏ qua và quay lại Dashboard</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="auth-bottom-info">
+    © 2026 Sở Giáo dục và Đào tạo thành phố Đà Nẵng. Hệ thống lưu hành nội bộ.
+  </footer>
+
+  <script src="../js/core/toast.js"></script>
+  <script src="../js/core/api.js"></script>
+  <script src="../js/core/auth-guard.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      // 1. Kiểm tra session
+      const user = await window.AuthGuard.check();
+      if (!user) return;
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const isRequired = urlParams.get('required') === '1' || user.bat_buoc_doi_mat_khau;
+      const requiredNotice = document.getElementById('requiredNotice');
+      const cancelLink = document.getElementById('cancelLink');
+
+      if (isRequired) {
+        requiredNotice.style.display = 'flex';
+        cancelLink.style.display = 'none'; // Không cho bỏ qua nếu bắt buộc
+      }
+
+      const form = document.getElementById('changePasswordForm');
+      const alertBox = document.getElementById('alertBox');
+      const alertMsg = document.getElementById('alertMsg');
+      const submitBtn = document.getElementById('submitBtn');
+      const btnSpinner = document.getElementById('btnSpinner');
+      const btnText = document.getElementById('btnText');
+
+      function showAlert(msg, type = 'danger') {
+        alertBox.className = `auth-alert auth-alert-${type} show`;
+        alertMsg.textContent = msg;
+      }
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        alertBox.className = 'auth-alert';
+
+        const mat_khau_cu = document.getElementById('mat_khau_cu').value;
+        const mat_khau_moi = document.getElementById('mat_khau_moi').value;
+        const xac_nhan_moi = document.getElementById('xac_nhan_moi').value;
+
+        if (!mat_khau_cu) {
+          showAlert('Vui lòng nhập mật khẩu hiện tại.');
+          return;
+        }
+
+        if (!mat_khau_moi || mat_khau_moi.length < 8) {
+          showAlert('Mật khẩu mới phải có ít nhất 8 ký tự.');
+          return;
+        }
+
+        const hasLetter = /[a-zA-Z]/.test(mat_khau_moi);
+        const hasDigit = /[0-9]/.test(mat_khau_moi);
+        if (!hasLetter || !hasDigit) {
+          showAlert('Mật khẩu mới phải chứa cả chữ cái và chữ số.');
+          return;
+        }
+
+        if (mat_khau_moi !== xac_nhan_moi) {
+          showAlert('Mật khẩu mới và mật khẩu xác nhận không trùng khớp.');
+          return;
+        }
+
+        submitBtn.disabled = true;
+        btnSpinner.classList.remove('d-none');
+        btnText.textContent = 'Đang lưu mật khẩu...';
+
+        try {
+          await window.api.post('/api/auth/doi-mat-khau', {
+            mat_khau_cu: mat_khau_cu,
+            mat_khau_moi: mat_khau_moi
+          });
+
+          window.Toast.success('Đổi mật khẩu thành công! Đang chuyển đến Bảng điều khiển...', 'Thành công');
+          setTimeout(() => {
+            window.location.replace('dashboard.html');
+          }, 1000);
+
+        } catch (err) {
+          showAlert(err.message || 'Không thể đổi mật khẩu. Vui lòng thử lại.');
+        } finally {
+          submitBtn.disabled = false;
+          btnSpinner.classList.add('d-none');
+          btnText.textContent = 'Lưu mật khẩu mới';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

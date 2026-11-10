@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Danh sách văn bản đến - Quản lý văn bản Sở GD&ĐT Đà Nẵng</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/logo-sodad.svg">
+  <link rel="stylesheet" href="../../css/base.css">
+  <link rel="stylesheet" href="../../css/layout.css">
+  <link rel="stylesheet" href="../../css/components.css">
+</head>
+<body>
+  <div class="app-wrapper">
+    <aside class="app-sidebar" id="appSidebar">
+      <div class="sidebar-brand">
+        <img src="../../assets/logo-sodad.svg" alt="Logo Sở GD&ĐT">
+        <div class="brand-text">
+          <span class="brand-title">Sở GD&ĐT Đà Nẵng</span>
+          <span class="brand-subtitle">Quản lý văn bản điều hành</span>
+        </div>
+      </div>
+      <div class="sidebar-nav" id="sidebarNav"></div>
+      <div class="sidebar-footer">
+        Đang đăng nhập: <b id="currentUserRole">Cán bộ</b>
+      </div>
+    </aside>
+
+    <div class="app-main">
+      <header class="app-topbar">
+        <div class="topbar-left">
+          <button class="sidebar-toggle-btn" id="sidebarToggle" aria-label="Toggle Menu">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <span class="system-header-title">HỆ THỐNG QUẢN LÝ VĂN BẢN VÀ ĐIỀU HÀNH NỘI BỘ</span>
+        </div>
+        <div class="topbar-right">
+          <div class="user-profile-widget">
+            <div class="user-avatar" id="currentUserAvatar">CB</div>
+            <div class="user-details">
+              <span class="user-name" id="currentUserName">...</span>
+              <span class="user-role-badge">Cán bộ</span>
+            </div>
+          </div>
+          <button class="btn btn-outline-primary btn-sm btn-logout" id="logoutBtn" title="Đăng xuất">
+            Đăng xuất
+          </button>
+        </div>
+      </header>
+
+      <main class="content-wrapper">
+        <div style="background-color: #eff6ff; border-left: 4px solid #0284c7; padding: 12px 16px; border-radius: 6px; margin-bottom: 18px; font-size: 13.5px; color: #1e3a8a; display: flex; align-items: center; justify-content: space-between; flex-wrap: gap: 10px;">
+          <div>
+            <b>Sổ Văn bản đến:</b> Quản lý công văn từ cơ quan bên ngoài gửi đến Sở.<br>
+            <span style="font-size: 12.5px; color: #475569;">Đối với dự thảo văn bản đi do Chuyên viên trình, Văn thư xử lý tại mục Dự thảo.</span>
+          </div>
+          <a href="../van-ban-di/kiem-tra.html" class="btn btn-warning btn-sm">
+            📥 Xem dự thảo Chuyên viên gửi &rarr;
+          </a>
+        </div>
+
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Sổ đăng ký văn bản đến</h1>
+            <p class="page-subtitle">Theo dõi, tìm kiếm và phân loại toàn bộ công văn, quyết định chuyển đến Sở GD&ĐT</p>
+          </div>
+          <div class="d-flex gap-2">
+            <a href="them.html" class="btn btn-primary" id="btnThemVB">
+              + Tiếp nhận văn bản mới
+            </a>
+            <a href="phe-duyet-phan-cong.html" class="btn btn-warning" id="btnPhanCong">
+              Phê duyệt & Phân công
+            </a>
+          </div>
+        </div>
+
+        <!-- Bộ lọc -->
+        <div class="filter-bar">
+          <div class="search-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="searchInput" class="form-control" placeholder="Tìm theo số ký hiệu, trích yếu, cơ quan gửi...">
+          </div>
+
+          <div style="min-width: 170px;">
+            <select id="filterStatus" class="form-select">
+              <option value="">-- Tất cả trạng thái --</option>
+              <option value="CHUA_PHAN_CONG">Chưa phân công</option>
+              <option value="DANG_XU_LY">Đang xử lý</option>
+              <option value="DA_XU_LY">Đã xử lý</option>
+            </select>
+          </div>
+
+          <div style="min-width: 150px;">
+            <select id="filterUrgency" class="form-select">
+              <option value="">-- Tất cả độ khẩn --</option>
+              <option value="Thượng khẩn">Thượng khẩn</option>
+              <option value="Khẩn">Khẩn</option>
+              <option value="Bình thường">Bình thường</option>
+            </select>
+          </div>
+
+          <button class="btn btn-secondary" id="reloadBtn">🔄 Làm mới</button>
+        </div>
+
+        <!-- Bảng danh sách -->
+        <div class="card">
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Số đến</th>
+                    <th>Số ký hiệu</th>
+                    <th>Ngày đến</th>
+                    <th>Cơ quan ban hành</th>
+                    <th>Trích yếu nội dung</th>
+                    <th>Độ khẩn</th>
+                    <th>Người xử lý</th>
+                    <th>Trạng thái</th>
+                    <th style="text-align: center;">Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody id="vbDenTableBody">
+                  <tr><td colspan="9" class="text-center p-4 text-muted">Đang tải...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer class="app-footer">
+        <span>© 2026 Sở Giáo dục và Đào tạo thành phố Đà Nẵng</span>
+        <span>Hệ thống Quản lý văn bản điều hành nội bộ</span>
+      </footer>
+    </div>
+  </div>
+
+  <script src="../../js/core/toast.js"></script>
+  <script src="../../js/core/api.js"></script>
+  <script src="../../js/core/menu.js"></script>
+  <script src="../../js/core/auth-guard.js"></script>
+  <script src="../../js/mock/du-lieu-van-ban.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = await window.AuthGuard.check();
+      if (!user) return;
+
+      const tbody = document.getElementById('vbDenTableBody');
+      const searchInput = document.getElementById('searchInput');
+      const filterStatus = document.getElementById('filterStatus');
+      const filterUrgency = document.getElementById('filterUrgency');
+      const reloadBtn = document.getElementById('reloadBtn');
+
+      const STATUS_LABELS = {
+        'CHUA_PHAN_CONG': '<span class="badge badge-warning">Chưa phân công</span>',
+        'DANG_XU_LY': '<span class="badge badge-info">Đang xử lý</span>',
+        'DA_XU_LY': '<span class="badge badge-success">Đã hoàn thành</span>'
+      };
+
+      const URGENCY_LABELS = {
+        'Thượng khẩn': '<span class="badge badge-danger">Thượng khẩn</span>',
+        'Khẩn': '<span class="badge badge-warning">Khẩn</span>',
+        'Bình thường': '<span class="badge badge-secondary">Bình thường</span>'
+      };
+
+      async function loadData() {
+        const filters = {
+          q: searchInput.value.trim(),
+          trang_thai: filterStatus.value,
+          do_khan: filterUrgency.value
+        };
+        const list = await window.vanBanDenService.getAll(filters);
+
+        if (list.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="9" class="text-center p-4 text-muted">Không tìm thấy văn bản đến nào.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = list.map(item => `
+          <tr>
+            <td><code>${item.so_den}</code></td>
+            <td><strong>${item.so_ky_hieu}</strong></td>
+            <td><small>${item.ngay_den}</small></td>
+            <td>${item.co_quan_gui}</td>
+            <td style="max-width: 280px;">${item.trich_yeu}</td>
+            <td>${URGENCY_LABELS[item.do_khan] || item.do_khan}</td>
+            <td>${item.chuyen_vien_xu_ly || '<i class="text-muted">Chưa giao</i>'}</td>
+            <td>${STATUS_LABELS[item.trang_thai] || item.trang_thai}</td>
+            <td style="text-align: center;">
+              <div class="actions justify-content-center">
+                <a href="chi-tiet.html?id=${item.id}" class="btn btn-outline-primary btn-sm">Chi tiết</a>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      searchInput.addEventListener('input', loadData);
+      filterStatus.addEventListener('change', loadData);
+      filterUrgency.addEventListener('change', loadData);
+      reloadBtn.addEventListener('click', loadData);
+
+      loadData();
+    });
+  </script>
+</body>
+</html>

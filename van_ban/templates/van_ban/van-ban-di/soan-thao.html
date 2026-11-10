@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Soạn thảo văn bản đi - Quản lý văn bản Sở GD&ĐT Đà Nẵng</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/logo-sodad.svg">
+  <link rel="stylesheet" href="../../css/base.css">
+  <link rel="stylesheet" href="../../css/layout.css">
+  <link rel="stylesheet" href="../../css/components.css">
+</head>
+<body>
+  <div class="app-wrapper">
+    <aside class="app-sidebar" id="appSidebar">
+      <div class="sidebar-brand">
+        <img src="../../assets/logo-sodad.svg" alt="Logo Sở GD&ĐT">
+        <div class="brand-text">
+          <span class="brand-title">Sở GD&ĐT Đà Nẵng</span>
+          <span class="brand-subtitle">Quản lý văn bản điều hành</span>
+        </div>
+      </div>
+      <div class="sidebar-nav" id="sidebarNav"></div>
+      <div class="sidebar-footer">
+        Đang đăng nhập: <b id="currentUserRole">Cán bộ</b>
+      </div>
+    </aside>
+
+    <div class="app-main">
+      <header class="app-topbar">
+        <div class="topbar-left">
+          <button class="sidebar-toggle-btn" id="sidebarToggle" aria-label="Toggle Menu">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <span class="system-header-title">HỆ THỐNG QUẢN LÝ VĂN BẢN VÀ ĐIỀU HÀNH NỘI BỘ</span>
+        </div>
+        <div class="topbar-right">
+          <div class="user-profile-widget">
+            <div class="user-avatar" id="currentUserAvatar">CB</div>
+            <div class="user-details">
+              <span class="user-name" id="currentUserName">...</span>
+              <span class="user-role-badge">Cán bộ</span>
+            </div>
+          </div>
+          <button class="btn btn-outline-primary btn-sm btn-logout" id="logoutBtn" title="Đăng xuất">
+            Đăng xuất
+          </button>
+        </div>
+      </header>
+
+      <main class="content-wrapper">
+
+
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Khởi tạo & Soạn thảo văn bản đi mới</h1>
+            <p class="page-subtitle">Dành cho Chuyên viên các phòng ban soạn thảo công văn, tờ trình hoặc kế hoạch công tác</p>
+          </div>
+          <a href="danh-sach.html" class="btn btn-secondary">Quay lại danh sách</a>
+        </div>
+
+        <div style="max-width: 880px; margin: 0 auto;">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Phiếu trình dự thảo văn bản đi</h2>
+            </div>
+            <div class="card-body">
+              <div id="linkedTaskBanner" style="display: none; background: #f0fdf4; border: 1px solid #86efac; border-left: 4px solid #22c55e; border-radius: 8px; padding: 14px 18px; margin-bottom: 20px;">
+                <div style="font-weight: 700; color: #15803d; font-size: 14px;">
+                  🎯 VĂN BẢN XỬ LÝ NHIỆM VỤ ĐƯỢC GIAO: <span id="linkedTaskName">...</span>
+                </div>
+                <div style="font-size: 12.5px; color: #166534; margin-top: 4px;">
+                  Khi gửi dự thảo này, hệ thống sẽ tự động liên kết ID công việc, cập nhật tiến độ nhiệm vụ sang <b>Đang thực hiện (50%)</b> và tự động nghiệm thu khi ban hành văn bản chính thức.
+                </div>
+              </div>
+              <form id="draftForm" novalidate>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                  <div class="form-group" style="grid-column: span 2;">
+                    <label class="form-label" style="display: flex; align-items: center; justify-content: space-between;">
+                      <span style="font-weight: 600; color: #003366;">🎯 Nhiệm vụ / Công việc điều hành cần xử lý (liên kết tiến độ)</span>
+                      <span class="text-muted" style="font-size: 11.5px; font-weight: normal;">(Tùy chọn liên kết)</span>
+                    </label>
+                    <select id="select_cong_viec" class="form-select" style="font-weight: 500;">
+                      <option value="">-- Văn bản độc lập (Không gắn với nhiệm vụ cụ thể) --</option>
+                    </select>
+                    <div class="form-hint" style="color: #64748b; font-size: 11.5px; margin-top: 4px;">
+                      💡 Chọn nhiệm vụ được giao để hệ thống tự động liên kết ID và cập nhật tiến độ công việc sang <b>"Đang thực hiện (50%)"</b> khi gửi dự thảo.
+                    </div>
+                  </div>
+
+                  <div class="form-group" style="grid-column: span 2;">
+                    <label class="form-label required">Trích yếu nội dung văn bản</label>
+                    <textarea id="trich_yeu" class="form-control" rows="3" placeholder="Tóm tắt ngắn gọn nội dung văn bản đi..." required></textarea>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label required">Hình thức / Loại văn bản</label>
+                    <select id="loai_van_ban" class="form-select" required>
+                      <option value="Công văn">Công văn</option>
+                      <option value="Kế hoạch">Kế hoạch</option>
+                      <option value="Tờ trình">Tờ trình</option>
+                      <option value="Thông báo">Thông báo</option>
+                      <option value="Quyết định">Quyết định</option>
+                      <option value="Báo cáo">Báo cáo</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label required">Lãnh đạo Sở phụ trách ký duyệt</label>
+                    <select id="lanh_dao_ky" class="form-select" required>
+                      <option value="Lê Thị Bích Thuận (Giám đốc Sở)">Lê Thị Bích Thuận (Giám đốc Sở)</option>
+                      <option value="Mai Tấn Linh (Phó Giám đốc Sở)">Mai Tấn Linh (Phó Giám đốc Sở)</option>
+                      <option value="Phùng Văn Cường (Phó Giám đốc Sở)">Phùng Văn Cường (Phó Giám đốc Sở)</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label required">Đơn vị soạn thảo</label>
+                    <input type="text" id="don_vi_soan_thao" class="form-control" required>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">Độ khẩn</label>
+                    <select id="do_khan" class="form-select">
+                      <option value="Bình thường">Bình thường</option>
+                      <option value="Khẩn">Khẩn</option>
+                      <option value="Thượng khẩn">Thượng khẩn</option>
+                      <option value="Hỏa tốc">Hỏa tốc</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group" style="grid-column: span 2;">
+                    <label class="form-label required">Nơi nhận văn bản</label>
+                    <input type="text" id="noi_nhan" class="form-control" placeholder="UBND thành phố, các phòng GD&ĐT quận/huyện, các trường THPT..." required>
+                  </div>
+
+                  <div class="form-group" style="grid-column: span 2;">
+                    <label class="form-label required">Tệp dự thảo đính kèm (DOCX / PDF)</label>
+                    <input type="file" id="tep_dinh_kem" class="form-control" accept=".doc,.docx,.pdf" required>
+                    <div class="form-hint">Đính kèm bản thảo có đầy đủ thể thức theo Nghị định 30/2020/NĐ-CP.</div>
+                  </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                  <a href="danh-sach.html" class="btn btn-secondary">Hủy bỏ</a>
+                  <button type="submit" class="btn btn-primary">
+                    📤 Trình Lãnh đạo phê duyệt
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer class="app-footer">
+        <span>© 2026 Sở Giáo dục và Đào tạo thành phố Đà Nẵng</span>
+        <span>Hệ thống Quản lý văn bản điều hành nội bộ</span>
+      </footer>
+    </div>
+  </div>
+
+  <script src="../../js/core/toast.js"></script>
+  <script src="../../js/core/api.js"></script>
+  <script src="../../js/core/menu.js"></script>
+  <script src="../../js/core/auth-guard.js"></script>
+  <script src="../../js/mock/du-lieu-van-ban.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = await window.AuthGuard.check();
+      if (!user) return;
+
+      document.getElementById('don_vi_soan_thao').value = user.phong_ban || 'Phòng Giáo dục Trung học';
+
+      // 1. Tải danh sách công việc được giao vào Combobox
+      const selectTask = document.getElementById('select_cong_viec');
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlTaskId = urlParams.get('cong_viec_id');
+      const urlTaskName = urlParams.get('ten_cong_viec');
+
+      try {
+        const taskRes = await window.api.get('/api/cong-viec');
+        if (taskRes && taskRes.du_lieu) {
+          taskRes.du_lieu.forEach(t => {
+            const opt = document.createElement('option');
+            opt.value = t.id;
+            opt.textContent = `[#${t.id}] ${t.ten_cong_viec} (Tiến độ: ${t.tien_do}% - Hạn: ${t.han_hoan_thanh})`;
+            opt.dataset.taskName = t.ten_cong_viec;
+            opt.dataset.taskContent = t.noi_dung || '';
+            selectTask.appendChild(opt);
+          });
+        }
+      } catch (err) {
+        console.warn('Không thể nạp danh sách công việc:', err);
+      }
+
+      // Xử lý khi chọn công việc từ Combobox
+      function handleTaskSelection() {
+        const val = selectTask.value;
+        const banner = document.getElementById('linkedTaskBanner');
+        const bannerName = document.getElementById('linkedTaskName');
+        const trichYeuEl = document.getElementById('trich_yeu');
+        const noiNhanEl = document.getElementById('noi_nhan');
+
+        if (val) {
+          const opt = selectTask.options[selectTask.selectedIndex];
+          const taskName = opt.dataset.taskName || urlTaskName || opt.textContent;
+          banner.style.display = 'block';
+          bannerName.textContent = taskName;
+
+          if (!trichYeuEl.value || trichYeuEl.dataset.autofilled === '1') {
+            trichYeuEl.value = `V/v triển khai thực hiện nhiệm vụ: ${taskName}`;
+            trichYeuEl.dataset.autofilled = '1';
+          }
+          if (!noiNhanEl.value) {
+            noiNhanEl.value = 'Ban Giám đốc Sở, Văn phòng Sở';
+          }
+        } else {
+          banner.style.display = 'none';
+          if (trichYeuEl.dataset.autofilled === '1') {
+            trichYeuEl.value = '';
+            delete trichYeuEl.dataset.autofilled;
+          }
+        }
+      }
+
+      selectTask.addEventListener('change', handleTaskSelection);
+
+      // Nếu chuyển từ trang công việc sang có sẵn ID trong URL -> tự chọn trong combobox
+      if (urlTaskId) {
+        selectTask.value = urlTaskId;
+        handleTaskSelection();
+      }
+
+      const form = document.getElementById('draftForm');
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const trich_yeu = document.getElementById('trich_yeu').value.trim();
+        const loai_van_ban = document.getElementById('loai_van_ban').value;
+        const lanh_dao_ky = document.getElementById('lanh_dao_ky').value;
+        const don_vi_soan_thao = document.getElementById('don_vi_soan_thao').value.trim();
+        const noi_nhan = document.getElementById('noi_nhan').value.trim();
+
+        if (!trich_yeu || !noi_nhan) {
+          window.Toast.warning('Vui lòng nhập trích yếu và nơi nhận văn bản.');
+          return;
+        }
+
+        const fileInput = document.getElementById('tep_dinh_kem');
+        const file = fileInput.files[0];
+
+        const formData = new FormData();
+        formData.append('trich_yeu', trich_yeu);
+        formData.append('loai_van_ban', loai_van_ban);
+        formData.append('lanh_dao_ky', lanh_dao_ky);
+        formData.append('don_vi_soan_thao', don_vi_soan_thao);
+        formData.append('nguoi_soan_thao', user.ho_va_ten);
+        formData.append('noi_nhan', noi_nhan);
+        formData.append('do_khan', document.getElementById('do_khan').value);
+
+        const selectedTaskId = selectTask.value;
+        if (selectedTaskId) {
+          formData.append('cong_viec_id', selectedTaskId);
+        }
+
+        if (file) {
+          formData.append('tep_dinh_kem', file);
+          formData.append('ten_tep', file.name);
+        } else {
+          formData.append('ten_tep', 'DuThaoVanBan.docx');
+        }
+
+        try {
+          await window.vanBanDiService.create(formData);
+          window.Toast.success(selectedTaskId 
+            ? 'Đã gửi trình dự thảo và liên kết cập nhật tiến độ công việc thành công!' 
+            : 'Đã gửi trình dự thảo văn bản tới Văn thư kiểm tra thành công!');
+          setTimeout(() => {
+            window.location.replace('danh-sach.html');
+          }, 1000);
+        } catch (err) {
+          window.Toast.error(err.message || 'Lỗi khi gửi dự thảo văn bản.');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

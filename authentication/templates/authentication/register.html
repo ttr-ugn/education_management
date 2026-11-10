@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng ký tài khoản - Quản lý văn bản điều hành Sở GD&ĐT TP. Đà Nẵng</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/logo-sodad.svg">
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/auth.css">
+</head>
+<body class="auth-page">
+
+  <header class="auth-header-bar">
+    <div class="national-header">
+      <div class="national-motto">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</div>
+      <div class="national-submotto">Độc lập - Tự do - Hạnh phúc</div>
+    </div>
+  </header>
+
+  <main class="auth-container">
+    <div class="auth-card auth-card-wide">
+      <div class="auth-card-header">
+        <img src="../assets/logo-sodad.svg" alt="Logo Sở GD&ĐT Đà Nẵng" class="auth-logo">
+        <h1 class="auth-title">ĐĂNG KÝ TÀI KHOẢN CÁN BỘ</h1>
+        <p class="auth-subtitle">HỆ THỐNG QUẢN LÝ VĂN BẢN VÀ ĐIỀU HÀNH NỘI BỘ</p>
+      </div>
+
+      <div class="auth-card-body">
+        <!-- Lựa chọn vai trò: Chuyên viên hoặc Văn thư -->
+        <label class="form-label required mb-2">Chọn vai trò đăng ký:</label>
+        <div class="role-tabs">
+          <button type="button" class="role-tab-btn active" id="tabChuyenVien" data-role="CHUYEN_VIEN">
+            Chuyên viên các Phòng/Ban
+          </button>
+          <button type="button" class="role-tab-btn" id="tabVanThu" data-role="VAN_THU">
+            Văn thư Sở (Admin)
+          </button>
+        </div>
+
+        <div id="registerAlert" class="auth-alert" role="alert">
+          <span id="alertIcon" style="font-weight: bold;">⚠</span>
+          <span id="alertMessage"></span>
+        </div>
+
+        <form id="registerForm" novalidate>
+          <input type="hidden" id="vai_tro" name="vai_tro" value="CHUYEN_VIEN">
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="form-group" style="grid-column: span 2;">
+              <label for="ho_va_ten" class="form-label required">Họ và tên cán bộ</label>
+              <input type="text" id="ho_va_ten" name="ho_va_ten" class="form-control" placeholder="Ví dụ: Nguyễn Văn An" required>
+            </div>
+
+            <div class="form-group">
+              <label for="email" class="form-label required">Email công vụ</label>
+              <input type="email" id="email" name="email" class="form-control" placeholder="an.nv@danang.edu.vn" required>
+            </div>
+
+            <div class="form-group">
+              <label for="sdt" class="form-label">Số điện thoại liên hệ</label>
+              <input type="tel" id="sdt" name="sdt" class="form-control" placeholder="Ví dụ: 0905123456">
+            </div>
+
+            <div class="form-group">
+              <label for="phong_ban" class="form-label required">Phòng ban / Đơn vị</label>
+              <select id="phong_ban" name="phong_ban" class="form-select" required>
+                <option value="">-- Chọn phòng ban --</option>
+                <option value="Văn phòng Sở">Văn phòng Sở GD&ĐT</option>
+                <option value="Phòng Giáo dục Tiểu học">Phòng Giáo dục Tiểu học</option>
+                <option value="Phòng Giáo dục Trung học">Phòng Giáo dục Trung học</option>
+                <option value="Phòng Giáo dục Mầm non">Phòng Giáo dục Mầm non</option>
+                <option value="Phòng Kế hoạch - Tài chính">Phòng Kế hoạch - Tài chính</option>
+                <option value="Phòng Tổ chức cán bộ">Phòng Tổ chức cán bộ</option>
+                <option value="Thanh tra Sở">Thanh tra Sở</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="chuc_vu" class="form-label required">Chức vụ</label>
+              <input type="text" id="chuc_vu" name="chuc_vu" class="form-control" placeholder="Ví dụ: Chuyên viên" value="Chuyên viên" required>
+            </div>
+
+            <div class="form-group" style="grid-column: span 2;">
+              <label for="ten_dang_nhap" class="form-label required">Tên đăng nhập</label>
+              <input type="text" id="ten_dang_nhap" name="ten_dang_nhap" class="form-control" placeholder="Từ 4-30 ký tự (chữ cái, số, dấu chấm, gạch dưới)" required>
+              <div class="form-hint">Ví dụ: nguyenvana hoặc an.nv</div>
+            </div>
+
+            <div class="form-group">
+              <label for="mat_khau" class="form-label required">Mật khẩu</label>
+              <input type="password" id="mat_khau" name="mat_khau" class="form-control" placeholder="Tối thiểu 8 ký tự, có chữ và số" required>
+            </div>
+
+            <div class="form-group">
+              <label for="xac_nhan_mat_khau" class="form-label required">Xác nhận mật khẩu</label>
+              <input type="password" id="xac_nhan_mat_khau" name="xac_nhan_mat_khau" class="form-control" placeholder="Nhập lại mật khẩu" required>
+            </div>
+          </div>
+
+          <!-- Trường mã nội bộ (chỉ hiện khi chọn Văn thư) -->
+          <div id="maNoiBoGroup" class="form-group mt-2 d-none" style="background-color: var(--accent-gold-light); padding: 14px; border-radius: var(--radius-md); border: 1px dashed var(--accent-gold);">
+            <label for="ma_noi_bo" class="form-label required" style="color: var(--accent-gold);">
+              Mã xác nhận nội bộ dành cho Văn thư (Admin)
+            </label>
+            <input type="password" id="ma_noi_bo" name="ma_noi_bo" class="form-control" placeholder="Nhập mã xác nhận nội bộ do Sở cấp">
+            <div class="form-hint" style="color: #855302;">
+              * Do tài khoản Văn thư có quyền quản trị tối cao, đồng chí bắt buộc phải nhập đúng mã bảo mật nội bộ của Sở GD&ĐT Đà Nẵng.
+            </div>
+          </div>
+
+          <button type="submit" id="submitBtn" class="btn btn-primary w-100 btn-lg mt-4">
+            <span id="btnSpinner" class="spinner d-none"></span>
+            <span id="btnText">Đăng ký tài khoản</span>
+          </button>
+        </form>
+
+        <div class="auth-footer">
+          Đã có tài khoản cán bộ?
+          <a href="login.html" class="fw-bold">Đăng nhập tại đây</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal thông báo đăng ký thành công cho Chuyên viên (Chờ duyệt) -->
+  <div id="pendingSuccessModal" class="modal-backdrop d-none">
+    <div class="modal-dialog">
+      <div class="modal-header" style="background-color: #ecfdf5;">
+        <h3 class="modal-title" style="color: #065f46;">GỬI YÊU CẦU ĐĂNG KÝ THÀNH CÔNG</h3>
+      </div>
+      <div class="modal-body text-center" style="padding: 30px 20px;">
+        <div style="font-size: 54px; color: #10b981; margin-bottom: 16px;">✓</div>
+        <h4 style="font-size: 17px; margin-bottom: 12px; color: #1e293b;">
+          Yêu cầu cấp tài khoản đang chờ phê duyệt
+        </h4>
+        <p style="color: #64748b; font-size: 13.5px; line-height: 1.5; margin-bottom: 24px;">
+          Yêu cầu của đồng chí <b id="successUserName"></b> đã được hệ thống ghi nhận và chuyển tới <b>Văn thư Sở GD&ĐT TP. Đà Nẵng</b>.<br><br>
+          Tài khoản hiện ở trạng thái <b>CHỜ DUYỆT</b>. Đồng chí sẽ có thể đăng nhập ngay sau khi Văn thư kiểm tra và duyệt hồ sơ cán bộ.
+        </p>
+        <a href="login.html" class="btn btn-primary btn-lg w-100">
+          Về trang Đăng nhập
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <footer class="auth-bottom-info">
+    © 2026 Sở Giáo dục và Đào tạo thành phố Đà Nẵng. Hệ thống lưu hành nội bộ.
+  </footer>
+
+  <script src="../js/core/toast.js"></script>
+  <script src="../js/core/api.js"></script>
+  <script src="../js/auth/register.js"></script>
+</body>
+</html>

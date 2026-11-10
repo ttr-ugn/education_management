@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Phê duyệt & Phân công văn bản đến - Quản lý văn bản Sở GD&ĐT Đà Nẵng</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/logo-sodad.svg">
+  <link rel="stylesheet" href="../../css/base.css">
+  <link rel="stylesheet" href="../../css/layout.css">
+  <link rel="stylesheet" href="../../css/components.css">
+</head>
+<body>
+  <div class="app-wrapper">
+    <aside class="app-sidebar" id="appSidebar">
+      <div class="sidebar-brand">
+        <img src="../../assets/logo-sodad.svg" alt="Logo Sở GD&ĐT">
+        <div class="brand-text">
+          <span class="brand-title">Sở GD&ĐT Đà Nẵng</span>
+          <span class="brand-subtitle">Quản lý văn bản điều hành</span>
+        </div>
+      </div>
+      <div class="sidebar-nav" id="sidebarNav"></div>
+      <div class="sidebar-footer">
+        Đang đăng nhập: <b id="currentUserRole">Lãnh đạo Sở</b>
+      </div>
+    </aside>
+
+    <div class="app-main">
+      <header class="app-topbar">
+        <div class="topbar-left">
+          <button class="sidebar-toggle-btn" id="sidebarToggle" aria-label="Toggle Menu">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <span class="system-header-title">HỆ THỐNG QUẢN LÝ VĂN BẢN VÀ ĐIỀU HÀNH NỘI BỘ</span>
+        </div>
+        <div class="topbar-right">
+          <div class="user-profile-widget">
+            <div class="user-avatar" id="currentUserAvatar">LĐ</div>
+            <div class="user-details">
+              <span class="user-name" id="currentUserName">...</span>
+              <span class="user-role-badge">Lãnh đạo</span>
+            </div>
+          </div>
+          <button class="btn btn-outline-primary btn-sm btn-logout" id="logoutBtn" title="Đăng xuất">
+            Đăng xuất
+          </button>
+        </div>
+      </header>
+
+      <main class="content-wrapper">
+        <div class="mock-data-banner">
+          <div>
+            <span class="banner-icon">📌</span>
+            <b>DỮ LIỆU MẪU (MOCK DATA)</b> - Chức năng phê duyệt và phân công của Lãnh đạo Sở đang chạy qua service mock.
+          </div>
+          <span class="badge badge-info">Mock Active</span>
+        </div>
+
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Phê duyệt chỉ đạo & Phân công văn bản đến</h1>
+            <p class="page-subtitle">Dành cho Lãnh đạo Sở: xem xét nội dung và chỉ đạo phòng chuyên môn chủ trì xử lý</p>
+          </div>
+          <a href="danh-sach.html" class="btn btn-secondary">Quay lại danh sách</a>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+          <!-- Chọn văn bản cần phân công -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">1. Chọn văn bản đến cần chỉ đạo</h2>
+            </div>
+            <div class="card-body">
+              <div class="form-group">
+                <label class="form-label required">Chọn văn bản từ danh sách</label>
+                <select id="selectDocument" class="form-select">
+                  <option value="">-- Đang nạp danh sách văn bản --</option>
+                </select>
+              </div>
+
+              <div id="docPreviewBox" style="background-color: #f8fafc; padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color); display: none;">
+                <div class="mb-2">
+                  <span class="badge badge-danger" id="previewUrgency">Khẩn</span>
+                  <span class="text-muted ml-2" id="previewCoQuan">...</span>
+                </div>
+                <h4 style="font-size: 14.5px; color: var(--primary-dark); margin-bottom: 8px;" id="previewTrichYeu">...</h4>
+                <div style="font-size: 12.5px; color: var(--text-muted);">
+                  Số đến: <b id="previewSoDen">...</b> | Ngày đến: <span id="previewNgayDen">...</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Form chỉ đạo & phân công -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">2. Ý kiến chỉ đạo & Giao chuyên viên</h2>
+            </div>
+            <div class="card-body">
+              <form id="assignForm">
+                <div class="form-group">
+                  <label class="form-label required">Chuyên viên / Đơn vị chủ trì xử lý</label>
+                  <select id="chuyen_vien_xu_ly" class="form-select" required>
+                    <option value="">-- Chọn cán bộ chủ trì --</option>
+                    <option value="Trần Văn Nam (Phòng GD Trung học)">Trần Văn Nam (Phòng GD Trung học)</option>
+                    <option value="Hoàng Minh Tuấn (Phòng GD Tiểu học)">Hoàng Minh Tuấn (Phòng GD Tiểu học)</option>
+                    <option value="Lê Thị Thảo (Phòng Kế hoạch - Tài chính)">Lê Thị Thảo (Phòng Kế hoạch - Tài chính)</option>
+                    <option value="Phạm Thị Thùy Dung (Phòng Tổ chức CB)">Phạm Thị Thùy Dung (Phòng Tổ chức CB)</option>
+                    <option value="Nguyễn Văn An (Thanh tra Sở)">Nguyễn Văn An (Thanh tra Sở)</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label required">Hạn cuối báo cáo kết quả</label>
+                  <input type="date" id="han_xu_ly" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label required">Ý kiến chỉ đạo của Lãnh đạo</label>
+                  <textarea id="noi_dung_chi_dao" class="form-control" rows="4" placeholder="Nhập định hướng xử lý, yêu cầu phối hợp với các cơ quan khác..." required></textarea>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                  <button type="submit" class="btn btn-warning w-100 btn-lg">
+                    ⚡ Phê duyệt & Chuyển giao nhiệm vụ
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer class="app-footer">
+        <span>© 2026 Sở Giáo dục và Đào tạo thành phố Đà Nẵng</span>
+        <span>Hệ thống Quản lý văn bản điều hành nội bộ</span>
+      </footer>
+    </div>
+  </div>
+
+  <script src="../../js/core/toast.js"></script>
+  <script src="../../js/core/api.js"></script>
+  <script src="../../js/core/menu.js"></script>
+  <script src="../../js/core/auth-guard.js"></script>
+  <script src="../../js/mock/du-lieu-van-ban.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = await window.AuthGuard.check();
+      if (!user) return;
+
+      const docSelect = document.getElementById('selectDocument');
+      const previewBox = document.getElementById('docPreviewBox');
+      const previewUrgency = document.getElementById('previewUrgency');
+      const previewCoQuan = document.getElementById('previewCoQuan');
+      const previewTrichYeu = document.getElementById('previewTrichYeu');
+      const previewSoDen = document.getElementById('previewSoDen');
+      const previewNgayDen = document.getElementById('previewNgayDen');
+      const form = document.getElementById('assignForm');
+
+      // Tải danh sách văn bản
+      const docs = await window.vanBanDenService.getAll();
+      docSelect.innerHTML = '<option value="">-- Chọn văn bản cần xử lý --</option>' +
+        docs.map(d => `<option value="${d.id}">${d.so_den} - ${d.so_ky_hieu} (${d.co_quan_gui})</option>`).join('');
+
+      docSelect.addEventListener('change', () => {
+        const id = docSelect.value;
+        if (!id) {
+          previewBox.style.display = 'none';
+          return;
+        }
+        const doc = docs.find(d => d.id === parseInt(id));
+        if (doc) {
+          previewUrgency.textContent = doc.do_khan;
+          previewCoQuan.textContent = doc.co_quan_gui;
+          previewTrichYeu.textContent = doc.trich_yeu;
+          previewSoDen.textContent = doc.so_den;
+          previewNgayDen.textContent = doc.ngay_den;
+          previewBox.style.display = 'block';
+          if (doc.han_xu_ly) {
+            document.getElementById('han_xu_ly').value = doc.han_xu_ly;
+          }
+        }
+      });
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = docSelect.value;
+        if (!id) {
+          window.Toast.warning('Vui lòng chọn văn bản cần phân công.');
+          return;
+        }
+
+        const chuyen_vien = document.getElementById('chuyen_vien_xu_ly').value;
+        const han = document.getElementById('han_xu_ly').value;
+        const chi_dao = document.getElementById('noi_dung_chi_dao').value.trim();
+
+        if (!chuyen_vien || !han || !chi_dao) {
+          window.Toast.warning('Vui lòng nhập đầy đủ các thông tin chỉ đạo.');
+          return;
+        }
+
+        await window.vanBanDenService.assign(id, {
+          nguoi_phan_cong: user.ho_va_ten,
+          chuyen_vien_xu_ly: chuyen_vien,
+          han_xu_ly: han,
+          noi_dung_chi_dao: chi_dao
+        });
+
+        window.Toast.success('Đã phê duyệt và chuyển phân công cho chuyên viên thành công!');
+        setTimeout(() => {
+          window.location.replace('danh-sach.html');
+        }, 1000);
+      });
+    });
+  </script>
+</body>
+</html>

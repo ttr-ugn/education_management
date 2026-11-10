@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tiếp nhận văn bản đến - Quản lý văn bản Sở GD&ĐT Đà Nẵng</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/logo-sodad.svg">
+  <link rel="stylesheet" href="../../css/base.css">
+  <link rel="stylesheet" href="../../css/layout.css">
+  <link rel="stylesheet" href="../../css/components.css">
+</head>
+<body>
+  <div class="app-wrapper">
+    <aside class="app-sidebar" id="appSidebar">
+      <div class="sidebar-brand">
+        <img src="../../assets/logo-sodad.svg" alt="Logo Sở GD&ĐT">
+        <div class="brand-text">
+          <span class="brand-title">Sở GD&ĐT Đà Nẵng</span>
+          <span class="brand-subtitle">Quản lý văn bản điều hành</span>
+        </div>
+      </div>
+      <div class="sidebar-nav" id="sidebarNav"></div>
+      <div class="sidebar-footer">
+        Đang đăng nhập: <b id="currentUserRole">Cán bộ</b>
+      </div>
+    </aside>
+
+    <div class="app-main">
+      <header class="app-topbar">
+        <div class="topbar-left">
+          <button class="sidebar-toggle-btn" id="sidebarToggle" aria-label="Toggle Menu">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <span class="system-header-title">HỆ THỐNG QUẢN LÝ VĂN BẢN VÀ ĐIỀU HÀNH NỘI BỘ</span>
+        </div>
+        <div class="topbar-right">
+          <div class="user-profile-widget">
+            <div class="user-avatar" id="currentUserAvatar">CB</div>
+            <div class="user-details">
+              <span class="user-name" id="currentUserName">...</span>
+              <span class="user-role-badge">Cán bộ</span>
+            </div>
+          </div>
+          <button class="btn btn-outline-primary btn-sm btn-logout" id="logoutBtn" title="Đăng xuất">
+            Đăng xuất
+          </button>
+        </div>
+      </header>
+
+      <main class="content-wrapper">
+        <div style="background-color: #eff6ff; border-left: 4px solid #0284c7; padding: 14px 18px; border-radius: 6px; margin-bottom: 20px; font-size: 13.5px; color: #1e3a8a;">
+          <b>ℹ HƯỚNG DẪN PHÂN LUỒNG TIẾP NHẬN:</b><br>
+          Đây là nơi tiếp nhận công văn gửi từ các cơ quan bên ngoài đến Sở (Bộ GD&ĐT, UBND, Sở ban ngành...).<br>
+          Nếu đồng chí muốn <b>xem và tiếp nhận các dự thảo do Chuyên viên nội bộ gửi lên</b>, vui lòng chuyển sang mục:
+          <a href="../van-ban-di/kiem-tra.html" class="btn btn-warning btn-sm" style="margin-left: 8px; font-weight: 600;">
+            📥 Tiếp nhận dự thảo từ Chuyên viên gửi &rarr;
+          </a>
+        </div>
+
+
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Vào sổ tiếp nhận văn bản đến</h1>
+            <p class="page-subtitle">Nhập thông tin văn bản gửi đến Sở GD&ĐT và đính kèm tệp số hóa</p>
+          </div>
+          <a href="danh-sach.html" class="btn btn-secondary">Quay lại danh sách</a>
+        </div>
+
+        <div style="max-width: 900px; margin: 0 auto;">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Phiếu tiếp nhận văn bản đến</h2>
+            </div>
+            <div class="card-body">
+              <form id="addVBDenForm" novalidate>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
+                  <div class="form-group">
+                    <label class="form-label required">Số ký hiệu văn bản</label>
+                    <input type="text" id="so_ky_hieu" class="form-control" placeholder="Ví dụ: 156/BGDĐT-GDTrH" required>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label required">Ngày ban hành</label>
+                    <input type="date" id="ngay_ban_hanh" class="form-control" required>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label required">Ngày đến cơ quan</label>
+                    <input type="date" id="ngay_den" class="form-control" required>
+                  </div>
+
+                  <div class="form-group" style="grid-column: span 2;">
+                    <label class="form-label required">Cơ quan ban hành / Nơi gửi</label>
+                    <input type="text" id="co_quan_gui" class="form-control" placeholder="Bộ GD&ĐT, UBND TP. Đà Nẵng, Sở Nội vụ..." required>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label required">Loại văn bản</label>
+                    <select id="loai_van_ban" class="form-select" required>
+                      <option value="Công văn">Công văn</option>
+                      <option value="Quyết định">Quyết định</option>
+                      <option value="Kế hoạch">Kế hoạch</option>
+                      <option value="Thông báo">Thông báo</option>
+                      <option value="Chỉ thị">Chỉ thị</option>
+                      <option value="Báo cáo">Báo cáo</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group" style="grid-column: span 3;">
+                    <label class="form-label required">Trích yếu nội dung</label>
+                    <textarea id="trich_yeu" class="form-control" rows="3" placeholder="Tóm tắt nội dung chính của văn bản..." required></textarea>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">Độ khẩn</label>
+                    <select id="do_khan" class="form-select">
+                      <option value="Bình thường">Bình thường</option>
+                      <option value="Khẩn">Khẩn</option>
+                      <option value="Thượng khẩn">Thượng khẩn</option>
+                      <option value="Hỏa tốc">Hỏa tốc</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">Độ mật</label>
+                    <select id="do_mat" class="form-select">
+                      <option value="Bình thường">Bình thường</option>
+                      <option value="Mật">Mật</option>
+                      <option value="Tối mật">Tối mật</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">Hạn xử lý (nếu có)</label>
+                    <input type="date" id="han_xu_ly" class="form-control">
+                  </div>
+
+                  <div class="form-group" style="grid-column: span 3;">
+                    <label class="form-label">Tệp đính kèm số hóa (PDF, DOCX)</label>
+                    <input type="file" id="tep_dinh_kem" class="form-control" accept=".pdf,.doc,.docx,.xlsx">
+                    <div class="form-hint">Dung lượng tối đa 25MB. Hỗ trợ định dạng PDF đã ký số.</div>
+                  </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                  <a href="danh-sach.html" class="btn btn-secondary">Hủy bỏ</a>
+                  <button type="submit" class="btn btn-primary">
+                    💾 Lưu vào sổ văn bản đến
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer class="app-footer">
+        <span>© 2026 Sở Giáo dục và Đào tạo thành phố Đà Nẵng</span>
+        <span>Hệ thống Quản lý văn bản điều hành nội bộ</span>
+      </footer>
+    </div>
+  </div>
+
+  <script src="../../js/core/toast.js"></script>
+  <script src="../../js/core/api.js"></script>
+  <script src="../../js/core/menu.js"></script>
+  <script src="../../js/core/auth-guard.js"></script>
+  <script src="../../js/mock/du-lieu-van-ban.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = await window.AuthGuard.check();
+      if (!user) return;
+
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('ngay_den').value = today;
+      document.getElementById('ngay_ban_hanh').value = today;
+
+      const form = document.getElementById('addVBDenForm');
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const so_ky_hieu = document.getElementById('so_ky_hieu').value.trim();
+        const co_quan_gui = document.getElementById('co_quan_gui').value.trim();
+        const trich_yeu = document.getElementById('trich_yeu').value.trim();
+
+        if (!so_ky_hieu || !co_quan_gui || !trich_yeu) {
+          window.Toast.warning('Vui lòng điền đầy đủ các thông tin bắt buộc.');
+          return;
+        }
+
+        const newDoc = await window.vanBanDenService.create({
+          so_ky_hieu,
+          co_quan_gui,
+          trich_yeu,
+          loai_van_ban: document.getElementById('loai_van_ban').value,
+          ngay_ban_hanh: document.getElementById('ngay_ban_hanh').value,
+          ngay_den: document.getElementById('ngay_den').value,
+          do_khan: document.getElementById('do_khan').value,
+          do_mat: document.getElementById('do_mat').value,
+          han_xu_ly: document.getElementById('han_xu_ly').value,
+          ten_tep: document.getElementById('tep_dinh_kem').files[0]?.name || 'VanBanDen_Scan.pdf'
+        });
+
+        window.Toast.success(`Đã tiếp nhận văn bản thành công (Số đến: ${newDoc.so_den})!`);
+        setTimeout(() => {
+          window.location.replace('danh-sach.html');
+        }, 1000);
+      });
+    });
+  </script>
+</body>
+</html>
