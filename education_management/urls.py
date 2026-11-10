@@ -72,6 +72,7 @@ urlpatterns = [
     path('api/auth/logout', auth_views.api_logout, name='api_auth_logout'),
     path('api/users', auth_views.api_users_list, name='api_users'),
     path('api/van-ban-di', vb_views.api_van_ban_di_list, name='api_van_ban_di'),
+    path('api/van-ban-den', vb_views.api_van_ban_den_list, name='api_van_ban_den'),
     path('api/cong-viec', cv_views.api_cong_viec_list, name='api_cong_viec'),
     path('api/ho-so', hs_views.api_ho_so_list, name='api_ho_so'),
     path('api/thong-bao', tb_views.api_thong_bao_list, name='api_thong_bao'),

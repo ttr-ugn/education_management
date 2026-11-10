@@ -43,3 +43,10 @@ def api_van_ban_di_list(request):
         qs = VanBanDi.objects.all().order_by('-ngay_tao')
         return JsonResponse({'thanh_cong': True, 'du_lieu': [vb.to_dict() for vb in qs]})
     return JsonResponse({'thanh_cong': True, 'thong_bao': 'Lưu văn bản thành công'})
+
+@csrf_exempt
+def api_van_ban_den_list(request):
+    if request.method == 'GET':
+        qs = VanBanDen.objects.all().order_by('-ngay_den')
+        return JsonResponse({'thanh_cong': True, 'du_lieu': [vb.to_dict() for vb in qs]})
+    return JsonResponse({'thanh_cong': True, 'thong_bao': 'Tiếp nhận văn bản đến thành công'})
