@@ -1,152 +1,202 @@
-# HỆ THỐNG QUẢN LÝ VĂN BẢN ĐIỀU HÀNH
-## SỞ GIÁO DỤC VÀ ĐÀO TẠO THÀNH PHỐ ĐÀ NẴNG
-**Môn học:** Lập trình Web | **Phiên bản:** 1.0.0 (Nhánh `main` - Leader)
+# Hệ thống Quản lý Văn bản và Điều hành — Sở GD&ĐT TP. Đà Nẵng
 
----
+Dự án xây dựng bằng **Django** nhằm tin học hóa quy trình quản lý văn bản đi, văn bản đến, hồ sơ lưu trữ, giao việc điều hành, thông báo và trợ lý ảo tra cứu kho văn bản tại **Sở Giáo dục và Đào tạo Thành phố Đà Nẵng**.  
+Hệ thống được nâng cấp từ giao diện frontend tĩnh sang kiến trúc **Django Backend + Template Rendering**, kết hợp API JSON nội bộ phục vụ thao tác dữ liệu theo thời gian thực.
 
-## 1. GIỚI THIỆU DỰ ÁN
-Dự án phục vụ công tác tin học hóa quản lý văn bản đi, văn bản đến, hồ sơ lưu trữ, phân công giao việc và điều hành nội bộ tại Sở Giáo dục và Đào tạo TP. Đà Nẵng.
+## Mục tiêu dự án
 
-### Công nghệ sử dụng:
-- **Backend:** Python 3.10+, Flask, SQLite 3 (thư viện chuẩn `sqlite3`), Werkzeug Security.
-- **Frontend:** HTML5, CSS3 hiện đại, Vanilla JavaScript (ES6+ fetch API, kiến trúc Module).
-- **Cơ sở dữ liệu:** SQLite (`database/qlvb.db`), trực quan hóa qua công cụ **DB Browser for SQLite**.
+- Quản lý tập trung văn bản đi và văn bản đến theo quy trình xử lý cơ quan nhà nước
+- Quản lý hồ sơ lưu trữ điện tử, danh mục văn bản ban hành và thời hạn bảo quản
+- Hỗ trợ giao việc, đính kèm văn bản căn cứ, phân công phòng ban/chuyên viên và theo dõi tiến độ xử lý
+- Tăng khả năng tra cứu, tổng hợp số liệu điều hành, thống kê KPI và gửi thông báo nhắc việc
+- Chuẩn hóa luồng xử lý, kiểm duyệt, ký số và hỗ trợ Trợ lý ảo AI tra cứu nhanh kho văn bản lưu trữ
 
----
+## Module chính
 
-## 2. PHẠM VI NHÁNH `main` CỦA LEADER
-1. **Toàn bộ giao diện người dùng (Frontend):** Đã xây dựng đầy đủ tất cả màn hình chức năng theo đặc tả, dùng dữ liệu mẫu (mock data) được đóng gói qua các Service JS.
-2. **Backend & CSDL thật cho phân hệ Xác thực & Phân quyền:**
-   - Đăng ký tài khoản Chuyên viên (chờ duyệt) và Văn thư (cần mã nội bộ).
-   - Đăng nhập (tạo session bảo mật, chống Brute-force khóa tạm 15 phút).
-   - Đổi mật khẩu (bắt buộc đổi ở lần đầu đối với Lãnh đạo và Văn thư mặc định).
-   - Văn thư duyệt / từ chối tài khoản Chuyên viên có lý do.
-   - Văn thư tạo tài khoản Lãnh đạo (sinh mật khẩu tạm 1 lần).
-   - Khóa / mở khóa và đặt lại mật khẩu cho người dùng.
-   - Phân quyền truy cập đa tầng (Frontend Auth Guard + Backend Decorator `@login_required`, `@role_required`).
+### 1. Quản lý văn bản đi
+- Thêm mới, soạn thảo và cập nhật dự thảo văn bản đi (hỗ trợ gắn từ công việc được giao)
+- Kiểm tra thể thức bởi Văn thư, trình Lãnh đạo Sở ký số
+- Xem danh sách, lọc tìm kiếm và xem chi tiết văn bản đi
+- Duyệt ký, hoàn trả chỉnh sửa và ban hành văn bản chính thức
+- Theo dõi lịch sử và trạng thái xử lý văn bản đi
 
----
+### 2. Quản lý văn bản đến
+- Tiếp nhận, đăng ký số đến và cập nhật thông tin văn bản đến
+- Xem danh sách, lọc theo trạng thái/độ khẩn và xem chi tiết văn bản đến
+- Chỉ đạo phân công phòng ban/chuyên viên chủ trì xử lý
+- Theo dõi tiến độ và hạn xử lý văn bản đến
 
-## 3. HƯỚNG DẪN CÀI ĐẶT & CHẠY TRÊN PYCHARM
+### 3. Hồ sơ lưu trữ
+- Tạo lập và cập nhật hồ sơ lưu trữ theo đơn vị, năm tài liệu và thời hạn bảo quản
+- Quản lý danh sách hồ sơ và xem chi tiết danh mục văn bản trong hồ sơ
+- Liên kết bổ sung hoặc gỡ văn bản ban hành khỏi hồ sơ, nộp lưu trữ và đóng hồ sơ
+- Xem trước văn bản trực tiếp (PDF gốc hoặc bản chuẩn A4 Nghị định 30/2020/NĐ-CP) và tải về (`.pdf` / `.doc`)
 
-### Bước 1: Mở dự án trong PyCharm
-- Khởi động PyCharm -> chọn **Open** -> duyệt tới thư mục `D:\education_management`.
+### 4. Quản lý công việc
+- Giao nhiệm vụ mới kèm thông tin căn cứ pháp lý và **văn bản đính kèm** (tải tệp lên hoặc chọn nhanh từ kho văn bản hệ thống)
+- Phân công chuyên viên, phòng ban phụ trách và điều chuyển công việc
+- Chuyên viên xem/tải văn bản đính kèm, cập nhật tỷ lệ `%` tiến độ và nộp báo cáo kết quả
+- Lãnh đạo / Văn thư nghiệm thu, phê duyệt đạt yêu cầu hoặc hoàn trả làm lại
+- Theo dõi biểu đồ KPI, tình trạng quá hạn và quản lý tệp liên quan đến công việc
 
-### Bước 2: Thiết lập môi trường ảo (Python Virtual Environment)
-- Vào **File** -> **Settings** (hoặc `Ctrl + Alt + S`).
-- Chọn **Project: education_management** -> **Python Interpreter**.
-- Nhấp **Add Interpreter** -> **Add Local Interpreter...**
-- Chọn **Existing**, trỏ tới file: `D:\education_management\venv\Scripts\python.exe`.
-- Nếu chưa có venv, chọn **New** với Python 3.10+.
+### 5. Xác thực & Phân quyền người dùng
+- Đăng ký tài khoản Chuyên viên / Văn thư và quy trình Văn thư phê duyệt tài khoản
+- Đăng nhập bảo mật phiên (session), giới hạn số lần đăng nhập sai
+- Tạo tài khoản Lãnh đạo, đổi mật khẩu, đặt lại mật khẩu và khóa/mở khóa tài khoản
+- Kiểm soát quyền truy cập đa tầng theo vai trò (`VAN_THU`, `LANH_DAO`, `CHUYEN_VIEN`)
 
-### Bước 3: Cài đặt thư viện
-Mở Terminal trong PyCharm (`Alt + F12`) và chạy:
+### 6. Dashboard, Thông báo & Trợ lý ảo AI
+- Dashboard tổng hợp số liệu văn bản, công việc, tỷ lệ hoàn thành đúng hạn và biểu đồ theo phòng ban
+- Tạo và gửi thông báo toàn đơn vị, nhắc nhở hạn xử lý công việc/văn bản
+- Trợ lý ảo AI tra cứu kho lưu trữ & kho mẫu văn bản: tìm theo từ khóa hoặc số ký hiệu, đề xuất danh sách tệp liên quan, xem trước trực tiếp (A4/PDF) và tải lên bổ sung văn bản vào kho dữ liệu
+
+## Công nghệ sử dụng
+
+- **Backend:** Python 3.10+, Django 6.1 (`Django>=5.0`), Pillow, pypdf, ReportLab, Mammoth
+- **Frontend:** HTML5, CSS3, Vanilla JavaScript (ES6+ Fetch API), Chart.js
+- **Database:** SQLite (`db.sqlite3`)
+- **Template Engine:** Django Templates (`templates/base.html`)
+- **Quản lý file tĩnh:** Django Static Files (`static/`)
+- **Quản lý media:** Django Media Files (`media/`)
+- **Kiểm thử:** Django Test Framework (`tests/`)
+- **Version Control:** Git, GitHub
+
+## Cấu trúc dự án
+
 ```bash
-pip install -r requirements.txt
+education_management/
+│
+├── manage.py
+├── requirements.txt
+├── db.sqlite3
+├── seed_django_data.py
+├── seed_mau_van_ban.py
+│
+├── education_management/
+│   ├── settings.py
+│   ├── urls.py
+│   ├── middleware.py
+│   ├── asgi.py
+│   └── wsgi.py
+│
+├── authentication/
+│   ├── models.py
+│   ├── services.py
+│   ├── views.py
+│   ├── urls.py
+│   └── templates/
+│       └── authentication/
+│
+├── van_ban/
+│   ├── models.py
+│   ├── services.py
+│   ├── reports.py
+│   ├── views.py
+│   ├── urls.py
+│   └── templates/
+│       └── van_ban/
+│
+├── ho_so/
+│   ├── models.py
+│   ├── services.py
+│   ├── reports.py
+│   ├── views.py
+│   ├── urls.py
+│   └── templates/
+│       └── ho_so/
+│
+├── cong_viec/
+│   ├── models.py
+│   ├── services.py
+│   ├── reports.py
+│   ├── views.py
+│   ├── urls.py
+│   └── templates/
+│       └── cong_viec/
+│
+├── dashboard/
+│   ├── services.py
+│   ├── views.py
+│   ├── urls.py
+│   └── templates/
+│       └── dashboard/
+│
+├── thong_bao/
+│   ├── models.py
+│   ├── services.py
+│   ├── views.py
+│   ├── urls.py
+│   └── templates/
+│       └── thong_bao/
+│
+├── chatbot/
+│   ├── models.py
+│   ├── services.py
+│   ├── views.py
+│   ├── urls.py
+│   └── templates/
+│       └── chatbot/
+│
+├── common/
+│   ├── audit.py
+│   ├── constants.py
+│   ├── excel_exporter.py
+│   ├── pagination.py
+│   ├── pdf_signer.py
+│   ├── security.py
+│   ├── serializers.py
+│   └── validators.py
+│
+├── templates/
+│   ├── base.html
+│   └── index.html
+│
+├── static/
+│   ├── css/
+│   ├── js/
+│   ├── libs/
+│   └── assets/
+│
+├── media/
+│   ├── cong_viec_dinh_kem/
+│   └── van_ban_dieu_hanh/
+│
+└── tests/
 ```
 
-### Bước 4: Tạo file cấu hình môi trường `.env`
-Sao chép từ `.env.example`:
-```bash
-cp .env.example .env
-```
-*(Trên Windows PowerShell có thể chạy `Copy-Item .env.example .env`)*.
+## Hướng dẫn cài đặt & chạy dự án
 
-Nội dung `.env`:
-- `SECRET_KEY`: Khóa bí mật bảo vệ session.
-- `DATABASE_PATH`: `database/qlvb.db`.
-- `INTERNAL_CODE`: Mã nội bộ để đăng ký Văn thư (`DANANG_SGD_VT2026`).
-- `DEFAULT_ADMIN_USERNAME`: `admin_vanthu`
-- `DEFAULT_ADMIN_PASSWORD`: `Admin@123`
+1. **Tạo / kích hoạt môi trường ảo và cài đặt thư viện:**
+   ```bash
+   python -m venv venv
+   venv\Scripts\activate
+   pip install -r requirements.txt
+   ```
 
-### Bước 5: Khởi tạo Cơ sở dữ liệu
-Trong Terminal PyCharm, chạy lệnh:
-```bash
-python database/init_db.py
-```
-Lệnh này sẽ tạo bảng `nguoi_dung` và tự động seed tài khoản Văn thư mặc định.
+2. **Khởi tạo cơ sở dữ liệu & dữ liệu mẫu (nếu chạy mới):**
+   ```bash
+   python manage.py migrate
+   python seed_django_data.py
+   python seed_mau_van_ban.py
+   ```
 
-### Bước 6: Cấu hình Run Configuration và Chạy ứng dụng
-1. Trên thanh công cụ PyCharm, nhấp **Add Configuration...** (hoặc **Current File** -> **Edit Configurations**).
-2. Nhấp dấu **+** -> chọn **Python**.
-3. Đặt tên: `Run App`.
-4. Mục **Script path**: Trỏ tới `D:\education_management\app.py`.
-5. Mục **Python interpreter**: Chọn venv của dự án.
-6. Mục **Working directory**: `D:\education_management`.
-7. Nhấn **Apply** -> **OK**.
-8. Nhấn nút **Play (Run)** màu xanh (hoặc `Shift + F10`).
-9. Mở trình duyệt web và truy cập: [http://localhost:5000](http://localhost:5000)
+3. **Chạy máy chủ phát triển Django:**
+   ```bash
+   python manage.py runserver 8000
+   ```
+   Truy cập ứng dụng tại: [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
 
----
+4. **Kiểm tra cấu hình và chạy bộ test:**
+   ```bash
+   python manage.py check
+   python manage.py test tests
+   ```
 
-## 4. TÀI KHOẢN MẪU ĐỂ KIỂM THỬ HỆ THỐNG
+## Tài khoản mẫu
 
-| Vai trò | Tên đăng nhập | Mật khẩu ban đầu | Ghi chú |
+| Vai trò | Tên đăng nhập | Mật khẩu | Đơn vị |
 | :--- | :--- | :--- | :--- |
-| **Văn thư (Admin)** | `admin_vanthu` | `Admin@123` | Hệ thống yêu cầu đổi mật khẩu ở lần đăng nhập đầu tiên |
-| **Đăng ký Văn thư mới** | Form đăng ký | Tự đặt (>=8 ký tự) | Cần nhập đúng mã xác nhận: `DANANG_SGD_VT2026` |
-| **Đăng ký Chuyên viên** | Form đăng ký | Tự đặt (>=8 ký tự) | Sẽ vào trạng thái `CHO_DUYET`. Dùng `admin_vanthu` để duyệt |
-| **Lãnh đạo** | Văn thư tạo | Hệ thống sinh ngẫu nhiên | Văn thư tạo tại trang Quản trị, mật khẩu tạm hiển thị 1 lần |
-
----
-
-## 5. QUY ƯỚC CHIA NHÁNH GIT CHO THÀNH VIÊN TRONG NHÓM (5 NGƯỜI)
-
-Leader đã chuẩn bị khung kiến trúc hoàn chỉnh. Các thành viên nhận nhiệm vụ sẽ tạo nhánh riêng từ `main`, triển khai backend cho phân hệ của mình theo quy ước sau:
-
-### Phân công đề xuất:
-- **Thành viên 1 (Leader):** Hoàn thiện Core, Auth, Users, Layout chung, Mock Frontend.
-- **Thành viên 2:** Nhánh `feature/van-ban-den` (Backend + CSDL Văn bản đến).
-- **Thành viên 3:** Nhánh `feature/van-ban-di` (Backend + CSDL Văn bản đi).
-- **Thành viên 4:** Nhánh `feature/cong-viec` (Backend + CSDL Giao việc & Xử lý công việc).
-- **Thành viên 5:** Nhánh `feature/ho-so-thong-ke` (Backend + CSDL Hồ sơ lưu trữ, Thông báo, Thống kê, Chatbot).
-
-### Các bước thành viên làm việc trên nhánh:
-1. **Lấy code mới nhất từ main:**
-   ```bash
-   git checkout main
-   git pull origin main
-   ```
-2. **Tạo nhánh chức năng riêng:**
-   ```bash
-   git checkout -b feature/van-ban-den
-   ```
-3. **Thêm bảng CSDL vào `database/schema.sql`:**
-   Mỗi thành viên viết câu lệnh `CREATE TABLE ...` của chức năng mình vào cuối file `schema.sql` (tuân thủ khóa ngoại liên kết tới `nguoi_dung(nguoi_dung_id)`).
-4. **Tạo Blueprint Backend trong thư mục `backend/<tên-module>/`:**
-   Ví dụ `backend/van_ban_den/`:
-   ```
-   backend/van_ban_den/
-   ├── __init__.py
-   ├── routes.py
-   └── services.py
-   ```
-5. **Đăng ký Blueprint trong `app.py`:**
-   ```python
-   from backend.van_ban_den.routes import van_ban_den_bp
-   app.register_blueprint(van_ban_den_bp, url_prefix='/api/van-ban-den')
-   ```
-6. **Chuyển đổi Frontend từ Mock Data sang API thật:**
-   Trong thư mục `frontend/js/mock/du-lieu-van-ban.js`:
-   - Chỉ cần thay nội dung bên trong hàm (ví dụ `vanBanDenService.getList()`) từ việc trả về mảng mẫu thành gọi `api.get('/api/van-ban-den')`.
-   - **Giao diện HTML/CSS không cần phải viết lại!**
-
----
-
-## 6. KIỂM TRA CƠ SỞ DỮ LIỆU
-1. Tải và cài đặt phần mềm miễn phí: [DB Browser for SQLite](https://sqlitebrowser.org/).
-2. Mở file `database/qlvb.db` (hoặc `db.sqlite3` trên phiên bản Django hiện tại) để trực tiếp xem và kiểm tra dữ liệu bảng `nguoi_dung`, `mau_van_ban`, `van_ban_di`, `van_ban_den`.
-
----
-
-## 7. CẬP NHẬT KIẾN TRÚC DJANGO & TRỢ LÝ ẢO AI TRA CỨU KHO LƯU TRỮ
-- **Khởi chạy máy chủ phát triển Django:**
-  ```bash
-  python manage.py runserver 8000
-  ```
-  Truy cập giao diện chính tại: `http://127.0.0.1:8000/pages/chatbot.html`.
-- **Trợ lý ảo & Kho lưu trữ văn bản điều hành (`/pages/chatbot.html`):**
-  - Hỗ trợ tìm kiếm nội dung trong kho lưu trữ (`MauVanBan`, `VanBanDi`, `VanBanDen`) theo từ khóa hoặc số hiệu văn bản.
-  - Đề xuất danh sách thẻ tài liệu liên quan và mở hộp thoại **Xem trước chuẩn A4** (kèm nhúng PDF gốc từ `media/van_ban_dieu_hanh/` và tải xuống `.doc`/`.pdf`).
-  - Hỗ trợ tải lên bổ sung văn bản mới qua API `/api/chatbot/upload`.
-
+| **Văn thư (Admin)** | `admin_vanthu` | `Admin@123` | Văn phòng Sở GD&ĐT |
+| **Giám đốc Sở** | `giamdoc_so` | `GiamDoc@123` | Ban Giám đốc Sở |
+| **Phó Giám đốc Sở** | `phogiamdoc_so` | `LanhDao@123` | Ban Giám đốc Sở |
+| **Chuyên viên** | `minhcv` | `ChuyenVien@123` | Phòng Giáo dục Trung học |
