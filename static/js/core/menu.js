@@ -125,15 +125,69 @@
     if (!navContainer) return;
 
     const sections = getMenuConfig(role);
-    const currentPath = window.location.pathname;
+    const currentPath = window.location.pathname.replace(/\/+$/, '');
+    const currentHref = window.location.href;
+
+    // Tìm duy nhất 1 mục (activeItemId) khớp với trang hiện tại
+    let activeItemId = null;
+
+    // Bước 1: Khớp chính xác tuyệt đối theo URL hoàn chỉnh
+    for (const sec of sections) {
+      for (const item of sec.items) {
+        try {
+          const itemUrl = new URL(item.href, currentHref);
+          const itemPath = itemUrl.pathname.replace(/\/+$/, '');
+          if (itemPath === currentPath) {
+            activeItemId = item.id;
+            break;
+          }
+        } catch (e) {}
+      }
+      if (activeItemId) break;
+    }
+
+    // Bước 2: Trang chủ / dashboard fallback
+    if (!activeItemId) {
+      if (currentPath === '' || currentPath === '/' || currentPath === '/pages' || currentPath.endsWith('/index.html') || currentPath.endsWith('/dashboard.html')) {
+        activeItemId = 'nav-dashboard';
+      }
+    }
+
+    // Bước 3: Các trang chi tiết hoặc trang con thuộc phân hệ
+    if (!activeItemId) {
+      if (currentPath.includes('/pages/van-ban-di/')) {
+        const isKiemTra = currentPath.includes('kiem-tra');
+        const isBanHanh = currentPath.includes('ban-hanh');
+        const isPheDuyet = currentPath.includes('phe-duyet');
+        const isSoanThao = currentPath.includes('soan-thao');
+        if (role === 'VAN_THU') {
+          if (isKiemTra) activeItemId = 'nav-vb-kiemtra';
+          else if (isBanHanh) activeItemId = 'nav-vb-banhanh';
+          else activeItemId = 'nav-vb-di';
+        } else if (role === 'LANH_DAO') {
+          if (isPheDuyet) activeItemId = 'nav-vb-phe-duyet';
+          else activeItemId = 'nav-vb-di';
+        } else {
+          if (isSoanThao) activeItemId = 'nav-vb-soan';
+          else activeItemId = 'nav-vb-di';
+        }
+      } else if (currentPath.includes('/pages/ho-so/')) {
+        activeItemId = 'nav-ho-so';
+      } else if (currentPath.includes('/pages/cong-viec/')) {
+        const isGiaoViec = currentPath.includes('giao-viec');
+        const isXuLy = currentPath.includes('xu-ly');
+        if (role === 'VAN_THU' && isGiaoViec) activeItemId = 'nav-giao-viec';
+        else if (role === 'CHUYEN_VIEN' && isXuLy) activeItemId = 'nav-cong-viec-xuly';
+        else activeItemId = 'nav-cong-viec';
+      }
+    }
 
     let html = '';
     sections.forEach(sec => {
       html += `<div class="nav-section-title">${sec.title}</div>`;
       html += '<ul class="nav-list">';
       sec.items.forEach(item => {
-        const itemFileName = item.href.split('/').pop().split('?')[0];
-        const isActive = currentPath.endsWith(itemFileName) || (currentPath.endsWith('/') && itemFileName === 'index.html');
+        const isActive = (item.id === activeItemId);
 
         html += `
           <li class="nav-item">
@@ -148,6 +202,15 @@
     });
 
     navContainer.innerHTML = html;
+
+    // Lắng nghe sự kiện click: Khi người dùng bấm vào bất kỳ mục nào
+    // thì lập tức mục đó sáng lên (màu xanh), đồng thời tắt sáng tất cả các mục còn lại
+    navContainer.onclick = function (e) {
+      const link = e.target.closest('.nav-link');
+      if (!link) return;
+      navContainer.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+      link.classList.add('active');
+    };
   }
 
   window.MenuBuilder = {
