@@ -1,112 +1,9 @@
-<!DOCTYPE html>
+{% extends "base.html" %}
 
-<html lang="vi">
+{% block title %}Nghiệm thu kết quả công việc - Sở GD&ĐT Đà Nẵng{% endblock %}
 
-<head>
-
-  <meta charset="UTF-8">
-
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>Nghiệm thu kết quả công việc - Sở GD&ĐT Đà Nẵng</title>
-
-  <link rel="icon" type="image/svg+xml" href="../../assets/logo-sodad.svg">
-
-  <link rel="stylesheet" href="../../css/base.css">
-
-  <link rel="stylesheet" href="../../css/layout.css?v=20261111_15">
-
-  <link rel="stylesheet" href="../../css/components.css?v=20261111_09">
-
-</head>
-
-<body>
-
-  <div class="app-wrapper">
-
-    <aside class="app-sidebar" id="appSidebar">
-
-      <div class="sidebar-brand">
-
-        <img src="../../assets/logo-sodad.svg" alt="Logo Sở GD&ĐT">
-
-        <div class="brand-text">
-
-          <span class="brand-title">Sở GD&ĐT Đà Nẵng</span>
-
-          <span class="brand-subtitle">Quản lý văn bản điều hành</span>
-
-        </div>
-
-      </div>
-
-      <div class="sidebar-nav" id="sidebarNav"></div>
-
-      <div class="sidebar-footer">
-
-        Đang đăng nhập: <b id="currentUserRole">Lãnh đạo</b>
-
-      </div>
-
-    </aside>
-
-
-
-    <div class="app-main">
-
-      <header class="app-topbar">
-
-        <div class="topbar-left">
-
-          <button class="sidebar-toggle-btn" id="sidebarToggle" aria-label="Toggle Menu">
-
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-
-              <line x1="3" y1="12" x2="21" y2="12"></line>
-
-              <line x1="3" y1="6" x2="21" y2="6"></line>
-
-              <line x1="3" y1="18" x2="21" y2="18"></line>
-
-            </svg>
-
-          </button>
-
-          <span class="system-header-title">HỆ THỐNG QUẢN LÝ VĂN BẢN VÀ ĐIỀU HÀNH NỘI BỘ</span>
-
-        </div>
-
-        <div class="topbar-right">
-
-          <div class="user-profile-widget">
-
-            <div class="user-avatar" id="currentUserAvatar">LĐ</div>
-
-            <div class="user-details">
-
-              <span class="user-name" id="currentUserName">...</span>
-
-              <span class="user-role-badge">Lãnh đạo</span>
-
-            </div>
-
-          </div>
-
-          <button class="btn btn-outline-primary btn-sm btn-logout" id="logoutBtn" title="Đăng xuất">
-
-            Đăng xuất
-
-          </button>
-
-        </div>
-
-      </header>
-
-
-
-      <main class="content-wrapper">
-
-        <div class="page-header">
+{% block content %}
+<div class="page-header">
 
           <div>
 
@@ -167,36 +64,12 @@
           </div>
 
         </div>
+{% endblock %}
 
-      </main>
+{% block extra_js %}
+<script src="../../js/mock/du-lieu-cong-viec.js"></script>
 
-
-
-      <footer class="app-footer">
-
-        <span>© 2026 Sở Giáo dục và Đào tạo thành phố Đà Nẵng</span>
-
-        <span>Hệ thống Quản lý văn bản điều hành nội bộ</span>
-
-      </footer>
-
-    </div>
-
-  </div>
-
-
-
-  <script src="../../js/core/toast.js?v=20261111_07"></script>
-
-  <script src="../../js/core/api.js?v=20261111_07"></script>
-
-  <script src="../../js/core/menu.js?v=20261111_15"></script>
-
-  <script src="../../js/core/auth-guard.js?v=20261111_07"></script>
-
-  <script src="../../js/mock/du-lieu-cong-viec.js"></script>
-
-  <script>
+<script>
 
     document.addEventListener('DOMContentLoaded', async () => {
 
@@ -341,8 +214,4 @@
     });
 
   </script>
-
-</body>
-
-</html>
-
+{% endblock %}

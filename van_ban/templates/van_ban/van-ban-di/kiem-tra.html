@@ -1,64 +1,9 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tiếp nhận & Kiểm tra dự thảo - Quản lý văn bản Sở GD&ĐT Đà Nẵng</title>
-  <link rel="icon" type="image/svg+xml" href="../../assets/logo-sodad.svg">
-  <link rel="stylesheet" href="../../css/base.css">
-  <link rel="stylesheet" href="../../css/layout.css?v=20261111_15">
-  <link rel="stylesheet" href="../../css/components.css?v=20261111_09">
-</head>
-<body>
-  <div class="app-wrapper">
-    <aside class="app-sidebar" id="appSidebar">
-      <div class="sidebar-brand">
-        <img src="../../assets/logo-sodad.svg" alt="Logo Sở GD&ĐT">
-        <div class="brand-text">
-          <span class="brand-title">Sở GD&ĐT Đà Nẵng</span>
-          <span class="brand-subtitle">Quản lý văn bản điều hành</span>
-        </div>
-      </div>
-      <div class="sidebar-nav" id="sidebarNav"></div>
-      <div class="sidebar-footer">
-        Đang đăng nhập: <b id="currentUserRole">Văn thư</b>
-      </div>
-    </aside>
+{% extends "base.html" %}
 
-    <div class="app-main">
-      <header class="app-topbar">
-        <div class="topbar-left">
-          <button class="sidebar-toggle-btn" id="sidebarToggle" aria-label="Toggle Menu">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="3" y1="12" x2="21" y2="12"></line>
-              <line x1="3" y1="6" x2="21" y2="6"></line>
-              <line x1="3" y1="18" x2="21" y2="18"></line>
-            </svg>
-          </button>
-          <span class="system-header-title">HỆ THỐNG QUẢN LÝ VĂN BẢN VÀ ĐIỀU HÀNH NỘI BỘ</span>
-        </div>
-        <div class="topbar-right">
-          <a href="../thong-bao.html" class="topbar-icon-btn" title="Thông báo">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-            </svg>
-          </a>
-          <a href="../ho-so-ca-nhan.html" class="user-profile-widget" style="text-decoration: none;">
-            <div class="user-avatar" id="currentUserAvatar">VT</div>
-            <div class="user-details">
-              <span class="user-name" id="currentUserName">Đang nạp...</span>
-              <span class="user-role-badge" id="currentUserRoleTop">Văn thư</span>
-            </div>
-          </a>
-          <button class="btn btn-outline-primary btn-sm btn-logout" id="logoutBtn" title="Đăng xuất">
-            Đăng xuất
-          </button>
-        </div>
-      </header>
+{% block title %}Tiếp nhận & Kiểm tra dự thảo - Quản lý văn bản Sở GD&ĐT Đà Nẵng{% endblock %}
 
-      <main class="content-wrapper">
-        <div class="page-header">
+{% block content %}
+<div class="page-header">
           <div>
             <h1 class="page-title">Tiếp nhận & Kiểm tra dự thảo văn bản đi</h1>
             <p class="page-subtitle">Dành cho Văn thư: Kiểm tra thể thức văn bản do Chuyên viên trình, chỉnh sửa hoặc hoàn trả, chuyển trình Lãnh đạo ký</p>
@@ -112,16 +57,10 @@
             </div>
           </div>
         </div>
-      </main>
+{% endblock %}
 
-      <footer class="app-footer">
-        <span>© 2026 Sở Giáo dục và Đào tạo thành phố Đà Nẵng</span>
-        <span>Hệ thống Quản lý văn bản điều hành nội bộ</span>
-      </footer>
-    </div>
-  </div>
-
-  <!-- Modal Chỉnh sửa thể thức văn bản -->
+{% block modals %}
+<!-- Modal Chỉnh sửa thể thức văn bản -->
   <div id="editModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1050; align-items: center; justify-content: center;">
     <div style="background: #fff; width: 90%; max-width: 600px; border-radius: 8px; padding: 24px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);">
       <h3 style="margin-top: 0; color: #003366; font-size: 18px;" id="editModalTitle">Chỉnh sửa thể thức văn bản dự thảo</h3>
@@ -130,7 +69,6 @@
         <div class="form-group mb-2">
           <label class="form-label required">Trích yếu nội dung</label>
           <textarea id="editTrichYeu" class="form-control" rows="3" required></textarea>
-        </div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;" class="mb-2">
           <div class="form-group">
             <label class="form-label required">Loại văn bản</label>
@@ -142,7 +80,6 @@
               <option value="Quyết định">Quyết định</option>
               <option value="Báo cáo">Báo cáo</option>
             </select>
-          </div>
           <div class="form-group">
             <label class="form-label">Độ khẩn</label>
             <select id="editDoKhan" class="form-select">
@@ -151,19 +88,13 @@
               <option value="Thượng khẩn">Thượng khẩn</option>
               <option value="Hỏa tốc">Hỏa tốc</option>
             </select>
-          </div>
-        </div>
         <div class="form-group mb-3">
           <label class="form-label required">Nơi nhận</label>
           <input type="text" id="editNoiNhan" class="form-control" required>
-        </div>
         <div class="d-flex justify-content-end gap-2">
           <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Hủy</button>
           <button type="submit" class="btn btn-primary">Lưu thông tin thể thức</button>
-        </div>
       </form>
-    </div>
-  </div>
 
   <!-- Modal Xem trước văn bản (không cần tải về) -->
   <div id="previewModal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px); z-index: 9999; align-items: center; justify-content: center; padding: 16px;">
@@ -175,8 +106,6 @@
           <div style="overflow: hidden;">
             <div id="previewModalTitle" style="font-weight: 600; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Xem trước văn bản</div>
             <div id="previewModalSubtitle" style="font-size: 12px; color: #cbd5e1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></div>
-          </div>
-        </div>
         <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
           <a id="previewDownloadBtn" href="#" class="btn btn-sm btn-outline-light" download title="Tải file gốc về máy tính" style="display: inline-flex; align-items: center; gap: 4px;">
             📥 Tải về máy
@@ -184,8 +113,6 @@
           <button type="button" class="btn btn-sm btn-light" onclick="closePreviewModal()" title="Đóng cửa sổ xem trước (Phím ESC)" style="font-weight: 600; padding: 4px 12px;">
             ✕ Đóng
           </button>
-        </div>
-      </div>
 
       <!-- Modal Body (Iframe Viewer) -->
       <div style="flex: 1; position: relative; background: #525659; overflow: hidden;">
@@ -193,23 +120,17 @@
           <div style="width: 36px; height: 36px; border: 3px solid #cbd5e1; border-top-color: #003366; border-radius: 50%; animation: spinPreview 0.8s linear infinite; margin-bottom: 12px;"></div>
           <div style="font-weight: 500; font-size: 14px;">Đang tải nội dung văn bản từ máy chủ...</div>
           <div style="font-size: 12px; color: #64748b; margin-top: 4px;">Tự động chuẩn hóa hiển thị không cần tải về máy</div>
-        </div>
         <iframe id="previewIframe" src="" style="width: 100%; height: 100%; border: none;" onload="onPreviewLoaded()"></iframe>
-      </div>
-    </div>
-  </div>
 
   <style>
     @keyframes spinPreview {
       to { transform: rotate(360deg); }
     }
   </style>
+{% endblock %}
 
-  <script src="../../js/core/toast.js?v=20261111_07"></script>
-  <script src="../../js/core/api.js?v=20261111_07"></script>
-  <script src="../../js/core/menu.js?v=20261111_15"></script>
-  <script src="../../js/core/auth-guard.js?v=20261111_07"></script>
-  <script>
+{% block extra_js %}
+<script>
     let currentFilterStatus = 'CHO_VAN_THU_KIEM_TRA';
     let allDrafts = [];
 
@@ -538,5 +459,4 @@
       fetchDrafts();
     });
   </script>
-</body>
-</html>
+{% endblock %}

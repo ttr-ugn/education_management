@@ -1,14 +1,9 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Trợ lý ảo & Kho mẫu văn bản điều hành - Sở GD&ĐT Đà Nẵng</title>
-  <link rel="icon" type="image/svg+xml" href="../assets/logo-sodad.svg">
-  <link rel="stylesheet" href="../css/base.css">
-  <link rel="stylesheet" href="../css/layout.css?v=20261111_15">
-  <link rel="stylesheet" href="../css/components.css?v=20261111_09">
-  <style>
+{% extends "base.html" %}
+
+{% block title %}Trợ lý ảo & Kho mẫu văn bản điều hành - Sở GD&ĐT Đà Nẵng{% endblock %}
+
+{% block extra_css %}
+<style>
     /* BỐ CỤC KHUNG CHAT */
     .chat-layout {
       display: flex;
@@ -574,51 +569,10 @@
       }
     }
   </style>
-</head>
-<body>
-  <div class="app-wrapper">
-    <aside class="app-sidebar" id="appSidebar">
-      <div class="sidebar-brand">
-        <img src="../assets/logo-sodad.svg" alt="Logo Sở GD&ĐT">
-        <div class="brand-text">
-          <span class="brand-title">Sở GD&ĐT Đà Nẵng</span>
-          <span class="brand-subtitle">Quản lý văn bản điều hành</span>
-        </div>
-      </div>
-      <div class="sidebar-nav" id="sidebarNav"></div>
-      <div class="sidebar-footer">
-        Đang đăng nhập: <b id="currentUserRole">Cán bộ</b>
-      </div>
-    </aside>
+{% endblock %}
 
-    <div class="app-main">
-      <header class="app-topbar">
-        <div class="topbar-left">
-          <button class="sidebar-toggle-btn" id="sidebarToggle" aria-label="Toggle Menu">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="3" y1="12" x2="21" y2="12"></line>
-              <line x1="3" y1="6" x2="21" y2="6"></line>
-              <line x1="3" y1="18" x2="21" y2="18"></line>
-            </svg>
-          </button>
-          <span class="system-header-title">HỆ THỐNG QUẢN LÝ VĂN BẢN VÀ ĐIỀU HÀNH NỘI BỘ</span>
-        </div>
-        <div class="topbar-right">
-          <div class="user-profile-widget">
-            <div class="user-avatar" id="currentUserAvatar">CB</div>
-            <div class="user-details">
-              <span class="user-name" id="currentUserName">...</span>
-              <span class="user-role-badge">Cán bộ</span>
-            </div>
-          </div>
-          <button class="btn btn-outline-primary btn-sm btn-logout" id="logoutBtn" title="Đăng xuất">
-            Đăng xuất
-          </button>
-        </div>
-      </header>
-
-      <main class="content-wrapper">
-        <div class="page-header" style="margin-bottom: 16px;">
+{% block content %}
+<div class="page-header" style="margin-bottom: 16px;">
           <div>
             <h1 class="page-title">Trợ lý ảo & Kho lưu trữ mẫu văn bản điều hành</h1>
             <p class="page-subtitle">Nhận diện nhu cầu soạn thảo, tự động gợi ý mẫu chuẩn Nghị định 30/2020/NĐ-CP và hỗ trợ xem trước, tải file Word</p>
@@ -709,16 +663,10 @@
             </button>
           </form>
         </div>
-      </main>
+{% endblock %}
 
-      <footer class="app-footer">
-        <span>© 2026 Sở Giáo dục và Đào tạo thành phố Đà Nẵng</span>
-        <span>Hệ thống Quản lý văn bản điều hành nội bộ</span>
-      </footer>
-    </div>
-  </div>
-
-  <!-- =====================================================================
+{% block modals %}
+<!-- =====================================================================
        MODAL 1: BẢN XEM TRƯỚC VĂN BẢN A4 (DOCUMENT PREVIEW)
        ===================================================================== -->
   <div class="preview-modal-backdrop" id="previewModal">
@@ -727,7 +675,6 @@
         <div class="preview-header-title">
           <span>👁️ BẢN XEM TRƯỚC VĂN BẢN CHUẨN A4:</span>
           <span id="previewModalTitle" style="color: #38bdf8;">Đang tải...</span>
-        </div>
         <div class="preview-toolbar">
           <button class="btn-tool" id="btnZoomOut" title="Thu nhỏ">🔍-</button>
           <button class="btn-tool" id="btnZoomReset" title="Đặt lại kích thước">100%</button>
@@ -742,18 +689,11 @@
             📥 Tải file Word (.doc)
           </a>
           <button class="btn-close-modal" id="btnClosePreview" title="Đóng">✕</button>
-        </div>
-      </div>
       <div class="preview-modal-body">
         <div class="a4-paper" id="printableArea">
           <!-- Nội dung văn bản HTML sẽ nạp vào đây -->
           <div style="text-align: center; padding: 40px; color: #64748b;">
             Đang tải dữ liệu mẫu văn bản...
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <!-- =====================================================================
        MODAL 2: KHO LƯU TRỮ TOÀN BỘ MẪU VĂN BẢN
@@ -766,15 +706,11 @@
           <div>
             <h2 style="font-size: 16px; font-weight: bold; margin: 0;">KHO LƯU TRỮ BIỂU MẪU VĂN BẢN ĐIỀU HÀNH</h2>
             <p style="font-size: 12px; margin: 0; color: #94a3b8;">Sở Giáo dục và Đào tạo TP. Đà Nẵng - Cập nhật chuẩn Nghị định 30/2020/NĐ-CP</p>
-          </div>
-        </div>
         <button class="btn-close-modal" id="btnCloseRepo" title="Đóng">✕</button>
-      </div>
 
       <div class="repo-filter-bar">
         <div style="flex-grow: 1; min-width: 240px;">
           <input type="text" id="repoSearchInput" class="form-control" placeholder="Tìm kiếm theo tên mẫu, mã hiệu, từ khóa...">
-        </div>
         <div style="width: 170px;">
           <select id="repoTypeSelect" class="form-control">
             <option value="">-- Tất cả loại --</option>
@@ -786,7 +722,6 @@
             <option value="Biên bản">Biên bản</option>
             <option value="Báo cáo">Báo cáo</option>
           </select>
-        </div>
         <div style="width: 200px;">
           <select id="repoFieldSelect" class="form-control">
             <option value="">-- Tất cả lĩnh vực --</option>
@@ -798,23 +733,15 @@
             <option value="Văn phòng Sở">Văn phòng Sở</option>
             <option value="Chuyển đổi số & CNTT">Chuyển đổi số & CNTT</option>
           </select>
-        </div>
         <button class="btn btn-outline-primary" id="btnRefreshRepo" title="Tải lại">Làm mới</button>
-      </div>
 
       <div class="repo-content-scroll">
         <div class="repo-grid" id="repoGrid">
           <!-- Các thẻ mẫu văn bản nạp qua JS -->
-        </div>
-      </div>
-    </div>
-  </div>
+{% endblock %}
 
-  <script src="../js/core/toast.js?v=20261111_07"></script>
-  <script src="../js/core/api.js?v=20261111_07"></script>
-  <script src="../js/core/menu.js?v=20261111_15"></script>
-  <script src="../js/core/auth-guard.js?v=20261111_07"></script>
-  <script>
+{% block extra_js %}
+<script>
     document.addEventListener('DOMContentLoaded', async () => {
       // 1. Kiểm tra xác thực cán bộ/chuyên viên
       const user = await window.AuthGuard.check();
@@ -1149,5 +1076,4 @@
       attachChipEvents();
     });
   </script>
-</body>
-</html>
+{% endblock %}

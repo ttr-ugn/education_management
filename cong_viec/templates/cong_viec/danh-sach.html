@@ -1,28 +1,9 @@
-<!DOCTYPE html>
+{% extends "base.html" %}
 
-<html lang="vi">
+{% block title %}Quản lý công việc & Báo cáo thống kê - Sở GD&ĐT Đà Nẵng{% endblock %}
 
-<head>
-
-  <meta charset="UTF-8">
-
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>Quản lý công việc & Báo cáo thống kê - Sở GD&ĐT Đà Nẵng</title>
-
-  <link rel="icon" type="image/svg+xml" href="../../assets/logo-sodad.svg">
-
-  <link rel="stylesheet" href="../../css/base.css">
-
-  <link rel="stylesheet" href="../../css/layout.css?v=20261111_15">
-
-  <link rel="stylesheet" href="../../css/components.css?v=20261111_09">
-
-  <!-- Chart.js CDN -->
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-  <style>
+{% block extra_css %}
+<style>
 
     .stats-grid {
 
@@ -299,96 +280,10 @@
       background-color: #f8fafc;
     }
   </style>
+{% endblock %}
 
-</head>
-
-<body>
-
-  <div class="app-wrapper">
-
-    <aside class="app-sidebar" id="appSidebar">
-
-      <div class="sidebar-brand">
-
-        <img src="../../assets/logo-sodad.svg" alt="Logo Sở GD&ĐT">
-
-        <div class="brand-text">
-
-          <span class="brand-title">Sở GD&ĐT Đà Nẵng</span>
-
-          <span class="brand-subtitle">Quản lý văn bản điều hành</span>
-
-        </div>
-
-      </div>
-
-      <div class="sidebar-nav" id="sidebarNav"></div>
-
-      <div class="sidebar-footer">
-
-        Đang đăng nhập: <b id="currentUserRole">Cán bộ</b>
-
-      </div>
-
-    </aside>
-
-
-
-    <div class="app-main">
-
-      <header class="app-topbar">
-
-        <div class="topbar-left">
-
-          <button class="sidebar-toggle-btn" id="sidebarToggle" aria-label="Toggle Menu">
-
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-
-              <line x1="3" y1="12" x2="21" y2="12"></line>
-
-              <line x1="3" y1="6" x2="21" y2="6"></line>
-
-              <line x1="3" y1="18" x2="21" y2="18"></line>
-
-            </svg>
-
-          </button>
-
-          <span class="system-header-title">HỆ THỐNG QUẢN LÝ VĂN BẢN VÀ ĐIỀU HÀNH NỘI BỘ</span>
-
-        </div>
-
-        <div class="topbar-right">
-
-          <div class="user-profile-widget">
-
-            <div class="user-avatar" id="currentUserAvatar">CB</div>
-
-            <div class="user-details">
-
-              <span class="user-name" id="currentUserName">...</span>
-
-              <span class="user-role-badge">Cán bộ</span>
-
-            </div>
-
-          </div>
-
-          <button class="btn btn-outline-primary btn-sm btn-logout" id="logoutBtn" title="Đăng xuất">
-
-            Đăng xuất
-
-          </button>
-
-        </div>
-
-      </header>
-
-
-
-      <main class="content-wrapper">
-
-        <div class="page-header">
+{% block content %}
+<div class="page-header">
 
           <div>
 
@@ -701,26 +596,10 @@
           </div>
 
         </div>
+{% endblock %}
 
-      </main>
-
-
-
-      <footer class="app-footer">
-
-        <span>© 2026 Sở Giáo dục và Đào tạo thành phố Đà Nẵng</span>
-
-        <span>Phân hệ Quản lý công việc điều hành & Báo cáo thống kê</span>
-
-      </footer>
-
-    </div>
-
-  </div>
-
-
-
-  <!-- MODAL CHI TIẾT CÔNG VIỆC & THÔNG TIN VĂN BẢN -->
+{% block modals %}
+<!-- MODAL CHI TIẾT CÔNG VIỆC & THÔNG TIN VĂN BẢN -->
 
   <div class="modal-backdrop" id="detailModal">
 
@@ -732,7 +611,6 @@
 
         <button style="border: none; background: none; font-size: 22px; cursor: pointer; color: #64748b;" id="closeModalBtn">&times;</button>
 
-      </div>
 
 
 
@@ -746,7 +624,6 @@
 
             📄 Căn cứ văn bản điều hành
 
-          </div>
 
           <div style="font-weight: 700; color: #0369a1; font-size: 14px;" id="modalDocNumber">Số: 125/SGDĐT-GDTrH</div>
 
@@ -754,7 +631,6 @@
 
           <div style="font-size: 12px; color: #64748b; margin-top: 4px;" id="modalDocDate">Ngày văn bản: 2026-10-20</div>
 
-        </div>
 
 
 
@@ -774,7 +650,6 @@
 
           <div>Trạng thái: <span id="modalStatus">...</span></div>
 
-        </div>
 
 
 
@@ -784,7 +659,6 @@
 
           <div style="background: #f8fafc; padding: 10px; border-radius: 6px; font-size: 13px; color: #334155;" id="modalContent">...</div>
 
-        </div>
 
 
 
@@ -794,7 +668,6 @@
 
           <div style="background: #f1f5f9; padding: 10px; border-radius: 6px; font-size: 13px; color: #1e293b;" id="modalResult">Chưa có báo cáo</div>
 
-        </div>
 
 
 
@@ -804,7 +677,6 @@
 
           <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 10px; border-radius: 6px; font-size: 13px; color: #166534;" id="modalFeedback">...</div>
 
-        </div>
 
 
 
@@ -816,9 +688,7 @@
 
           <div id="modalTimeline"></div>
 
-        </div>
 
-      </div>
 
 
 
@@ -832,29 +702,14 @@
 
           </a>
 
-        </div>
 
         <button class="btn btn-secondary btn-sm" id="closeModalBtn2">Đóng</button>
+{% endblock %}
 
-      </div>
+{% block extra_js %}
+<script src="../../js/mock/du-lieu-cong-viec.js?v=20261111_16"></script>
 
-    </div>
-
-  </div>
-
-
-
-  <script src="../../js/core/toast.js?v=20261111_07"></script>
-
-  <script src="../../js/core/api.js?v=20261111_07"></script>
-
-  <script src="../../js/core/menu.js?v=20261111_15"></script>
-
-  <script src="../../js/core/auth-guard.js?v=20261111_07"></script>
-
-  <script src="../../js/mock/du-lieu-cong-viec.js?v=20261111_16"></script>
-
-  <script>
+<script>
 
     document.addEventListener('DOMContentLoaded', async () => {
 
@@ -1407,8 +1262,4 @@
     });
 
   </script>
-
-</body>
-
-</html>
-
+{% endblock %}

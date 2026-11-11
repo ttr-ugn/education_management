@@ -1,17 +1,15 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Đăng nhập - Quản lý văn bản điều hành Sở GD&ĐT TP. Đà Nẵng</title>
-  <link rel="icon" type="image/svg+xml" href="../assets/logo-sodad.svg">
-  <link rel="stylesheet" href="../css/base.css">
-  <link rel="stylesheet" href="../css/components.css?v=20261111_09">
-  <link rel="stylesheet" href="../css/auth.css">
-</head>
-<body class="auth-page">
+{% extends "base.html" %}
 
-  <!-- Quốc hiệu & Tiêu ngữ hành chính -->
+{% block title %}Đăng nhập - Quản lý văn bản điều hành Sở GD&ĐT TP. Đà Nẵng{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/css/auth.css">
+{% endblock %}
+
+{% block body_class %}auth-page{% endblock %}
+
+{% block body %}
+<!-- Quốc hiệu & Tiêu ngữ hành chính -->
   <header class="auth-header-bar">
     <div class="national-header">
       <div class="national-motto">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</div>
@@ -93,8 +91,10 @@
     © 2026 Sở Giáo dục và Đào tạo thành phố Đà Nẵng. Hệ thống lưu hành nội bộ.
   </footer>
 
-  <script src="../js/core/toast.js?v=20261111_07"></script>
-  <script src="../js/core/api.js?v=20261111_07"></script>
-  <script src="../js/auth/login.js?v=20261111_07"></script>
-</body>
-</html>
+<script src="/js/core/api.js?v=20261111_07"></script>
+<script src="/js/core/toast.js?v=20261111_07"></script>
+{% endblock body %}
+
+{% block extra_js %}
+<script src="../js/auth/login.js?v=20261111_07"></script>
+{% endblock %}
