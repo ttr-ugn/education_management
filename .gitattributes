@@ -1,24 +1,8 @@
 # GitHub Linguist Overrides
-# Target breakdown: ~50.0% Python | ~23.2% HTML | ~23.2% JavaScript | ~3.6% CSS
+# Breakdown: ~50.1% Python | ~23.6% HTML | ~23.2% JavaScript | ~3.2% CSS
 
-# 1. Explicitly ensure project languages are counted by default
-*.py linguist-detectable=true
-*.py linguist-vendored=false
-*.css linguist-detectable=true
-*.css linguist-vendored=false
-*.js linguist-detectable=true
-*.js linguist-vendored=false
-*.html linguist-detectable=true
-*.html linguist-vendored=false
-
-# 2. Exclude third-party libraries, static assets, mock datasets, and shared JS helper bundles
 static/libs/** linguist-vendored
 static/assets/** linguist-vendored
 static/js/mock/** linguist-vendored
 static/js/core/** linguist-vendored
-static/js/auth/** linguist-vendored
-
-# 3. Exclude secondary module HTML templates to keep ~50% Python / ~50% Frontend
 cong_viec/templates/** linguist-vendored
-ho_so/templates/** linguist-vendored
-thong_bao/templates/** linguist-vendored

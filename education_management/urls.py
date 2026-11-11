@@ -113,6 +113,8 @@ urlpatterns = [
     path('api/ho-so/<int:ho_so_id>/xoa-van-ban', hs_views.api_ho_so_xoa_van_ban, name='api_ho_so_xoa_van_ban'),
     path('api/ho-so/<int:ho_so_id>/nop-luu-tru', hs_views.api_ho_so_nop_luu_tru, name='api_ho_so_nop_luu_tru'),
     path('api/ho-so/<int:ho_so_id>/dong', hs_views.api_ho_so_dong, name='api_ho_so_dong'),
+    path('api/ho-so/van-ban/<int:van_ban_id>/xem-truoc', hs_views.api_ho_so_van_ban_xem_truoc, name='api_ho_so_van_ban_xem_truoc'),
+    path('api/ho-so/van-ban/<int:van_ban_id>/tai-ve', hs_views.api_ho_so_van_ban_tai_ve, name='api_ho_so_van_ban_tai_ve'),
 
     # Thông báo & Nhắc nhở
     path('api/thong-bao', tb_views.api_thong_bao_list, name='api_thong_bao'),

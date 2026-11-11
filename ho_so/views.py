@@ -97,39 +97,65 @@ def api_ho_so_detail(request, ho_so_id):
 @csrf_exempt
 def api_ho_so_van_ban(request, ho_so_id):
     """Danh sách văn bản trong hồ sơ."""
+    from ho_so.services import ArchivalDocumentService
+
     try:
         hs = HoSoLuuTru.objects.get(pk=ho_so_id)
     except HoSoLuuTru.DoesNotExist:
         return JsonResponse({'thanh_cong': False, 'thong_bao': 'Không tìm thấy hồ sơ.'}, status=404)
 
-    docs = VanBanBanHanh.objects.filter(ho_so=hs)
-    du_lieu = []
-    for d in docs:
-        du_lieu.append({
-            'van_ban_id': d.van_ban_id,
-            'so_ky_hieu': d.so_ky_hieu,
-            'trich_yeu': d.trich_yeu,
-            'loai_van_ban': d.loai_van_ban,
-            'nguoi_ky': d.nguoi_ky,
-            'ngay_ban_hanh': d.ngay_ban_hanh.strftime('%Y-%m-%d') if d.ngay_ban_hanh else '',
-        })
+    docs = VanBanBanHanh.objects.filter(ho_so=hs).select_related('ho_so').order_by('-ngay_ban_hanh', 'van_ban_id')
+    du_lieu = [ArchivalDocumentService.serialize_document(d) for d in docs]
     return JsonResponse({'thanh_cong': True, 'du_lieu': du_lieu, 'tong_so': len(du_lieu)})
 
 @csrf_exempt
 def api_ho_so_van_ban_kha_dung(request, ho_so_id):
     """Danh sách văn bản khả dụng để thêm vào hồ sơ."""
-    docs = VanBanBanHanh.objects.filter(ho_so__isnull=True)[:20]
-    du_lieu = []
-    for d in docs:
-        du_lieu.append({
-            'van_ban_id': d.van_ban_id,
-            'so_ky_hieu': d.so_ky_hieu,
-            'trich_yeu': d.trich_yeu,
-            'loai_van_ban': d.loai_van_ban,
-            'nguoi_ky': d.nguoi_ky,
-            'ngay_ban_hanh': d.ngay_ban_hanh.strftime('%Y-%m-%d') if d.ngay_ban_hanh else '',
-        })
+    from ho_so.services import ArchivalDocumentService
+
+    docs = VanBanBanHanh.objects.filter(ho_so__isnull=True).select_related('ho_so').order_by('-ngay_ban_hanh', 'van_ban_id')[:30]
+    du_lieu = [ArchivalDocumentService.serialize_document(d) for d in docs]
     return JsonResponse({'thanh_cong': True, 'du_lieu': du_lieu, 'tong_so': len(du_lieu)})
+
+
+def _render_van_ban_ban_hanh_response(van_ban_id: int, as_download: bool):
+    """Trả về response xem trước (PDF inline hoặc HTML A4) hay tải về (PDF/.doc) cho văn bản lưu trữ."""
+    from django.http import FileResponse, HttpResponse
+    from ho_so.services import ArchivalDocumentService
+
+    try:
+        doc = VanBanBanHanh.objects.select_related('ho_so').get(pk=van_ban_id)
+    except VanBanBanHanh.DoesNotExist:
+        return JsonResponse({'thanh_cong': False, 'thong_bao': 'Không tìm thấy văn bản lưu trữ.'}, status=404)
+
+    _, disk_path, is_pdf = ArchivalDocumentService.resolve_attachment(doc.tep_dinh_kem)
+    if is_pdf and disk_path is not None:
+        return FileResponse(
+            open(disk_path, 'rb'),
+            as_attachment=as_download,
+            filename=disk_path.name if as_download else None,
+            content_type='application/pdf',
+        )
+
+    if as_download:
+        word_html = ArchivalDocumentService.build_document_html(doc, for_word=True)
+        filename = ArchivalDocumentService.safe_download_filename(doc.so_ky_hieu, 'doc')
+        response = HttpResponse(word_html, content_type='application/msword; charset=utf-8')
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response
+
+    preview_html = ArchivalDocumentService.build_document_html(doc, for_word=False)
+    return HttpResponse(preview_html, content_type='text/html; charset=utf-8')
+
+
+def api_ho_so_van_ban_xem_truoc(request, van_ban_id):
+    """Xem trước trực tiếp nội dung văn bản lưu trữ (PDF hoặc bản A4 Nghị định 30)."""
+    return _render_van_ban_ban_hanh_response(van_ban_id, as_download=False)
+
+
+def api_ho_so_van_ban_tai_ve(request, van_ban_id):
+    """Tải về tệp văn bản lưu trữ (PDF gốc hoặc file Word .doc)."""
+    return _render_van_ban_ban_hanh_response(van_ban_id, as_download=True)
 
 @csrf_exempt
 def api_ho_so_them_van_ban(request, ho_so_id):

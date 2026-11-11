@@ -960,7 +960,12 @@ def seed():
         for k, v in item.items():
             setattr(hs, k, v)
         hs.save()
-    print(f"[OK] Đã nạp {HoSoLuuTru.objects.count()} Hồ sơ lưu trữ.")
+    try:
+        from import_ho_so_van_ban import sync_ho_so_van_ban
+        sync_ho_so_van_ban(verbose=False)
+    except Exception as exc:
+        print(f"[WARN] Không thể đồng bộ văn bản hồ sơ: {exc}")
+    print(f"[OK] Đã nạp {HoSoLuuTru.objects.count()} Hồ sơ lưu trữ ({VanBanBanHanh.objects.count()} văn bản ban hành).")
 
     # 7. THÔNG BÁO CƠ QUAN (12 thông báo)
     thong_bao_samples = [
