@@ -16,6 +16,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 1. Kiểm tra nếu đã có phiên làm việc thì tự động chuyển vào Dashboard
   (async function checkExistingSession() {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('redirect')) {
+      // Nếu có redirect từ trang khác tới, không tự chuyển hướng để tránh vòng lặp
+      return;
+    }
     try {
       const res = await window.api.get('/api/auth/toi');
       if (res && res.thanh_cong && res.du_lieu) {

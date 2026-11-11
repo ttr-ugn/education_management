@@ -89,7 +89,7 @@
       }
 
       // 2. Kiểm tra cờ bắt buộc đổi mật khẩu
-      if (currentUser.bat_buoc_doi_mat_khau) {
+      if (currentUser && currentUser.bat_buoc_doi_mat_khau) {
         if (!currentPath.endsWith('doi-mat-khau.html')) {
           window.location.replace(`${getRootPath()}pages/doi-mat-khau.html?required=1`);
           return currentUser;
@@ -97,30 +97,40 @@
       }
 
       // 3. Tự động kiểm tra ma trận phân quyền hệ thống (System Route Permissions)
-      for (const rule of SYSTEM_ROUTE_PERMISSIONS) {
-        if (currentPath.includes(rule.pattern)) {
-          if (!rule.roles.includes(currentUser.vai_tro)) {
-            showForbiddenPage(rule.roles);
-            return null;
+      if (currentUser && currentUser.vai_tro) {
+        for (const rule of SYSTEM_ROUTE_PERMISSIONS) {
+          if (currentPath.includes(rule.pattern)) {
+            if (!rule.roles.includes(currentUser.vai_tro)) {
+              showForbiddenPage(rule.roles);
+              return null;
+            }
+            break;
           }
-          break;
         }
       }
 
       // 4. Kiểm tra tham số requiredRoles nếu trang gọi trực tiếp
       if (options.requiredRoles && Array.isArray(options.requiredRoles)) {
-        if (!options.requiredRoles.includes(currentUser.vai_tro)) {
+        if (!currentUser || !options.requiredRoles.includes(currentUser.vai_tro)) {
           showForbiddenPage(options.requiredRoles);
           return null;
         }
       }
 
       // Cập nhật thông tin người dùng lên thanh topbar
-      renderUserProfile(currentUser);
+      try {
+        renderUserProfile(currentUser);
+      } catch (e) {
+        console.warn('Lỗi renderUserProfile:', e);
+      }
 
       // Dựng menu theo vai trò nếu có hàm renderMenu
-      if (window.MenuBuilder && typeof window.MenuBuilder.render === 'function') {
-        window.MenuBuilder.render(currentUser.vai_tro);
+      try {
+        if (window.MenuBuilder && typeof window.MenuBuilder.render === 'function') {
+          window.MenuBuilder.render(currentUser.vai_tro);
+        }
+      } catch (e) {
+        console.warn('Lỗi MenuBuilder.render:', e);
       }
 
       return currentUser;
@@ -128,9 +138,13 @@
     } catch (err) {
       currentUser = null;
 
-      // Nếu chưa đăng nhập mà đang ở trang cần bảo vệ -> chuyển về login
+      // Chỉ chuyển hướng về login nếu mã lỗi là 401 (chưa đăng nhập)
       if (!isAuthPage) {
-        window.location.replace(`${getRootPath()}pages/login.html?redirect=${encodeURIComponent(window.location.href)}`);
+        if (err && err.status === 401) {
+          window.location.replace(`${getRootPath()}pages/login.html?redirect=${encodeURIComponent(window.location.href)}`);
+        } else {
+          console.error('Lỗi xác thực hoặc không kết nối được máy chủ:', err);
+        }
       }
       return null;
     }
