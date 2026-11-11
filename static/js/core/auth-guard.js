@@ -282,7 +282,7 @@
           <br>Chức năng này chỉ dành riêng cho: <b>${requiredRoles.map(r => ROLE_NAMES[r] || r).join(', ')}</b>.
         </p>
         <a href="${getRootPath()}pages/dashboard.html" class="btn btn-primary">
-          &larr; Quay lại Bảng điều khiển
+          &larr; Quay lại Trang chủ
         </a>
       </div>
     `;

@@ -33,7 +33,7 @@
         {
           title: 'Tổng quan',
           items: [
-            { label: 'Bảng điều khiển', href: `${root}pages/dashboard.html`, icon: ICONS.dashboard, id: 'nav-dashboard' }
+            { label: 'Trang chủ', href: `${root}pages/dashboard.html`, icon: ICONS.dashboard, id: 'nav-dashboard' }
           ]
         },
         {
@@ -69,7 +69,7 @@
         {
           title: 'Tổng quan',
           items: [
-            { label: 'Bảng điều khiển Lãnh đạo', href: `${root}pages/dashboard.html`, icon: ICONS.dashboard, id: 'nav-dashboard' }
+            { label: 'Trang chủ', href: `${root}pages/dashboard.html`, icon: ICONS.dashboard, id: 'nav-dashboard' }
           ]
         },
         {
@@ -95,7 +95,7 @@
         {
           title: 'Tổng quan',
           items: [
-            { label: 'Bảng điều khiển cá nhân', href: `${root}pages/dashboard.html`, icon: ICONS.dashboard, id: 'nav-dashboard' }
+            { label: 'Trang chủ', href: `${root}pages/dashboard.html`, icon: ICONS.dashboard, id: 'nav-dashboard' }
           ]
         },
         {
