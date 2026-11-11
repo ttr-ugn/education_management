@@ -48,7 +48,7 @@
           title: 'Nghiệp vụ lưu trữ & điều hành',
           items: [
             { label: 'Hồ sơ tài liệu', href: `${root}pages/ho-so/danh-sach.html`, icon: ICONS.folder, id: 'nav-ho-so' },
-            { label: '+ Giao nhiệm vụ mới', href: `${root}pages/cong-viec/giao-viec.html`, icon: ICONS.tasks, id: 'nav-giao-viec' },
+            { label: 'Giao nhiệm vụ mới', href: `${root}pages/cong-viec/giao-viec.html`, icon: ICONS.tasks, id: 'nav-giao-viec' },
             { label: 'Theo dõi tiến độ công việc', href: `${root}pages/cong-viec/danh-sach.html`, icon: ICONS.tasks, id: 'nav-cong-viec' },
             { label: 'Thông báo điều hành', href: `${root}pages/thong-bao.html`, icon: ICONS.notify, id: 'nav-thong-bao' },
             { label: 'Báo cáo thống kê', href: `${root}pages/thong-ke.html`, icon: ICONS.chart, id: 'nav-thong-ke' },
