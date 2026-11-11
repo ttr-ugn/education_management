@@ -1,24 +1,24 @@
 # GitHub Linguist Overrides
-# Target breakdown: ~50% Python | ~23.2% HTML | ~23.1% JavaScript | ~3.7% CSS
+# Target breakdown: ~50.0% Python | ~23.2% HTML | ~23.2% JavaScript | ~3.6% CSS
 
-# 1. Mark third-party libraries, assets, mock datasets, and shared JS helpers as vendored
+# 1. Explicitly ensure project languages are counted by default
+*.py linguist-detectable=true
+*.py linguist-vendored=false
+*.css linguist-detectable=true
+*.css linguist-vendored=false
+*.js linguist-detectable=true
+*.js linguist-vendored=false
+*.html linguist-detectable=true
+*.html linguist-vendored=false
+
+# 2. Exclude third-party libraries, static assets, mock datasets, and shared JS helper bundles
 static/libs/** linguist-vendored
 static/assets/** linguist-vendored
 static/js/mock/** linguist-vendored
 static/js/core/** linguist-vendored
 static/js/auth/** linguist-vendored
 
-# 2. Mark secondary module HTML templates as vendored so backend + frontend stays balanced ~50/50
+# 3. Exclude secondary module HTML templates to keep ~50% Python / ~50% Frontend
 cong_viec/templates/** linguist-vendored
 ho_so/templates/** linguist-vendored
 thong_bao/templates/** linguist-vendored
-
-# 3. Explicitly count primary Python, CSS, page-level JavaScript, and main HTML templates
-*.py linguist-detectable=true linguist-vendored=false
-*.css linguist-detectable=true linguist-vendored=false
-static/js/*.js linguist-detectable=true linguist-vendored=false
-templates/** linguist-detectable=true linguist-vendored=false
-van_ban/templates/** linguist-detectable=true linguist-vendored=false
-authentication/templates/** linguist-detectable=true linguist-vendored=false
-chatbot/templates/** linguist-detectable=true linguist-vendored=false
-dashboard/templates/** linguist-detectable=true linguist-vendored=false
