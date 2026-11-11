@@ -54,7 +54,14 @@ def api_van_ban_di_list(request):
         if q:
             qs = qs.filter(Q(trich_yeu__icontains=q) | Q(so_ky_hieu__icontains=q))
         if trang_thai:
-            qs = qs.filter(trang_thai=trang_thai)
+            if trang_thai in ['DA_DUYET', 'DA_KY_CHO_BAN_HANH']:
+                qs = qs.filter(trang_thai__in=['DA_DUYET', 'DA_KY_CHO_BAN_HANH'])
+            elif trang_thai in ['CHO_LANH_DAO_KY', 'CHO_LANH_DAO_DUYET']:
+                qs = qs.filter(trang_thai__in=['CHO_LANH_DAO_KY', 'CHO_LANH_DAO_DUYET'])
+            elif trang_thai in ['CHO_VAN_THU_KIEM_TRA', 'CHO_KIEM_TRA']:
+                qs = qs.filter(trang_thai__in=['CHO_VAN_THU_KIEM_TRA', 'CHO_KIEM_TRA'])
+            else:
+                qs = qs.filter(trang_thai=trang_thai)
         if loai_van_ban:
             qs = qs.filter(loai_van_ban=loai_van_ban)
 
@@ -134,6 +141,44 @@ def api_van_ban_di_trang_thai(request, van_ban_id):
 
     return JsonResponse({'thanh_cong': False, 'thong_bao': 'Thiếu tham số trang_thai.'}, status=400)
 
+@csrf_exempt
+def api_van_ban_di_ban_hanh(request, van_ban_id):
+    """Cấp số và ban hành văn bản đi chính thức."""
+    try:
+        vb = VanBanDi.objects.get(pk=van_ban_id)
+    except VanBanDi.DoesNotExist:
+        return JsonResponse({'thanh_cong': False, 'thong_bao': 'Không tìm thấy văn bản đi.'}, status=404)
+
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body.decode('utf-8'))
+        except Exception:
+            data = request.POST
+
+        so_ky_hieu = data.get('so_ky_hieu')
+        if so_ky_hieu:
+            vb.so_ky_hieu = so_ky_hieu
+        
+        from django.utils import timezone
+        vb.trang_thai = 'DA_BAN_HANH'
+        vb.ngay_ban_hanh = timezone.now()
+        vb.save()
+
+        # Nếu có chọn hồ sơ thì liên kết
+        ho_so_id = data.get('ho_so_id')
+        if ho_so_id:
+            try:
+                from ho_so.models import HoSoTaiLieu
+                hs = HoSoTaiLieu.objects.get(pk=ho_so_id)
+                hs.so_luong_van_ban = (hs.so_luong_van_ban or 0) + 1
+                hs.save()
+            except Exception:
+                pass
+
+        return JsonResponse({'thanh_cong': True, 'thong_bao': f'Đã ban hành văn bản {vb.so_ky_hieu} thành công!', 'du_lieu': vb.to_dict()})
+
+    return JsonResponse({'thanh_cong': False, 'thong_bao': 'Phương thức không hỗ trợ'}, status=405)
+
 # ==============================================================================
 # API VĂN BẢN ĐẾN
 # ==============================================================================
@@ -151,7 +196,14 @@ def api_van_ban_den_list(request):
         if q:
             qs = qs.filter(Q(trich_yeu__icontains=q) | Q(so_ky_hieu__icontains=q) | Q(co_quan_ban_hanh__icontains=q))
         if trang_thai:
-            qs = qs.filter(trang_thai=trang_thai)
+            if trang_thai in ['DA_DUYET', 'DA_KY_CHO_BAN_HANH']:
+                qs = qs.filter(trang_thai__in=['DA_DUYET', 'DA_KY_CHO_BAN_HANH'])
+            elif trang_thai in ['CHO_LANH_DAO_KY', 'CHO_LANH_DAO_DUYET']:
+                qs = qs.filter(trang_thai__in=['CHO_LANH_DAO_KY', 'CHO_LANH_DAO_DUYET'])
+            elif trang_thai in ['CHO_VAN_THU_KIEM_TRA', 'CHO_KIEM_TRA']:
+                qs = qs.filter(trang_thai__in=['CHO_VAN_THU_KIEM_TRA', 'CHO_KIEM_TRA'])
+            else:
+                qs = qs.filter(trang_thai=trang_thai)
         if loai_van_ban:
             qs = qs.filter(loai_van_ban=loai_van_ban)
         if do_khan:

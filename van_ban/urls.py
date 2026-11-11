@@ -20,5 +20,6 @@ urlpatterns = [
 
     # API
     path('api/van-ban-di', views.api_van_ban_di_list, name='api_van_ban_di_list'),
+    path('api/van-ban-di/<int:van_ban_id>/ban-hanh', views.api_van_ban_di_ban_hanh, name='api_van_ban_di_ban_hanh'),
     path('api/van-ban-den', views.api_van_ban_den_list, name='api_van_ban_den_list'),
 ]

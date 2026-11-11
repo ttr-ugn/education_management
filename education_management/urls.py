@@ -90,6 +90,7 @@ urlpatterns = [
     path('api/van-ban-di/', vb_views.api_van_ban_di_list, name='api_van_ban_di_slash'),
     path('api/van-ban-di/<int:van_ban_id>', vb_views.api_van_ban_di_detail, name='api_van_ban_di_detail'),
     path('api/van-ban-di/<int:van_ban_id>/trang-thai', vb_views.api_van_ban_di_trang_thai, name='api_van_ban_di_trang_thai'),
+    path('api/van-ban-di/<int:van_ban_id>/ban-hanh', vb_views.api_van_ban_di_ban_hanh, name='api_van_ban_di_ban_hanh'),
 
     # Văn bản đến
     path('api/van-ban-den', vb_views.api_van_ban_den_list, name='api_van_ban_den'),
