@@ -5,7 +5,7 @@
 
 (function (window) {
   // Tự động nhận diện host: nếu chạy cùng port hoặc khác port (Live Server)
-  const API_BASE = window.location.origin.includes(':5000') ? '' : 'http://localhost:5000';
+  const API_BASE = ''; // Tu dong nhan dien origin theo port hien tai
 
   async function request(endpoint, options = {}) {
     const url = endpoint.startsWith('http') ? endpoint : `${API_BASE}${endpoint}`;
