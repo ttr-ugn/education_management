@@ -5,16 +5,16 @@
 
 window.AdminUserModule = (function () {
   const ROLE_BADGES = {
-    'VAN_THU': '<span class="badge badge-info">Văn thư (Admin)</span>',
-    'LANH_DAO': '<span class="badge badge-warning">Lãnh đạo</span>',
-    'CHUYEN_VIEN': '<span class="badge badge-secondary">Chuyên viên</span>'
+    'VAN_THU': '<span class="badge" style="background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; padding: 4px 10px; border-radius: 20px; font-weight: 600; font-size: 11.5px; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;">⚡ Văn thư (Admin)</span>',
+    'LANH_DAO': '<span class="badge" style="background: #faf5ff; color: #7e22ce; border: 1px solid #e9d5ff; padding: 4px 10px; border-radius: 20px; font-weight: 600; font-size: 11.5px; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;">🏛️ Lãnh đạo</span>',
+    'CHUYEN_VIEN': '<span class="badge" style="background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; padding: 4px 10px; border-radius: 20px; font-weight: 600; font-size: 11.5px; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;">💼 Chuyên viên</span>'
   };
 
   const STATUS_BADGES = {
-    'CHO_DUYET': '<span class="badge badge-warning">Chờ duyệt</span>',
-    'HOAT_DONG': '<span class="badge badge-success">Hoạt động</span>',
-    'TU_CHOI': '<span class="badge badge-danger">Từ chối</span>',
-    'BI_KHOA': '<span class="badge badge-danger">Bị khóa</span>'
+    'CHO_DUYET': '<span class="badge" style="background: #fef3c7; color: #b45309; border: 1px solid #fde68a; padding: 4px 10px; border-radius: 20px; font-weight: 600; font-size: 11.5px; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;">⏳ Chờ duyệt</span>',
+    'HOAT_DONG': '<span class="badge" style="background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; padding: 4px 10px; border-radius: 20px; font-weight: 600; font-size: 11.5px; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;">● Hoạt động</span>',
+    'TU_CHOI': '<span class="badge" style="background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; padding: 4px 10px; border-radius: 20px; font-weight: 600; font-size: 11.5px; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;">❌ Bị từ chối</span>',
+    'BI_KHOA': '<span class="badge" style="background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; padding: 4px 10px; border-radius: 20px; font-weight: 700; font-size: 11.5px; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;">🔒 Bị khóa</span>'
   };
 
   /**
