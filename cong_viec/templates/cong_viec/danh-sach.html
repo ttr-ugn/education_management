@@ -600,110 +600,78 @@
 
 {% block modals %}
 <!-- MODAL CHI TIẾT CÔNG VIỆC & THÔNG TIN VĂN BẢN -->
-
   <div class="modal-backdrop" id="detailModal">
-
     <div class="modal-dialog">
-
       <div style="padding: 20px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
-
         <h3 style="margin: 0; font-size: 17px; color: var(--primary-dark);" id="modalTaskTitle">Chi tiết nhiệm vụ</h3>
-
         <button style="border: none; background: none; font-size: 22px; cursor: pointer; color: #64748b;" id="closeModalBtn">&times;</button>
-
-
-
+      </div>
 
       <div style="padding: 20px;" id="modalBodyContent">
-
         <!-- Thông tin văn bản liên kết -->
-
         <div style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 14px; margin-bottom: 16px;">
-
           <div style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: #0284c7; margin-bottom: 4px;">
-
             📄 Căn cứ văn bản điều hành
-
-
+          </div>
           <div style="font-weight: 700; color: #0369a1; font-size: 14px;" id="modalDocNumber">Số: 125/SGDĐT-GDTrH</div>
-
           <div style="font-size: 13px; color: #334155; margin-top: 4px;" id="modalDocSummary">Trích yếu nội dung văn bản</div>
-
           <div style="font-size: 12px; color: #64748b; margin-top: 4px;" id="modalDocDate">Ngày văn bản: 2026-10-20</div>
-
-
-
+          <div id="modalAttachmentBox" style="display: none; margin-top: 10px; padding-top: 10px; border-top: 1px dashed #bae6fd;">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;">
+              <div style="display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: #0369a1; font-weight: 600; min-width: 0;">
+                <span>📎</span>
+                <span id="modalAttachmentName" style="word-break: break-word;"></span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px; flex-shrink: 0;">
+                <a id="modalAttachmentPreviewBtn" href="#" target="_blank" rel="noopener" class="btn btn-outline-primary btn-sm" style="padding: 3px 10px; font-size: 12px; font-weight: 600;">👁 Xem trước</a>
+                <a id="modalAttachmentDownloadBtn" href="#" class="btn btn-primary btn-sm" style="padding: 3px 10px; font-size: 12px; font-weight: 600;">⬇ Tải về</a>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <!-- Thông tin giao việc -->
-
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 13px; margin-bottom: 16px;">
-
           <div>Người giao: <strong id="modalAssigner">...</strong></div>
-
           <div>Người xử lý: <strong id="modalAssignee">...</strong></div>
-
           <div>Phòng ban: <strong id="modalDept">...</strong></div>
-
           <div>Hạn hoàn thành: <span class="text-danger fw-bold" id="modalDeadline">...</span></div>
-
           <div>Mức ưu tiên: <span id="modalPriority">...</span></div>
-
           <div>Trạng thái: <span id="modalStatus">...</span></div>
-
-
-
+        </div>
 
         <div style="margin-bottom: 16px;">
-
           <div style="font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 4px;">Nội dung yêu cầu chi tiết:</div>
-
           <div style="background: #f8fafc; padding: 10px; border-radius: 6px; font-size: 13px; color: #334155;" id="modalContent">...</div>
-
-
-
+        </div>
 
         <div style="margin-bottom: 16px;">
-
           <div style="font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 4px;">Báo cáo kết quả:</div>
-
           <div style="background: #f1f5f9; padding: 10px; border-radius: 6px; font-size: 13px; color: #1e293b;" id="modalResult">Chưa có báo cáo</div>
-
-
-
+        </div>
 
         <div style="margin-bottom: 16px;" id="modalFeedbackBox">
-
           <div style="font-size: 12px; font-weight: 600; color: #15803d; margin-bottom: 4px;">Đánh giá của Lãnh đạo:</div>
-
           <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 10px; border-radius: 6px; font-size: 13px; color: #166534;" id="modalFeedback">...</div>
-
-
-
+        </div>
 
         <!-- Nhật ký tiến độ -->
-
         <div>
-
           <div style="font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 8px;">Nhật ký cập nhật tiến độ:</div>
-
           <div id="modalTimeline"></div>
-
-
-
-
+        </div>
+      </div>
 
       <div style="padding: 14px 20px; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; gap: 8px;">
-
         <div>
-
           <a id="btnTaskActionDraft" class="btn btn-primary btn-sm" href="#" style="display: none; font-weight: 600;">
-
             ✍ Xử lý / Soạn thảo văn bản đi &rarr;
-
           </a>
-
-
+        </div>
         <button class="btn btn-secondary btn-sm" id="closeModalBtn2">Đóng</button>
+      </div>
+    </div>
+  </div>
 {% endblock %}
 
 {% block extra_js %}
@@ -714,6 +682,6 @@
     document.write('<script src="https://cdn.jsdelivr.net/npm/chart.js"><\/script>');
   }
 </script>
-<script src="/js/mock/du-lieu-cong-viec.js?v=20261111_22"></script>
-<script src="/static/js/cong_viec_danh_sach.js?v=20261111_22"></script>
+<script src="/js/mock/du-lieu-cong-viec.js?v=20261111_24"></script>
+<script src="/static/js/cong_viec_danh_sach.js?v=20261111_24"></script>
 {% endblock %}

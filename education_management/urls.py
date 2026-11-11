@@ -99,10 +99,12 @@ urlpatterns = [
 
     # Công việc
     path('api/cong-viec', cv_views.api_cong_viec_list, name='api_cong_viec'),
+    path('api/cong-viec/van-ban-goi-y', cv_views.api_cong_viec_van_ban_goi_y, name='api_cong_viec_van_ban_goi_y'),
+    path('api/cong-viec/thong-ke', cv_views.api_cong_viec_thong_ke, name='api_cong_viec_thong_ke'),
     path('api/cong-viec/<int:cong_viec_id>', cv_views.api_cong_viec_detail, name='api_cong_viec_detail'),
     path('api/cong-viec/<int:cong_viec_id>/tien-do', cv_views.api_cong_viec_tien_do, name='api_cong_viec_tien_do'),
     path('api/cong-viec/<int:cong_viec_id>/danh-gia', cv_views.api_cong_viec_danh_gia, name='api_cong_viec_danh_gia'),
-    path('api/cong-viec/thong-ke', cv_views.api_cong_viec_thong_ke, name='api_cong_viec_thong_ke'),
+    path('api/cong-viec/<int:cong_viec_id>/tai-dinh-kem', cv_views.api_cong_viec_tai_dinh_kem, name='api_cong_viec_tai_dinh_kem'),
 
     # Hồ sơ lưu trữ
     path('api/ho-so', hs_views.api_ho_so_list, name='api_ho_so'),

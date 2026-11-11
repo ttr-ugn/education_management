@@ -1,10 +1,12 @@
 import json
+import mimetypes
 from datetime import date, timedelta
 from django.shortcuts import render
-from django.http import JsonResponse
+from django.http import JsonResponse, FileResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q, Count
 from .models import CongViec, NhatKyCongViec
+from .services import TaskAttachmentService, TaskServiceException
 from authentication.models import NguoiDung
 
 
@@ -66,30 +68,62 @@ def api_cong_viec_list(request):
         return JsonResponse({'thanh_cong': True, 'du_lieu': [cv.to_dict() for cv in qs], 'tong_so': qs.count()})
 
     elif request.method == 'POST':
-        try:
-            data = json.loads(request.body.decode('utf-8'))
-        except Exception:
+        if request.FILES or (request.content_type or '').startswith('multipart/form-data'):
             data = request.POST
+        else:
+            try:
+                data = json.loads(request.body.decode('utf-8')) if request.body else {}
+            except Exception:
+                data = request.POST
 
         user_id = request.session.get('user_id')
         user = NguoiDung.objects.filter(pk=user_id).first() if user_id else NguoiDung.objects.first()
 
-        chuyen_vien = NguoiDung.objects.filter(pk=data.get('nguoi_xu_ly_id')).first() if data.get('nguoi_xu_ly_id') else user
+        assignee_id = data.get('nguoi_xu_ly_id')
+        chuyen_vien = NguoiDung.objects.filter(pk=assignee_id).first() if assignee_id else None
+        if not chuyen_vien and data.get('nguoi_xu_ly'):
+            chuyen_vien = NguoiDung.objects.filter(ho_va_ten__iexact=str(data.get('nguoi_xu_ly')).strip()).first()
+        if not chuyen_vien:
+            chuyen_vien = user
 
+        try:
+            ngay_van_ban = TaskAttachmentService.parse_optional_date(data.get('ngay_van_ban'))
+            han_hoan_thanh = TaskAttachmentService.parse_optional_date(data.get('han_hoan_thanh')) or (date.today() + timedelta(days=7))
+
+            uploaded_file = request.FILES.get('tep_dinh_kem')
+            if uploaded_file:
+                tep_dinh_kem, ten_tep_dinh_kem = TaskAttachmentService.save_uploaded_attachment(uploaded_file)
+            else:
+                tep_dinh_kem, ten_tep_dinh_kem = TaskAttachmentService.normalize_existing_attachment(
+                    data.get('tep_dinh_kem'),
+                    data.get('ten_tep_dinh_kem'),
+                )
+        except TaskServiceException as exc:
+            return JsonResponse({'thanh_cong': False, 'thong_bao': str(exc)}, status=400)
+
+        ten_cong_viec = (data.get('ten_cong_viec') or '').strip() or 'Công việc mới'
         cv = CongViec.objects.create(
-            ten_cong_viec=data.get('ten_cong_viec', 'Công việc mới'),
+            ten_cong_viec=ten_cong_viec,
             noi_dung=data.get('noi_dung', ''),
             nguoi_giao=user,
             nguoi_xu_ly=chuyen_vien,
             phong_ban=data.get('phong_ban') or (chuyen_vien.phong_ban if chuyen_vien else 'Văn phòng Sở'),
-            han_hoan_thanh=data.get('han_hoan_thanh') or (date.today() + timedelta(days=7)),
+            han_hoan_thanh=han_hoan_thanh,
             do_uu_tien=data.get('do_uu_tien', 'TRUNG_BINH'),
             tien_do=0,
             trang_thai='CHUA_THUC_HIEN',
-            so_ky_hieu_vb=data.get('so_ky_hieu_vb', ''),
-            trich_yeu_vb=data.get('trich_yeu_vb', '')
+            so_ky_hieu_vb=(data.get('so_ky_hieu_vb') or '').strip(),
+            ngay_van_ban=ngay_van_ban,
+            trich_yeu_vb=data.get('trich_yeu_vb', ''),
+            tep_dinh_kem=tep_dinh_kem or '',
+            ten_tep_dinh_kem=ten_tep_dinh_kem or '',
         )
-        return JsonResponse({'thanh_cong': True, 'thong_bao': 'Giao nhiệm vụ thành công!', 'cong_viec_id': cv.cong_viec_id})
+        return JsonResponse({
+            'thanh_cong': True,
+            'thong_bao': 'Giao nhiệm vụ thành công!',
+            'cong_viec_id': cv.cong_viec_id,
+            'du_lieu': cv.to_dict(),
+        })
 
     return JsonResponse({'thanh_cong': False, 'thong_bao': 'Phương thức không hỗ trợ'}, status=405)
 
@@ -273,3 +307,48 @@ def api_cong_viec_thong_ke(request):
             'chart_bar': chart_bar
         }
     })
+
+
+def api_cong_viec_tai_dinh_kem(request, cong_viec_id):
+    """Tải về hoặc xem trước tệp văn bản đính kèm khi giao việc."""
+    try:
+        cv = CongViec.objects.get(pk=cong_viec_id)
+    except CongViec.DoesNotExist:
+        return JsonResponse({'thanh_cong': False, 'thong_bao': 'Không tìm thấy công việc.'}, status=404)
+
+    if not cv.tep_dinh_kem:
+        return JsonResponse({'thanh_cong': False, 'thong_bao': 'Công việc chưa có văn bản đính kèm.'}, status=404)
+
+    preview = request.GET.get('xem_truoc') in ('1', 'true', 'yes')
+    archival_id = TaskAttachmentService.parse_archival_ref(cv.tep_dinh_kem)
+    if archival_id is not None:
+        from ho_so.views import _render_van_ban_ban_hanh_response
+        return _render_van_ban_ban_hanh_response(archival_id, as_download=not preview)
+
+    disk_path = TaskAttachmentService.resolve_media_path(cv.tep_dinh_kem)
+    if disk_path is None:
+        return JsonResponse({'thanh_cong': False, 'thong_bao': 'Không tìm thấy tệp văn bản đính kèm trên máy chủ.'}, status=404)
+
+    content_type = mimetypes.guess_type(disk_path.name)[0] or 'application/octet-stream'
+    if preview:
+        return FileResponse(open(disk_path, 'rb'), as_attachment=False, content_type=content_type)
+
+    download_name = cv.ten_tep_dinh_kem or disk_path.name
+    return FileResponse(open(disk_path, 'rb'), as_attachment=True, filename=download_name, content_type=content_type)
+
+
+def api_cong_viec_van_ban_goi_y(request):
+    """Lấy danh sách văn bản hiện có trong hệ thống để chọn nhanh khi giao việc."""
+    if request.method != 'GET':
+        return JsonResponse({'thanh_cong': False, 'thong_bao': 'Phương thức không hỗ trợ'}, status=405)
+
+    q = (request.GET.get('q') or '').strip().lower()
+    docs = TaskAttachmentService.get_suggested_documents(limit=40)
+    if q:
+        docs = [
+            d for d in docs
+            if q in (d.get('so_ky_hieu') or '').lower()
+            or q in (d.get('trich_yeu') or '').lower()
+            or q in (d.get('loai_van_ban') or '').lower()
+        ]
+    return JsonResponse({'thanh_cong': True, 'du_lieu': docs, 'tong_so': len(docs)})

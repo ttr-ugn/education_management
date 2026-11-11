@@ -4,6 +4,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (!user) return;
 
+      const escapeHtml = (val) => String(val ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+
 
 
       const role = user.vai_tro;
@@ -292,16 +299,32 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         tbody.innerHTML = list.map((item, index) => {
-          // 1. Văn bản liên kết dạng pill monospace
-          const docHtml = item.so_ky_hieu_vb ? `
-            <div style="min-width: 175px; max-width: 220px;">
-              <div style="display: inline-flex; align-items: center; gap: 5px; padding: 3px 8px; background: #f0f7ff; border: 1px solid #bae6fd; border-radius: 6px; font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace; font-size: 11.5px; font-weight: 600; color: #0284c7;">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                <span>${item.so_ky_hieu_vb}</span>
-              </div>
-              <div style="font-size: 11px; color: #64748b; margin-top: 3px; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;" title="${(item.trich_yeu_vb || '').replace(/"/g, '&quot;')}">
-                ${item.trich_yeu_vb || 'Văn bản chỉ đạo giao ban'}
-              </div>
+          // 1. Văn bản liên kết dạng pill monospace + tệp văn bản đính kèm
+          const attachName = escapeHtml(item.ten_tep_dinh_kem || 'Văn bản đính kèm');
+          const previewHref = item.xem_dinh_kem_url || `/api/cong-viec/${item.id}/tai-dinh-kem?xem_truoc=1`;
+          const attachPill = item.tep_dinh_kem ? `
+            <div style="margin-top: 4px;">
+              <a href="${previewHref}" target="_blank" rel="noopener" title="${attachName}" style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 7px; background: #ecfeff; border: 1px solid #a5f3fc; border-radius: 5px; font-size: 11px; font-weight: 600; color: #0e7490; text-decoration: none; max-width: 210px;">
+                <span>📎</span>
+                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${attachName}</span>
+              </a>
+            </div>
+          ` : '';
+
+          const docHtml = (item.so_ky_hieu_vb || item.tep_dinh_kem) ? `
+            <div style="min-width: 175px; max-width: 225px;">
+              ${item.so_ky_hieu_vb ? `
+                <div style="display: inline-flex; align-items: center; gap: 5px; padding: 3px 8px; background: #f0f7ff; border: 1px solid #bae6fd; border-radius: 6px; font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace; font-size: 11.5px; font-weight: 600; color: #0284c7;">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                  <span>${escapeHtml(item.so_ky_hieu_vb)}</span>
+                </div>
+              ` : ''}
+              ${item.trich_yeu_vb ? `
+                <div style="font-size: 11px; color: #64748b; margin-top: 3px; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;" title="${escapeHtml(item.trich_yeu_vb)}">
+                  ${escapeHtml(item.trich_yeu_vb)}
+                </div>
+              ` : (item.so_ky_hieu_vb ? '<div style="font-size: 11px; color: #64748b; margin-top: 3px;">Văn bản chỉ đạo giao ban</div>' : '')}
+              ${attachPill}
             </div>
           ` : `
             <span style="display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 11.5px; color: #64748b;">
@@ -434,6 +457,18 @@ document.addEventListener('DOMContentLoaded', async () => {
           document.getElementById('modalDocSummary').innerText = task.trich_yeu_vb || 'Căn cứ nhiệm vụ theo chỉ đạo nội bộ';
 
           document.getElementById('modalDocDate').innerText = task.ngay_van_ban ? `Ngày văn bản: ${task.ngay_van_ban}` : '';
+
+          const attachBox = document.getElementById('modalAttachmentBox');
+          if (attachBox) {
+            if (task.tep_dinh_kem) {
+              attachBox.style.display = 'block';
+              document.getElementById('modalAttachmentName').innerText = task.ten_tep_dinh_kem || 'Văn bản đính kèm';
+              document.getElementById('modalAttachmentPreviewBtn').href = task.xem_dinh_kem_url || `/api/cong-viec/${task.id}/tai-dinh-kem?xem_truoc=1`;
+              document.getElementById('modalAttachmentDownloadBtn').href = task.tai_dinh_kem_url || `/api/cong-viec/${task.id}/tai-dinh-kem`;
+            } else {
+              attachBox.style.display = 'none';
+            }
+          }
 
           document.getElementById('modalAssigner').innerText = task.nguoi_giao || 'Lãnh đạo';
 

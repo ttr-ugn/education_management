@@ -67,7 +67,7 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="../../js/mock/du-lieu-cong-viec.js"></script>
+<script src="/js/mock/du-lieu-cong-viec.js?v=20261111_24"></script>
 
 <script>
 
@@ -76,6 +76,13 @@
       const user = await window.AuthGuard.check({ requiredRoles: ['VAN_THU'] });
 
       if (!user) return;
+
+      const escapeHtml = (val) => String(val ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
 
 
 
@@ -119,7 +126,8 @@
 
               <div style="font-size: 11.5px; color: #64748b;">${item.phong_ban}</div>
 
-              ${item.so_ky_hieu_vb ? `<div style="font-size: 11px; color: #0284c7; margin-top: 2px;">📄 Căn cứ: ${item.so_ky_hieu_vb}</div>` : ''}
+              ${item.so_ky_hieu_vb ? `<div style="font-size: 11px; color: #0284c7; margin-top: 2px;">📄 Căn cứ: ${escapeHtml(item.so_ky_hieu_vb)}</div>` : ''}
+              ${item.tep_dinh_kem ? `<div style="font-size: 11px; margin-top: 2px;"><a href="${item.xem_dinh_kem_url || `/api/cong-viec/${item.id}/tai-dinh-kem?xem_truoc=1`}" target="_blank" rel="noopener" style="color: #0e7490; font-weight: 600; text-decoration: none;">📎 ${escapeHtml(item.ten_tep_dinh_kem || 'Văn bản đính kèm')}</a></div>` : ''}
 
             </td>
 

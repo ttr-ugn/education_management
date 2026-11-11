@@ -27,8 +27,13 @@
 
                 <div id="taskDetailBox" style="background-color: #f8fafc; padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-bottom: 20px; display: none;">
                   <!-- Căn cứ văn bản -->
-                  <div id="taskDocBox" style="background: #e0f2fe; color: #0369a1; padding: 6px 12px; border-radius: 4px; font-size: 12.5px; margin-bottom: 10px; display: none;">
-                    📄 <b>Căn cứ văn bản:</b> <span id="taskDocText">...</span>
+                  <div id="taskDocBox" style="background: #e0f2fe; color: #0369a1; padding: 8px 12px; border-radius: 6px; font-size: 12.5px; margin-bottom: 10px; display: none;">
+                    <div>📄 <b>Căn cứ văn bản:</b> <span id="taskDocText">...</span></div>
+                    <div id="taskDocAttachment" style="display: none; margin-top: 6px; padding-top: 6px; border-top: 1px dashed #7dd3fc;">
+                      📎 <b>Văn bản đính kèm:</b> <span id="taskDocFileName"></span>
+                      &nbsp;·&nbsp;<a id="taskDocPreviewLink" href="#" target="_blank" rel="noopener" style="font-weight: 600; color: #0284c7; text-decoration: underline;">Xem trước</a>
+                      &nbsp;|&nbsp;<a id="taskDocDownloadLink" href="#" style="font-weight: 600; color: #0369a1; text-decoration: underline;">Tải về</a>
+                    </div>
                   </div>
 
                   <div class="d-flex justify-content-between mb-2">
@@ -69,7 +74,7 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="../../js/mock/du-lieu-cong-viec.js"></script>
+<script src="/js/mock/du-lieu-cong-viec.js?v=20261111_24"></script>
 
 <script>
     document.addEventListener('DOMContentLoaded', async () => {
@@ -80,6 +85,10 @@
       const detailBox = document.getElementById('taskDetailBox');
       const taskDocBox = document.getElementById('taskDocBox');
       const taskDocText = document.getElementById('taskDocText');
+      const taskDocAttachment = document.getElementById('taskDocAttachment');
+      const taskDocFileName = document.getElementById('taskDocFileName');
+      const taskDocPreviewLink = document.getElementById('taskDocPreviewLink');
+      const taskDocDownloadLink = document.getElementById('taskDocDownloadLink');
       const progressRange = document.getElementById('progressRange');
       const progressValue = document.getElementById('progressValue');
       const reportNote = document.getElementById('reportNote');
@@ -117,11 +126,23 @@
           document.getElementById('taskContent').textContent = task.noi_dung || 'Không có mô tả chi tiết.';
           document.getElementById('taskAssigner').textContent = task.nguoi_giao || 'Lãnh đạo Sở';
 
-          if (task.so_ky_hieu_vb) {
-            taskDocText.textContent = `${task.so_ky_hieu_vb} - ${task.trich_yeu_vb || ''}`;
+          if (task.so_ky_hieu_vb || task.tep_dinh_kem) {
+            const parts = [];
+            if (task.so_ky_hieu_vb) parts.push(task.so_ky_hieu_vb);
+            if (task.trich_yeu_vb) parts.push(task.trich_yeu_vb);
+            taskDocText.textContent = parts.length ? parts.join(' - ') : 'Tài liệu đính kèm khi giao việc';
+            if (task.tep_dinh_kem) {
+              taskDocFileName.textContent = task.ten_tep_dinh_kem || 'Văn bản đính kèm';
+              taskDocPreviewLink.href = task.xem_dinh_kem_url || `/api/cong-viec/${task.id}/tai-dinh-kem?xem_truoc=1`;
+              taskDocDownloadLink.href = task.tai_dinh_kem_url || `/api/cong-viec/${task.id}/tai-dinh-kem`;
+              taskDocAttachment.style.display = 'block';
+            } else {
+              taskDocAttachment.style.display = 'none';
+            }
             taskDocBox.style.display = 'block';
           } else {
             taskDocBox.style.display = 'none';
+            taskDocAttachment.style.display = 'none';
           }
 
           progressRange.value = task.tien_do;

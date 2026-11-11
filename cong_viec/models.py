@@ -31,7 +31,10 @@ class CongViec(models.Model):
     danh_gia_lanh_dao = models.TextField(blank=True, null=True)
     tep_dinh_kem_ket_qua = models.CharField(max_length=500, blank=True, null=True)
     so_ky_hieu_vb = models.CharField(max_length=100, blank=True, null=True)
+    ngay_van_ban = models.DateField(blank=True, null=True)
     trich_yeu_vb = models.TextField(blank=True, null=True)
+    tep_dinh_kem = models.CharField(max_length=500, blank=True, null=True)
+    ten_tep_dinh_kem = models.CharField(max_length=255, blank=True, null=True)
     ngay_tao = models.DateTimeField(auto_now_add=True)
     ngay_cap_nhat = models.DateTimeField(auto_now=True)
 
@@ -68,7 +71,12 @@ class CongViec(models.Model):
             'danh_gia_lanh_dao': self.danh_gia_lanh_dao or '',
             'tep_dinh_kem_ket_qua': self.tep_dinh_kem_ket_qua or '',
             'so_ky_hieu_vb': self.so_ky_hieu_vb or '',
+            'ngay_van_ban': self.ngay_van_ban.strftime('%Y-%m-%d') if self.ngay_van_ban else '',
             'trich_yeu_vb': self.trich_yeu_vb or '',
+            'tep_dinh_kem': self.tep_dinh_kem or '',
+            'ten_tep_dinh_kem': self.ten_tep_dinh_kem or '',
+            'tai_dinh_kem_url': f'/api/cong-viec/{self.cong_viec_id}/tai-dinh-kem' if self.tep_dinh_kem else '',
+            'xem_dinh_kem_url': f'/api/cong-viec/{self.cong_viec_id}/tai-dinh-kem?xem_truoc=1' if self.tep_dinh_kem else '',
             'ngay_tao': self.ngay_tao.strftime('%Y-%m-%d %H:%M:%S') if self.ngay_tao else '',
             'nhat_ky': [
                 {

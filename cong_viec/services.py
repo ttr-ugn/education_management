@@ -3,8 +3,13 @@ Education Management - Task Management & Dispatch Service Layer (Cong Viec)
 Chịu trách nhiệm phân công nhiệm vụ, giám sát tiến độ thực hiện, đánh giá KPI và cảnh báo quá hạn.
 """
 
+import os
+import re
+import uuid
+from pathlib import Path
 from datetime import datetime, date
 from typing import Optional, Dict, Any, Tuple, List
+from django.conf import settings
 from django.utils import timezone
 from django.db import transaction
 from django.db.models import Q, Count, Avg
@@ -16,13 +21,185 @@ from common.constants import (
     MucDoUuTien,
     VaiTroNguoiDung,
 )
-from common.validators import validate_date_range
+from common.validators import validate_date_range, validate_file_upload
 from common.security import sanitize_input_text
 
 
 class TaskServiceException(Exception):
     """Ngoại lệ riêng cho quản lý công việc và nhiệm vụ"""
     pass
+
+
+class TaskAttachmentService:
+    """
+    Quản lý tệp văn bản đính kèm khi giao việc: kiểm tra hợp lệ, lưu an toàn và phân giải tệp tải về.
+    """
+
+    ALLOWED_EXTENSIONS = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'png', 'jpg', 'jpeg', 'txt']
+    MAX_SIZE_MB = 15
+    SUBDIR = 'cong_viec_dinh_kem'
+    _ARCHIVAL_URL_RE = re.compile(r'^/api/ho-so/van-ban/(\d+)/(xem-truoc|tai-ve)$')
+
+    @staticmethod
+    def parse_optional_date(raw_value: Any) -> Optional[date]:
+        """Chuyển đổi chuỗi YYYY-MM-DD hoặc đối tượng date thành date (trả về None nếu rỗng)."""
+        if raw_value is None or raw_value == '':
+            return None
+        if isinstance(raw_value, datetime):
+            return raw_value.date()
+        if isinstance(raw_value, date):
+            return raw_value
+        text = str(raw_value).strip()
+        if not text:
+            return None
+        try:
+            return datetime.strptime(text[:10], '%Y-%m-%d').date()
+        except ValueError as exc:
+            raise TaskServiceException("Định dạng ngày văn bản không hợp lệ (cần YYYY-MM-DD).") from exc
+
+    @classmethod
+    def resolve_media_path(cls, tep_dinh_kem: Optional[str]) -> Optional[Path]:
+        """Phân giải đường dẫn /media/... sang Path thực tế trong MEDIA_ROOT, chống path traversal."""
+        raw = (tep_dinh_kem or '').strip().replace('\\', '/')
+        if not raw:
+            return None
+
+        if raw.startswith('/media/'):
+            rel = raw[len('/media/'):]
+        elif raw.startswith('media/'):
+            rel = raw[len('media/'):]
+        else:
+            rel = raw.lstrip('/')
+
+        if not rel:
+            return None
+
+        media_root = Path(settings.MEDIA_ROOT).resolve()
+        candidate = (media_root / rel).resolve()
+        if not candidate.is_relative_to(media_root) or not candidate.is_file():
+            return None
+        return candidate
+
+    @classmethod
+    def parse_archival_ref(cls, tep_dinh_kem: Optional[str]) -> Optional[int]:
+        """Trích xuất van_ban_id nếu đường dẫn tham chiếu trực tiếp văn bản lưu trữ nội bộ."""
+        match = cls._ARCHIVAL_URL_RE.match((tep_dinh_kem or '').strip())
+        return int(match.group(1)) if match else None
+
+    @classmethod
+    def save_uploaded_attachment(cls, uploaded_file) -> Tuple[str, str]:
+        """Kiểm tra và lưu tệp văn bản đính kèm vào MEDIA_ROOT/cong_viec_dinh_kem."""
+        raw_name = getattr(uploaded_file, 'name', '') or ''
+        file_size = getattr(uploaded_file, 'size', 0) or 0
+
+        is_valid, err_msg = validate_file_upload(
+            raw_name,
+            file_size,
+            allowed_extensions=cls.ALLOWED_EXTENSIONS,
+            max_size_mb=cls.MAX_SIZE_MB,
+        )
+        if not is_valid:
+            raise TaskServiceException(err_msg or "Tệp văn bản đính kèm không hợp lệ.")
+
+        base_name = os.path.basename(raw_name).strip()
+        stem, ext = os.path.splitext(base_name)
+        safe_stem = re.sub(r'[^A-Za-z0-9._-]+', '_', stem).strip('._') or 'van_ban'
+        disk_filename = f"{uuid.uuid4().hex[:8]}_{safe_stem}{ext.lower()}"
+
+        upload_dir = Path(settings.MEDIA_ROOT) / cls.SUBDIR
+        upload_dir.mkdir(parents=True, exist_ok=True)
+        dest_path = upload_dir / disk_filename
+
+        with open(dest_path, 'wb+') as destination:
+            for chunk in uploaded_file.chunks():
+                destination.write(chunk)
+
+        media_prefix = settings.MEDIA_URL.rstrip('/')
+        return f"{media_prefix}/{cls.SUBDIR}/{disk_filename}", base_name[:255]
+
+    @classmethod
+    def normalize_existing_attachment(
+        cls,
+        tep_dinh_kem: Optional[str],
+        ten_tep_dinh_kem: Optional[str] = None,
+    ) -> Tuple[Optional[str], Optional[str]]:
+        """Chuẩn hóa đường dẫn đính kèm có sẵn trong kho hệ thống (từ MEDIA_ROOT hoặc /api/ho-so/van-ban/...)."""
+        raw = (tep_dinh_kem or '').strip()
+        if not raw:
+            return None, None
+
+        archival_id = cls.parse_archival_ref(raw)
+        if archival_id is not None:
+            display = sanitize_input_text(ten_tep_dinh_kem)[:255] if ten_tep_dinh_kem else f"van_ban_{archival_id}.doc"
+            return raw, display
+
+        disk_path = cls.resolve_media_path(raw)
+        if disk_path is not None:
+            media_root = Path(settings.MEDIA_ROOT).resolve()
+            rel = disk_path.relative_to(media_root).as_posix()
+            media_url = f"{settings.MEDIA_URL.rstrip('/')}/{rel}"
+            display = sanitize_input_text(ten_tep_dinh_kem)[:255] if ten_tep_dinh_kem else disk_path.name
+            return media_url, display
+
+        raise TaskServiceException("Đường dẫn tệp văn bản đính kèm không hợp lệ hoặc không tồn tại.")
+
+    @classmethod
+    def get_suggested_documents(cls, limit: int = 30) -> List[Dict[str, Any]]:
+        """Lấy danh sách văn bản hiện có trong hệ thống để gợi ý đính kèm nhanh khi giao việc."""
+        from ho_so.models import VanBanBanHanh
+        from ho_so.services import ArchivalDocumentService
+        from van_ban.models import VanBanDen
+
+        suggestions: List[Dict[str, Any]] = []
+        seen_numbers = set()
+
+        ban_hanh_docs = list(
+            VanBanBanHanh.objects.all().order_by('-tep_dinh_kem', '-ngay_ban_hanh', 'van_ban_id')[:limit]
+        )
+        for doc in ban_hanh_docs:
+            media_url, disk_path, is_pdf = ArchivalDocumentService.resolve_attachment(doc.tep_dinh_kem)
+            ngay_str = doc.ngay_ban_hanh.strftime('%Y-%m-%d') if doc.ngay_ban_hanh else ''
+            ten_tep = (
+                disk_path.name
+                if disk_path is not None
+                else ArchivalDocumentService.safe_download_filename(doc.so_ky_hieu, 'doc')
+            )
+            tep_path = media_url if disk_path is not None else f'/api/ho-so/van-ban/{doc.van_ban_id}/xem-truoc'
+            key = (doc.so_ky_hieu or '').strip().lower()
+            if key:
+                seen_numbers.add(key)
+            suggestions.append({
+                'source': 'BAN_HANH',
+                'so_ky_hieu': doc.so_ky_hieu or '',
+                'ngay_van_ban': ngay_str,
+                'trich_yeu': doc.trich_yeu or '',
+                'loai_van_ban': doc.loai_van_ban or 'Văn bản',
+                'tep_dinh_kem': tep_path,
+                'ten_tep_dinh_kem': ten_tep,
+                'co_file_pdf': bool(is_pdf),
+                'label': f"{doc.so_ky_hieu} — {(doc.trich_yeu or '')[:90]}",
+            })
+
+        remaining = max(0, limit - len(suggestions))
+        if remaining > 0:
+            for vb_den in VanBanDen.objects.all().order_by('-ngay_ban_hanh', '-van_ban_id')[:remaining]:
+                key = (vb_den.so_ky_hieu or '').strip().lower()
+                if key and key in seen_numbers:
+                    continue
+                ngay_str = vb_den.ngay_ban_hanh.strftime('%Y-%m-%d') if vb_den.ngay_ban_hanh else ''
+                suggestions.append({
+                    'source': 'VAN_BAN_DEN',
+                    'so_ky_hieu': vb_den.so_ky_hieu or '',
+                    'ngay_van_ban': ngay_str,
+                    'trich_yeu': vb_den.trich_yeu or '',
+                    'loai_van_ban': vb_den.loai_van_ban or 'Văn bản đến',
+                    'tep_dinh_kem': '',
+                    'ten_tep_dinh_kem': '',
+                    'co_file_pdf': False,
+                    'label': f"{vb_den.so_ky_hieu} — {(vb_den.trich_yeu or '')[:90]}",
+                })
+
+        return suggestions
 
 
 class TaskDispatchService:
@@ -42,7 +219,10 @@ class TaskDispatchService:
         noi_dung: Optional[str] = None,
         do_uu_tien: str = MucDoUuTien.TRUNG_BINH,
         so_ky_hieu_vb: Optional[str] = None,
-        trich_yeu_vb: Optional[str] = None
+        trich_yeu_vb: Optional[str] = None,
+        ngay_van_ban: Optional[date] = None,
+        tep_dinh_kem: Optional[str] = None,
+        ten_tep_dinh_kem: Optional[str] = None,
     ) -> CongViec:
         """
         Giao một công việc / nhiệm vụ mới cho cán bộ thụ lý.
@@ -67,16 +247,20 @@ class TaskDispatchService:
             tien_do=0,
             trang_thai=TrangThaiCongViec.CHUA_THUC_HIEN,
             so_ky_hieu_vb=so_ky_hieu_vb.strip() if so_ky_hieu_vb else None,
-            trich_yeu_vb=sanitize_input_text(trich_yeu_vb) if trich_yeu_vb else None
+            ngay_van_ban=ngay_van_ban,
+            trich_yeu_vb=sanitize_input_text(trich_yeu_vb) if trich_yeu_vb else None,
+            tep_dinh_kem=tep_dinh_kem or None,
+            ten_tep_dinh_kem=ten_tep_dinh_kem or None,
         )
 
         # Ghi nhật ký khởi tạo công việc
+        attach_note = f" (Đính kèm: {ten_tep_dinh_kem})" if ten_tep_dinh_kem else ""
         NhatKyCongViec.objects.create(
             cong_viec=task,
             nguoi_cap_nhat=creator,
             tien_do_cu=0,
             tien_do_moi=0,
-            noi_dung_ghi_chu=f"Giao nhiệm vụ mới cho đồng chí {assignee.ho_va_ten} (Hạn: {han_hoan_thanh.strftime('%d/%m/%Y')})"
+            noi_dung_ghi_chu=f"Giao nhiệm vụ mới cho đồng chí {assignee.ho_va_ten} (Hạn: {han_hoan_thanh.strftime('%d/%m/%Y')}){attach_note}"
         )
 
         return task
