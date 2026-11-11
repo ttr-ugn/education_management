@@ -49,16 +49,18 @@ class VanBanDi(models.Model):
         return f"{self.so_ky_hieu or 'Dự thảo'} - {self.trich_yeu[:40]}"
 
     def to_dict(self):
+        author_name = self.nguoi_soan.ho_va_ten if self.nguoi_soan else 'Nguyễn Văn Nam'
         return {
             'van_ban_id': self.van_ban_id,
             'so_ky_hieu': self.so_ky_hieu or '',
             'trich_yeu': self.trich_yeu,
             'loai_van_ban': self.loai_van_ban,
             'do_khan': self.do_khan,
-            'don_vi_soan_thao': self.don_vi_soan_thao,
+            'don_vi_soan_thao': self.don_vi_soan_thao or 'Phòng Giáo dục Trung học',
             'noi_nhan': self.noi_nhan,
             'trang_thai': self.trang_thai,
-            'nguoi_soan_ten': self.nguoi_soan.ho_va_ten if self.nguoi_soan else '',
+            'nguoi_soan_ten': author_name,
+            'nguoi_soan_thao': author_name,
             'lanh_dao_ky_ten': self.lanh_dao_ky_ten or '',
             'ngay_tao': self.ngay_tao.strftime('%Y-%m-%d %H:%M:%S') if self.ngay_tao else '',
         }
