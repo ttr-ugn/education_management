@@ -135,4 +135,18 @@ Leader đã chuẩn bị khung kiến trúc hoàn chỉnh. Các thành viên nh�
 
 ## 6. KIỂM TRA CƠ SỞ DỮ LIỆU
 1. Tải và cài đặt phần mềm miễn phí: [DB Browser for SQLite](https://sqlitebrowser.org/).
-2. Mở file `database/qlvb.db` để trực tiếp xem và kiểm tra dữ liệu bảng `nguoi_dung`.
+2. Mở file `database/qlvb.db` (hoặc `db.sqlite3` trên phiên bản Django hiện tại) để trực tiếp xem và kiểm tra dữ liệu bảng `nguoi_dung`, `mau_van_ban`, `van_ban_di`, `van_ban_den`.
+
+---
+
+## 7. CẬP NHẬT KIẾN TRÚC DJANGO & TRỢ LÝ ẢO AI TRA CỨU KHO LƯU TRỮ
+- **Khởi chạy máy chủ phát triển Django:**
+  ```bash
+  python manage.py runserver 8000
+  ```
+  Truy cập giao diện chính tại: `http://127.0.0.1:8000/pages/chatbot.html`.
+- **Trợ lý ảo & Kho lưu trữ văn bản điều hành (`/pages/chatbot.html`):**
+  - Hỗ trợ tìm kiếm nội dung trong kho lưu trữ (`MauVanBan`, `VanBanDi`, `VanBanDen`) theo từ khóa hoặc số hiệu văn bản.
+  - Đề xuất danh sách thẻ tài liệu liên quan và mở hộp thoại **Xem trước chuẩn A4** (kèm nhúng PDF gốc từ `media/van_ban_dieu_hanh/` và tải xuống `.doc`/`.pdf`).
+  - Hỗ trợ tải lên bổ sung văn bản mới qua API `/api/chatbot/upload`.
+
