@@ -25,11 +25,17 @@ class MauVanBan(models.Model):
     def to_dict(self):
         return {
             'mau_id': self.mau_id,
+            'id': self.mau_id,
             'ma_mau': self.ma_mau,
             'ten_mau': self.ten_mau,
             'loai_van_ban': self.loai_van_ban,
             'linh_vuc': self.linh_vuc,
+            'tham_quyen_ky': 'Giám đốc Sở' if self.loai_van_ban in ('Quyết định', 'Kế hoạch') else ('Trưởng phòng' if self.loai_van_ban == 'Tờ trình' else 'Lãnh đạo Sở'),
+            'mo_ta': f"Mẫu {self.loai_van_ban.lower()} chuẩn thể thức Nghị định 30/2020/NĐ-CP - Lĩnh vực {self.linh_vuc}.",
             'noi_dung_html': self.noi_dung_html,
+            'noi_dung_text': self.noi_dung_text,
+            'luot_xem': self.luot_xem,
+            'luot_tai': self.luot_tai,
         }
 
 class LichSuChat(models.Model):

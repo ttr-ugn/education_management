@@ -54,24 +54,25 @@ document.addEventListener('DOMContentLoaded', async () => {
         let html = '<div class="template-card-deck">';
         templates.forEach(t => {
           const badgeClass = getBadgeClass(t.loai_van_ban);
+          const loaiTep = t.loai_tep || 'mau';
           const downloadUrl = `/api/chatbot/mau-van-ban/${t.mau_id}/tai-ve`;
 
           html += `
-            <div class="template-card">
+            <div class="template-card" style="cursor: pointer;" onclick="if (!event.target.closest('a')) window.showPreviewModal(${t.mau_id}, '${loaiTep}')" title="Nhấn vào thẻ để xem trước file">
               <div>
                 <div class="template-card-header">
                   <span class="template-badge ${badgeClass}">${t.loai_van_ban}</span>
-                  <span class="template-code">${t.ma_mau}</span>
+                  <span class="template-code">${t.ma_mau || ''}</span>
                 </div>
                 <div class="template-title">${t.ten_mau}</div>
-                <div class="template-field">📂 ${t.linh_vuc} | ✍️ ${t.tham_quyen_ky || 'Lãnh đạo Sở'}</div>
+                <div class="template-field">📂 ${t.linh_vuc || 'Sở GD&ĐT'} | ✍️ ${t.tham_quyen_ky || 'Lãnh đạo Sở'}</div>
                 <div class="template-desc">${t.mo_ta || ''}</div>
               </div>
               <div class="template-actions">
-                <button type="button" class="btn-preview" onclick="window.showPreviewModal(${t.mau_id})">
+                <button type="button" class="btn-preview" onclick="event.stopPropagation(); window.showPreviewModal(${t.mau_id}, '${loaiTep}')">
                   <span>👁️ Xem trước (Preview)</span>
                 </button>
-                <a href="${downloadUrl}" class="btn-download-doc" download title="Tải file Word mẫu">
+                <a href="${downloadUrl}" class="btn-download-doc" download title="Tải file Word mẫu" onclick="event.stopPropagation();">
                   <span>📥 Tải Word (.doc)</span>
                 </a>
               </div>
@@ -140,9 +141,13 @@ document.addEventListener('DOMContentLoaded', async () => {
           if (indicator) indicator.remove();
 
           if (res.thanh_cong) {
-            appendMessage('Trợ lý ảo', res.cau_tra_loi, false, res.mau_de_xuat);
-            if (res.goi_y_tiep_theo) {
-              updateQuickChips(res.goi_y_tiep_theo);
+            const data = res.du_lieu || res;
+            const answer = data.cau_tra_loi || data.tra_loi || res.cau_tra_loi || res.tra_loi || '';
+            const templates = data.mau_de_xuat || res.mau_de_xuat || [];
+            appendMessage('Trợ lý ảo', answer, false, templates);
+            const chips = data.goi_y_tiep_theo || res.goi_y_tiep_theo;
+            if (chips && chips.length > 0) {
+              updateQuickChips(chips);
             }
           } else {
             appendMessage('Trợ lý ảo', res.thong_bao || 'Rất tiếc, đã có lỗi xảy ra.', false);
@@ -161,20 +166,39 @@ document.addEventListener('DOMContentLoaded', async () => {
       // ===================================================================
       // XỬ LÝ XEM TRƯỚC VĂN BẢN (MODAL PREVIEW A4)
       // ===================================================================
-      window.showPreviewModal = async function(mauId) {
-        printableArea.innerHTML = '<div style="text-align:center; padding: 40px; color: #64748b;">Đang tải nội dung văn bản...</div>';
+      window.showPreviewModal = async function(itemId, loaiTep = 'mau') {
+        printableArea.innerHTML = '<div style="text-align:center; padding: 40px; color: #64748b;">Đang tải bản xem trước văn bản...</div>';
         previewModalTitle.textContent = 'Đang tải...';
         previewModal.classList.add('active');
         currentZoom = 1.0;
         printableArea.style.transform = `scale(${currentZoom})`;
 
         try {
-          const res = await window.api.get(`/api/chatbot/mau-van-ban/${mauId}`);
-          if (res.thanh_cong && res.mau) {
-            currentLoadedMau = res.mau;
-            previewModalTitle.textContent = `${res.mau.ma_mau} - ${res.mau.ten_mau}`;
-            printableArea.innerHTML = res.mau.noi_dung_html;
-            btnDownloadFromPreview.href = `/api/chatbot/mau-van-ban/${mauId}/tai-ve`;
+          let res;
+          if (loaiTep && loaiTep !== 'mau' && loaiTep !== 'mau_van_ban') {
+            res = await window.api.get(`/api/chatbot/xem-truoc/${loaiTep}/${itemId}`);
+            if (res.thanh_cong) {
+              previewModalTitle.textContent = res.tieu_de || 'Xem trước văn bản';
+              printableArea.innerHTML = res.noi_dung_html;
+              if (res.download_url) {
+                btnDownloadFromPreview.href = res.download_url;
+                btnDownloadFromPreview.style.display = 'inline-flex';
+              } else {
+                btnDownloadFromPreview.style.display = 'none';
+              }
+              currentLoadedMau = { noi_dung_text: printableArea.innerText };
+              return;
+            }
+          }
+
+          res = await window.api.get(`/api/chatbot/mau-van-ban/${itemId}`);
+          if (res.thanh_cong && (res.mau || res.du_lieu)) {
+            const mau = res.mau || res.du_lieu;
+            currentLoadedMau = mau;
+            previewModalTitle.textContent = `${mau.ma_mau} - ${mau.ten_mau}`;
+            printableArea.innerHTML = mau.noi_dung_html;
+            btnDownloadFromPreview.href = `/api/chatbot/mau-van-ban/${itemId}/tai-ve`;
+            btnDownloadFromPreview.style.display = 'inline-flex';
           } else {
             printableArea.innerHTML = '<div style="color:red; text-align:center; padding: 30px;">Không thể tải dữ liệu mẫu văn bản này.</div>';
           }
@@ -265,7 +289,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           const downloadUrl = `/api/chatbot/mau-van-ban/${t.mau_id}/tai-ve`;
 
           html += `
-            <div class="template-card">
+            <div class="template-card" style="cursor: pointer;" onclick="if (!event.target.closest('a')) window.showPreviewModal(${t.mau_id}, 'mau')" title="Nhấn vào thẻ để xem trước file">
               <div>
                 <div class="template-card-header">
                   <span class="template-badge ${badgeClass}">${t.loai_van_ban}</span>
@@ -276,10 +300,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <div class="template-desc">${t.mo_ta || ''}</div>
               </div>
               <div class="template-actions">
-                <button type="button" class="btn-preview" onclick="window.showPreviewModal(${t.mau_id})">
+                <button type="button" class="btn-preview" onclick="event.stopPropagation(); window.showPreviewModal(${t.mau_id}, 'mau')">
                   <span>👁️ Xem trước</span>
                 </button>
-                <a href="${downloadUrl}" class="btn-download-doc" download title="Tải file Word mẫu">
+                <a href="${downloadUrl}" class="btn-download-doc" download title="Tải file Word mẫu" onclick="event.stopPropagation();">
                   <span>📥 Tải Word</span>
                 </a>
               </div>

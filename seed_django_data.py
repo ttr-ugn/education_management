@@ -1069,8 +1069,14 @@ def seed():
         tb.save()
     print(f"[OK] Đã nạp {ThongBao.objects.count()} Thông báo cơ quan.")
 
-    # 8. MẪU VĂN BẢN CHATBOT (Giữ nguyên theo yêu cầu)
-    print(f"[OK] Giữ nguyên {MauVanBan.objects.count()} Mẫu văn bản Chatbot theo yêu cầu.")
+    # 8. MẪU VĂN BẢN CHATBOT (Khởi tạo chuẩn Nghị định 30 nếu chưa có)
+    if MauVanBan.objects.count() == 0:
+        try:
+            import subprocess
+            subprocess.run(["python", "seed_mau_van_ban.py"], check=True)
+        except Exception:
+            pass
+    print(f"[OK] Đã sẵn sàng {MauVanBan.objects.count()} Mẫu văn bản Chatbot.")
 
     print("=" * 70)
     print("✅ HOÀN TẤT NẠP TOÀN BỘ 100% DỮ LIỆU MẪU ĐỒNG BỘ!")

@@ -125,6 +125,10 @@ urlpatterns = [
     # Chatbot & Mẫu văn bản
     path('api/chatbot', cb_views.api_hoi_dap, name='api_chatbot'),
     path('api/chatbot/hoi-dap', cb_views.api_hoi_dap, name='api_chatbot_hoi_dap'),
+    path('api/chatbot/kho-mau', cb_views.api_kho_mau, name='api_chatbot_kho_mau'),
+    path('api/chatbot/mau-van-ban/<int:mau_id>', cb_views.api_mau_van_ban_detail, name='api_chatbot_mau_detail'),
+    path('api/chatbot/mau-van-ban/<int:mau_id>/tai-ve', cb_views.api_mau_van_ban_tai_ve, name='api_chatbot_mau_tai_ve'),
+    path('api/chatbot/xem-truoc/<str:loai>/<int:item_id>', cb_views.api_xem_truoc_tai_lieu, name='api_chatbot_xem_truoc'),
 
     # Báo cáo Thống kê tổng hợp điều hành văn bản
     path('api/thong-ke', api_thong_ke, name='api_thong_ke'),
