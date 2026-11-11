@@ -6,8 +6,8 @@
   <title>Cấp số & Ban hành văn bản đi - Quản lý văn bản Sở GD&ĐT Đà Nẵng</title>
   <link rel="icon" type="image/svg+xml" href="../../assets/logo-sodad.svg">
   <link rel="stylesheet" href="../../css/base.css">
-  <link rel="stylesheet" href="../../css/layout.css?v=20261111_09">
-  <link rel="stylesheet" href="../../css/components.css?v=20261111_09">
+  <link rel="stylesheet" href="../../css/layout.css?v=20261111_10">
+  <link rel="stylesheet" href="../../css/components.css?v=20261111_10">
 </head>
 <body>
   <div class="app-wrapper">
@@ -243,39 +243,6 @@
           tbody.innerHTML = `<tr><td colspan="5" class="text-center p-4 text-danger">⚠️ Lỗi nạp dữ liệu: ${err.message}</td></tr>`;
         }
       }
-
-      document.getElementById('btnConfirmPublish').addEventListener('click', async () => {
-        if (!currentPublishDocId) return;
-        const soKyHieu = document.getElementById('modalSoKyHieu').value.trim();
-        const ngayBanHanh = document.getElementById('modalNgayBanHanh').value;
-        const hoSoId = document.getElementById('modalHoSoSelect').value;
-
-        if (!soKyHieu) {
-          window.Toast.error('Vui lòng nhập số ký hiệu chính thức.');
-          return;
-        }
-
-        try {
-          await window.vanBanDiService.publish(currentPublishDocId, {
-            so_ky_hieu: soKyHieu,
-            ngay_ban_hanh: ngayBanHanh,
-            ho_so_id: hoSoId ? parseInt(hoSoId) : null
-          });
-          window.Toast.success(`Đã ban hành văn bản chính thức với số: ${soKyHieu}!`);
-          closePublishModal();
-          loadData();
-        } catch (err) {
-          window.Toast.error(err.message || 'Lỗi ban hành văn bản');
-        }
-      });
-
-      // Phím ESC đóng modal
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') closePublishModal();
-      });
-
-      loadData();
-    });
 
       document.getElementById('btnConfirmPublish').addEventListener('click', async () => {
         if (!currentPublishDocId) return;
