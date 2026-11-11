@@ -707,7 +707,13 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="../../js/mock/du-lieu-cong-viec.js?v=20261111_16"></script>
-
-<script src="/static/js/cong_viec_danh_sach.js"></script>
+<!-- Nạp thư viện Chart.js vẽ biểu đồ (hỗ trợ offline cục bộ & CDN dự phòng) -->
+<script src="/static/libs/chart.min.js"></script>
+<script>
+  if (typeof Chart === 'undefined') {
+    document.write('<script src="https://cdn.jsdelivr.net/npm/chart.js"><\/script>');
+  }
+</script>
+<script src="/js/mock/du-lieu-cong-viec.js?v=20261111_22"></script>
+<script src="/static/js/cong_viec_danh_sach.js?v=20261111_22"></script>
 {% endblock %}

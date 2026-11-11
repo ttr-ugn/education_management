@@ -7,17 +7,26 @@ from django.db.models import Q, Count
 from .models import CongViec, NhatKyCongViec
 from authentication.models import NguoiDung
 
+
 def danh_sach_cong_viec(request):
+    """Trang giao diện Theo dõi tiến độ & Điều hành công việc."""
     return render(request, 'cong_viec/danh-sach.html')
 
+
 def giao_viec(request):
+    """Trang giao nhiệm vụ mới."""
     return render(request, 'cong_viec/giao-viec.html')
 
+
 def xu_ly_cong_viec(request):
+    """Trang xử lý / cập nhật tiến độ công việc."""
     return render(request, 'cong_viec/xu-ly.html')
 
+
 def phe_duyet_ket_qua(request):
+    """Trang nghiệm thu, đánh giá kết quả công việc."""
     return render(request, 'cong_viec/phe-duyet-ket-qua.html')
+
 
 # ==============================================================================
 # API CÔNG VIỆC
@@ -84,6 +93,7 @@ def api_cong_viec_list(request):
 
     return JsonResponse({'thanh_cong': False, 'thong_bao': 'Phương thức không hỗ trợ'}, status=405)
 
+
 @csrf_exempt
 def api_cong_viec_detail(request, cong_viec_id):
     """Chi tiết hoặc xóa công việc."""
@@ -100,6 +110,7 @@ def api_cong_viec_detail(request, cong_viec_id):
 
     return JsonResponse({'thanh_cong': False, 'thong_bao': 'Phương thức không hỗ trợ'}, status=405)
 
+
 @csrf_exempt
 def api_cong_viec_tien_do(request, cong_viec_id):
     """Cập nhật tiến độ công việc."""
@@ -114,33 +125,36 @@ def api_cong_viec_tien_do(request, cong_viec_id):
         data = request.POST
 
     tien_do_cu = cv.tien_do
-    tien_do = int(data.get('tien_do', cv.tien_do))
-    cv.tien_do = tien_do
-    ghi_chu = data.get('bao_cao') or data.get('ket_qua_bao_cao', '')
+    tien_do_moi = int(data.get('tien_do', tien_do_cu))
+    ghi_chu = data.get('ghi_chu', data.get('bao_cao_noi_dung', ''))
+    tep_dinh_kem = data.get('tep_dinh_kem')
+
+    cv.tien_do = tien_do_moi
     if ghi_chu:
         cv.ket_qua_bao_cao = ghi_chu
-    if data.get('tep_dinh_kem_ket_qua'):
-        cv.tep_dinh_kem_ket_qua = data.get('tep_dinh_kem_ket_qua')
+    if tep_dinh_kem:
+        cv.tep_dinh_kem_ket_qua = tep_dinh_kem
 
-    if tien_do >= 100:
+    if tien_do_moi == 100:
         cv.trang_thai = 'CHO_DANH_GIA'
-    elif tien_do > 0:
+    elif tien_do_moi > 0:
         cv.trang_thai = 'DANG_THUC_HIEN'
 
     cv.save()
 
-    # Ghi nhận lịch sử vào NhatKyCongViec
+    # Ghi nhật ký
     user_id = request.session.get('user_id')
     user = NguoiDung.objects.filter(pk=user_id).first() if user_id else cv.nguoi_xu_ly
     NhatKyCongViec.objects.create(
         cong_viec=cv,
         nguoi_cap_nhat=user,
         tien_do_cu=tien_do_cu,
-        tien_do_moi=tien_do,
-        noi_dung_ghi_chu=ghi_chu or f'Cập nhật tiến độ hoàn thành {tien_do}%'
+        tien_do_moi=tien_do_moi,
+        noi_dung_ghi_chu=ghi_chu or f"Cập nhật tiến độ từ {tien_do_cu}% lên {tien_do_moi}%"
     )
 
     return JsonResponse({'thanh_cong': True, 'thong_bao': 'Cập nhật tiến độ thành công!'})
+
 
 @csrf_exempt
 def api_cong_viec_danh_gia(request, cong_viec_id):
@@ -174,6 +188,7 @@ def api_cong_viec_danh_gia(request, cong_viec_id):
     )
 
     return JsonResponse({'thanh_cong': True, 'thong_bao': 'Đã nghiệm thu kết quả công việc thành công!'})
+
 
 @csrf_exempt
 def api_cong_viec_thong_ke(request):
