@@ -1,11 +1,20 @@
 /**
- * API.JS - FETCH WRAPPER CHUẨN CHO BACKEND FLASK
- * Hỗ trợ credentials (session cookie), xử lý mã lỗi HTTP và JSON trả về.
+ * API.JS - FETCH WRAPPER CHUẨN CHO BACKEND HỆ THỐNG
+ * Hỗ trợ credentials (session cookie), xử lý mã lỗi HTTP, JSON trả về và CORS đa nguồn.
  */
 
 (function (window) {
-  // Tự động nhận diện host: nếu chạy cùng port hoặc khác port (Live Server)
-  const API_BASE = ''; // Tu dong nhan dien origin theo port hien tai
+  // Tự động nhận diện host:
+  // - Nếu chạy cùng port 8000 (Django): dùng relative ''
+  // - Nếu chạy từ PyCharm (63342), Live Server (5500), file:/// hoặc port khác: tự động kết nối http://127.0.0.1:8000
+  let API_BASE = '';
+  if (typeof window !== 'undefined' && window.location) {
+    const origin = window.location.origin || '';
+    const protocol = window.location.protocol || '';
+    if (protocol === 'file:' || (!origin.includes(':8000') && !origin.includes('localhost:8000') && !origin.includes('127.0.0.1:8000'))) {
+      API_BASE = 'http://127.0.0.1:8000';
+    }
+  }
 
   async function request(endpoint, options = {}) {
     const url = endpoint.startsWith('http') ? endpoint : `${API_BASE}${endpoint}`;

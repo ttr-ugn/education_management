@@ -112,7 +112,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Xử lý thông báo theo từng trạng thái cụ thể
       if (status === 423) {
-        // Tài khoản bị tạm khóa 15 phút do nhập sai 5 lần
         showAlert(errorMsg, 'warning', '🔒');
       } else if (status === 403) {
         if (errorMsg.includes('chờ Văn thư')) {
@@ -124,6 +123,8 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
           showAlert(errorMsg, 'danger', '⚠');
         }
+      } else if (errorMsg.includes('Failed to fetch') || err.name === 'TypeError') {
+        showAlert('Không thể kết nối đến máy chủ Django backend. Hãy truy cập đúng http://127.0.0.1:8000 và bấm Ctrl + F5 để làm mới bộ nhớ đệm.', 'danger', '⚠');
       } else {
         showAlert(errorMsg, 'danger', '⚠');
       }

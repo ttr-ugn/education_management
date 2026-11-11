@@ -67,18 +67,62 @@ urlpatterns = [
     path('pages/ho-so/them-sua.html', hs_views.them_sua_ho_so),
 
     # 5. API Endpoints (tương thích 100% với Frontend Fetch)
+    # Xác thực & Người dùng
     path('api/auth/login', auth_views.api_login, name='api_auth_login'),
     path('api/auth/dang-nhap', auth_views.api_login, name='api_auth_dang_nhap'),
     path('api/auth/me', auth_views.api_me, name='api_auth_me'),
     path('api/auth/toi', auth_views.api_me, name='api_auth_toi'),
     path('api/auth/logout', auth_views.api_logout, name='api_auth_logout'),
     path('api/auth/dang-xuat', auth_views.api_logout, name='api_auth_dang_xuat'),
+    path('api/auth/register', auth_views.api_register, name='api_auth_register'),
+    path('api/auth/dang-ky', auth_views.api_register, name='api_auth_dang_ky'),
+    path('api/auth/doi-mat-khau', auth_views.api_doi_mat_khau, name='api_auth_doi_mat_khau'),
     path('api/users', auth_views.api_users_list, name='api_users'),
+    path('api/users/<int:user_id>/duyet', auth_views.api_user_duyet, name='api_user_duyet'),
+    path('api/users/<int:user_id>/tu-choi', auth_views.api_user_tu_choi, name='api_user_tu_choi'),
+    path('api/users/<int:user_id>/khoa', auth_views.api_user_khoa, name='api_user_khoa'),
+    path('api/users/<int:user_id>/mo-khoa', auth_views.api_user_mo_khoa, name='api_user_mo_khoa'),
+    path('api/users/<int:user_id>/dat-lai-mat-khau', auth_views.api_user_dat_lai_mat_khau, name='api_user_dat_lai_mat_khau'),
+    path('api/users/lanh-dao', auth_views.api_user_tao_lanh_dao, name='api_user_tao_lanh_dao'),
+
+    # Văn bản đi
     path('api/van-ban-di', vb_views.api_van_ban_di_list, name='api_van_ban_di'),
+    path('api/van-ban-di/', vb_views.api_van_ban_di_list, name='api_van_ban_di_slash'),
+    path('api/van-ban-di/<int:van_ban_id>', vb_views.api_van_ban_di_detail, name='api_van_ban_di_detail'),
+    path('api/van-ban-di/<int:van_ban_id>/trang-thai', vb_views.api_van_ban_di_trang_thai, name='api_van_ban_di_trang_thai'),
+
+    # Văn bản đến
     path('api/van-ban-den', vb_views.api_van_ban_den_list, name='api_van_ban_den'),
+    path('api/van-ban-den/<int:van_ban_id>', vb_views.api_van_ban_den_detail, name='api_van_ban_den_detail'),
+    path('api/van-ban-den/<int:van_ban_id>/phan-cong', vb_views.api_van_ban_den_phan_cong, name='api_van_ban_den_phan_cong'),
+
+    # Công việc
     path('api/cong-viec', cv_views.api_cong_viec_list, name='api_cong_viec'),
+    path('api/cong-viec/<int:cong_viec_id>', cv_views.api_cong_viec_detail, name='api_cong_viec_detail'),
+    path('api/cong-viec/<int:cong_viec_id>/tien-do', cv_views.api_cong_viec_tien_do, name='api_cong_viec_tien_do'),
+    path('api/cong-viec/<int:cong_viec_id>/danh-gia', cv_views.api_cong_viec_danh_gia, name='api_cong_viec_danh_gia'),
+    path('api/cong-viec/thong-ke', cv_views.api_cong_viec_thong_ke, name='api_cong_viec_thong_ke'),
+
+    # Hồ sơ lưu trữ
     path('api/ho-so', hs_views.api_ho_so_list, name='api_ho_so'),
+    path('api/ho-so/<int:ho_so_id>', hs_views.api_ho_so_detail, name='api_ho_so_detail'),
+    path('api/ho-so/<int:ho_so_id>/van-ban', hs_views.api_ho_so_van_ban, name='api_ho_so_van_ban'),
+    path('api/ho-so/<int:ho_so_id>/van-ban-kha-dung', hs_views.api_ho_so_van_ban_kha_dung, name='api_ho_so_van_ban_kha_dung'),
+    path('api/ho-so/<int:ho_so_id>/them-van-ban', hs_views.api_ho_so_them_van_ban, name='api_ho_so_them_van_ban'),
+    path('api/ho-so/<int:ho_so_id>/xoa-van-ban', hs_views.api_ho_so_xoa_van_ban, name='api_ho_so_xoa_van_ban'),
+    path('api/ho-so/<int:ho_so_id>/nop-luu-tru', hs_views.api_ho_so_nop_luu_tru, name='api_ho_so_nop_luu_tru'),
+    path('api/ho-so/<int:ho_so_id>/dong', hs_views.api_ho_so_dong, name='api_ho_so_dong'),
+
+    # Thông báo & Nhắc nhở
     path('api/thong-bao', tb_views.api_thong_bao_list, name='api_thong_bao'),
+    path('api/thong-bao/<int:thong_bao_id>', tb_views.api_thong_bao_detail, name='api_thong_bao_detail'),
+    path('api/thong-bao/<int:thong_bao_id>/da-doc', tb_views.api_thong_bao_da_doc, name='api_thong_bao_da_doc'),
+    path('api/thong-bao/dem-chua-doc', tb_views.api_thong_bao_dem_chua_doc, name='api_thong_bao_dem_chua_doc'),
+    path('api/thong-bao/doc-tat-ca', tb_views.api_thong_bao_doc_tat_ca, name='api_thong_bao_doc_tat_ca'),
+    path('api/thong-bao/kiem-tra-den-han', tb_views.api_thong_bao_kiem_tra_den_han, name='api_thong_bao_kiem_tra_den_han'),
+
+    # Chatbot & Mẫu văn bản
+    path('api/chatbot', cb_views.api_hoi_dap, name='api_chatbot'),
     path('api/chatbot/hoi-dap', cb_views.api_hoi_dap, name='api_chatbot_hoi_dap'),
 
     # 6. Phục vụ static assets (CSS, JS, Assets)
