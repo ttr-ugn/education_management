@@ -266,6 +266,8 @@ def api_cong_viec_thong_ke(request):
         'du_lieu': {
             'tong_so': tong_so,
             'theo_trang_thai': theo_trang_thai,
+            'hoan_thanh': theo_trang_thai['HOAN_THANH'],
+            'da_hoan_thanh': theo_trang_thai['HOAN_THANH'],
             'ty_le_dung_han': ty_le_dung_han,
             'chart_doughnut': chart_doughnut,
             'chart_bar': chart_bar

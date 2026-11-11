@@ -110,7 +110,12 @@ document.addEventListener('DOMContentLoaded', async () => {
           document.getElementById('statDangLam').innerText = stats.theo_trang_thai?.DANG_THUC_HIEN || 0;
           document.getElementById('statChoDuyet').innerText = stats.theo_trang_thai?.CHO_DANH_GIA || 0;
           document.getElementById('statQuaHan').innerText = stats.theo_trang_thai?.QUA_HAN || 0;
-          document.getElementById('statTyLeDungHan').innerText = `${stats.ty_le_dung_han !== undefined ? stats.ty_le_dung_han : 0}%`;
+          const elHoanThanh = document.getElementById('statHoanThanh');
+          if (elHoanThanh) {
+            elHoanThanh.innerText = stats.theo_trang_thai?.HOAN_THANH ?? stats.da_hoan_thanh ?? 0;
+          } else if (document.getElementById('statTyLeDungHan')) {
+            document.getElementById('statTyLeDungHan').innerText = `${stats.ty_le_dung_han !== undefined ? stats.ty_le_dung_han : 0}%`;
+          }
 
           // Render Biểu đồ tròn (Doughnut) hiện đại
           if (typeof Chart !== 'undefined' && stats.chart_doughnut && stats.chart_doughnut.labels) {
