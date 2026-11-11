@@ -3,9 +3,14 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import MauVanBan, LichSuChat
+from .services import ChatbotNLPService
+from authentication.models import NguoiDung
+
 
 def trang_chatbot(request):
+    """Trang giao diện Trợ lý ảo AI tư vấn văn bản điều hành."""
     return render(request, 'chatbot/chatbot.html')
+
 
 @csrf_exempt
 def api_hoi_dap(request):
@@ -18,24 +23,18 @@ def api_hoi_dap(request):
 
         question = data.get('cau_hoi') or data.get('tin_nhan') or data.get('query') or ''
 
-        # Tìm kiếm mẫu văn bản phù hợp theo từ khóa
-        matches = []
-        if question:
-            matches = list(MauVanBan.objects.filter(ten_mau__icontains=question)[:3])
-        if not matches:
-            matches = list(MauVanBan.objects.all()[:3])
+        user_id = request.session.get('user_id')
+        user = NguoiDung.objects.filter(pk=user_id).first() if user_id else None
 
-        tra_loi = (
-            f"Trợ lý ảo Sở GD&ĐT TP. Đà Nẵng: Tôi đã tìm thấy {len(matches)} mẫu văn bản hành chính "
-            f"phù hợp với yêu cầu: \"{question}\". Bạn có thể tải mẫu về hoặc chỉnh sửa trực tiếp."
-        )
+        result = ChatbotNLPService.process_message(question, user=user)
 
         return JsonResponse({
             'thanh_cong': True,
             'du_lieu': {
-                'cau_tra_loi': tra_loi,
-                'tra_loi': tra_loi,
-                'mau_de_xuat': [m.to_dict() for m in matches]
+                'cau_tra_loi': result['answer'],
+                'tra_loi': result['answer'],
+                'intent': result['intent'],
+                'mau_de_xuat': result['suggested_templates']
             }
         })
     elif request.method == 'GET':

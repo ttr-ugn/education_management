@@ -4,10 +4,14 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q
 from .models import ThongBao, ThongBaoDaDoc
+from .services import NotificationPushService, NotificationReadService
 from authentication.models import NguoiDung
 
+
 def trang_thong_bao(request):
+    """Trang giao diện trung tâm thông báo và nhắc nhở điều hành."""
     return render(request, 'thong_bao/thong-bao.html')
+
 
 # ==============================================================================
 # API THÔNG BÁO & NHẮC NHỞ
@@ -18,24 +22,13 @@ def api_thong_bao_list(request):
     """Danh sách thông báo hoặc tạo mới thông báo."""
     if request.method == 'GET':
         user_id = request.session.get('user_id')
-        loai = request.GET.get('loai')
-        muc_do = request.GET.get('muc_do')
+        user = NguoiDung.objects.filter(pk=user_id).first() if user_id else None
 
-        qs = ThongBao.objects.all().order_by('-ngay_tao')
-        if loai:
-            qs = qs.filter(loai=loai)
-        if muc_do:
-            qs = qs.filter(muc_do=muc_do)
-
-        read_ids = set()
-        if user_id:
-            read_ids = set(ThongBaoDaDoc.objects.filter(nguoi_dung_id=user_id).values_list('thong_bao_id', flat=True))
-
-        data = []
-        for tb in qs:
-            d = tb.to_dict()
-            d['da_doc'] = tb.thong_bao_id in read_ids
-            data.append(d)
+        if user:
+            data = NotificationReadService.get_user_notifications(user, limit=50)
+        else:
+            qs = ThongBao.objects.all().order_by('-ngay_tao')[:50]
+            data = [tb.to_dict() for tb in qs]
 
         return JsonResponse({'thanh_cong': True, 'du_lieu': data, 'tong_so': len(data)})
 
@@ -48,30 +41,37 @@ def api_thong_bao_list(request):
         user_id = request.session.get('user_id')
         user = NguoiDung.objects.filter(pk=user_id).first() if user_id else NguoiDung.objects.first()
 
-        tb = ThongBao.objects.create(
-            tieu_de=data.get('tieu_de', 'Thông báo mới'),
-            noi_dung=data.get('noi_dung', ''),
+        tb = NotificationPushService.push_personal_notification(
+            recipient=user,
+            title=data.get('tieu_de', 'Thông báo mới'),
+            content=data.get('noi_dung', ''),
             loai=data.get('loai', 'Điều hành'),
             muc_do=data.get('muc_do', 'Bình thường'),
-            nguoi_gui=user
+            sender=user
         )
         return JsonResponse({'thanh_cong': True, 'thong_bao': 'Tạo thông báo thành công!', 'du_lieu': tb.to_dict()})
 
     return JsonResponse({'thanh_cong': False, 'thong_bao': 'Phương thức không hỗ trợ'}, status=405)
 
+
 @csrf_exempt
 def api_thong_bao_dem_chua_doc(request):
-    """Đếm số thông báo chưa đọc."""
+    """Đếm số thông báo chưa đọc phục vụ badge real-time mỗi 2 giây."""
     user_id = request.session.get('user_id')
-    tong_so = ThongBao.objects.count()
-    da_doc = ThongBaoDaDoc.objects.filter(nguoi_dung_id=user_id).count() if user_id else 0
-    chua_doc = max(0, tong_so - da_doc)
+    user = NguoiDung.objects.filter(pk=user_id).first() if user_id else None
+
+    if user:
+        chua_doc = NotificationReadService.get_unread_count(user)
+    else:
+        tong_so = ThongBao.objects.count()
+        chua_doc = tong_so
 
     return JsonResponse({
         'thanh_cong': True,
         'chua_doc': chua_doc,
         'den_han': 0
     })
+
 
 @csrf_exempt
 def api_thong_bao_kiem_tra_den_han(request):
@@ -82,17 +82,18 @@ def api_thong_bao_kiem_tra_den_han(request):
         'so_luong': 0
     })
 
+
 @csrf_exempt
 def api_thong_bao_da_doc(request, thong_bao_id):
     """Đánh dấu thông báo đã đọc."""
     user_id = request.session.get('user_id')
     user = NguoiDung.objects.filter(pk=user_id).first() if user_id else NguoiDung.objects.first()
 
-    tb = ThongBao.objects.filter(pk=thong_bao_id).first()
-    if tb and user:
-        ThongBaoDaDoc.objects.get_or_create(thong_bao=tb, nguoi_dung=user)
+    if user:
+        NotificationReadService.mark_as_read(thong_bao_id, user)
 
     return JsonResponse({'thanh_cong': True, 'thong_bao': 'Đã đánh dấu thông báo là đã đọc.'})
+
 
 @csrf_exempt
 def api_thong_bao_doc_tat_ca(request):
@@ -101,11 +102,10 @@ def api_thong_bao_doc_tat_ca(request):
     user = NguoiDung.objects.filter(pk=user_id).first() if user_id else NguoiDung.objects.first()
 
     if user:
-        all_tb = ThongBao.objects.all()
-        for tb in all_tb:
-            ThongBaoDaDoc.objects.get_or_create(thong_bao=tb, nguoi_dung=user)
+        NotificationReadService.mark_all_as_read(user)
 
     return JsonResponse({'thanh_cong': True, 'thong_bao': 'Đã đánh dấu tất cả là đã đọc.'})
+
 
 @csrf_exempt
 def api_thong_bao_detail(request, thong_bao_id):
