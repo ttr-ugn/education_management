@@ -82,11 +82,7 @@ def api_login(request):
     return JsonResponse({
         'thanh_cong': True,
         'thong_bao': 'Đăng nhập thành công!',
-        'du_lieu': {
-            'nguoi_dung': user.to_dict(),
-            'token': 'session_auth_token_2026',
-            'bat_buoc_doi_mat_khau': bool(user.bat_buoc_doi_mat_khau)
-        }
+        'du_lieu': user.to_dict()
     })
 
 @csrf_exempt
@@ -94,10 +90,6 @@ def api_me(request):
     """Lấy thông tin người dùng hiện tại."""
     user_id = request.session.get('user_id')
     if not user_id:
-        # Nếu chưa có session, fallback kiểm tra user admin đầu tiên để test
-        user = NguoiDung.objects.filter(vai_tro='VAN_THU').first()
-        if user:
-            return JsonResponse({'thanh_cong': True, 'du_lieu': user.to_dict()})
         return JsonResponse({'thanh_cong': False, 'thong_bao': 'Chưa đăng nhập.'}, status=401)
 
     try:

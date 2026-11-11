@@ -13,9 +13,12 @@ urlpatterns = [
     path('admin/quan-ly-nguoi-dung/', views.admin_quan_ly_nguoi_dung_page, name='admin_quan_ly_nguoi_dung'),
     path('admin/tao-lanh-dao/', views.admin_tao_lanh_dao_page, name='admin_tao_lanh_dao'),
 
-    # API Endpoints
+    # API Endpoints (ho tro ca ten tieng Viet va tieng Anh)
     path('api/auth/login', views.api_login, name='api_login'),
+    path('api/auth/dang-nhap', views.api_login, name='api_dang_nhap'),
     path('api/auth/me', views.api_me, name='api_me'),
+    path('api/auth/toi', views.api_me, name='api_toi'),
     path('api/auth/logout', views.api_logout, name='api_logout'),
+    path('api/auth/dang-xuat', views.api_logout, name='api_dang_xuat'),
     path('api/users', views.api_users_list, name='api_users_list'),
 ]

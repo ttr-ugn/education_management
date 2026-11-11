@@ -68,8 +68,11 @@ urlpatterns = [
 
     # 5. API Endpoints (tương thích 100% với Frontend Fetch)
     path('api/auth/login', auth_views.api_login, name='api_auth_login'),
+    path('api/auth/dang-nhap', auth_views.api_login, name='api_auth_dang_nhap'),
     path('api/auth/me', auth_views.api_me, name='api_auth_me'),
+    path('api/auth/toi', auth_views.api_me, name='api_auth_toi'),
     path('api/auth/logout', auth_views.api_logout, name='api_auth_logout'),
+    path('api/auth/dang-xuat', auth_views.api_logout, name='api_auth_dang_xuat'),
     path('api/users', auth_views.api_users_list, name='api_users'),
     path('api/van-ban-di', vb_views.api_van_ban_di_list, name='api_van_ban_di'),
     path('api/van-ban-den', vb_views.api_van_ban_den_list, name='api_van_ban_den'),
