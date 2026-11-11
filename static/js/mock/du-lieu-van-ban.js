@@ -247,7 +247,13 @@ window.ENABLE_MOCK_BANNER = true; // Biến cấu hình hiển thị banner cả
       try {
         if (window.api && typeof window.api.get === 'function') {
           const res = await window.api.get('/api/van-ban-di', filters);
-          if (res && res.thanh_cong) return res.du_lieu || [];
+          if (res && res.thanh_cong) {
+            return (res.du_lieu || []).map(item => ({
+              ...item,
+              id: item.id || item.van_ban_id,
+              van_ban_id: item.van_ban_id || item.id
+            }));
+          }
         }
       } catch (err) {
         console.warn('Dùng dữ liệu dự phòng:', err.message);

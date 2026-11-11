@@ -50,7 +50,10 @@ class VanBanDi(models.Model):
 
     def to_dict(self):
         author_name = self.nguoi_soan.ho_va_ten if self.nguoi_soan else 'Nguyễn Văn Nam'
+        leader_name = self.lanh_dao_ky_ten or (self.lanh_dao_ky.ho_va_ten if self.lanh_dao_ky else 'Lãnh đạo Sở')
+        formatted_date = self.ngay_tao.strftime('%Y-%m-%d %H:%M:%S') if self.ngay_tao else ''
         return {
+            'id': self.van_ban_id,
             'van_ban_id': self.van_ban_id,
             'so_ky_hieu': self.so_ky_hieu or '',
             'trich_yeu': self.trich_yeu,
@@ -58,11 +61,19 @@ class VanBanDi(models.Model):
             'do_khan': self.do_khan,
             'don_vi_soan_thao': self.don_vi_soan_thao or 'Phòng Giáo dục Trung học',
             'noi_nhan': self.noi_nhan,
+            'noi_dung_tom_tat': self.noi_dung_tom_tat or '',
             'trang_thai': self.trang_thai,
             'nguoi_soan_ten': author_name,
             'nguoi_soan_thao': author_name,
-            'lanh_dao_ky_ten': self.lanh_dao_ky_ten or '',
-            'ngay_tao': self.ngay_tao.strftime('%Y-%m-%d %H:%M:%S') if self.ngay_tao else '',
+            'lanh_dao_ky': leader_name,
+            'lanh_dao_ky_ten': leader_name,
+            'ngay_tao': formatted_date,
+            'ngay_soan': formatted_date,
+            'file_goc_ten': self.file_goc_ten or '',
+            'file_da_ky_ten': self.file_da_ky_ten or '',
+            'co_file_da_ky': bool(self.file_da_ky_path or self.file_da_ky_ten),
+            'co_file_goc': bool(self.file_goc_path or self.file_goc_ten),
+            'ly_do_chinh_sua': self.y_kien_van_thu or self.y_kien_lanh_dao or '',
         }
 
 class LichSuXuLyVanBan(models.Model):
