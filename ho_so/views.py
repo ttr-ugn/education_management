@@ -32,7 +32,10 @@ def api_ho_so_list(request):
         if q:
             qs = qs.filter(Q(tieu_de__icontains=q) | Q(ma_ho_so__icontains=q))
         if tinh_trang:
-            qs = qs.filter(tinh_trang=tinh_trang)
+            if tinh_trang in ['DA_LUU_TRU', 'DA_NOP_LUU_TRU']:
+                qs = qs.filter(Q(tinh_trang='DA_LUU_TRU') | Q(tinh_trang='DA_NOP_LUU_TRU'))
+            else:
+                qs = qs.filter(tinh_trang=tinh_trang)
         if nam_tai_lieu:
             qs = qs.filter(nam_tai_lieu=nam_tai_lieu)
         if don_vi:

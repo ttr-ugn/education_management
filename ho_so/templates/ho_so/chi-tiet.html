@@ -479,7 +479,7 @@
         document.getElementById('hsNam').textContent = hs.nam_tai_lieu || '2026';
         document.getElementById('hsThoiHan').textContent = hs.thoi_han_bao_quan || 'Vĩnh viễn';
 
-        const isNop = (hs.tinh_trang === 'DA_NOP_LUU_TRU');
+        const isNop = (hs.tinh_trang === 'DA_NOP_LUU_TRU' || hs.tinh_trang === 'DA_LUU_TRU');
         isDossierClosed = (hs.tinh_trang === 'DA_DONG');
 
         document.getElementById('hsStatus').textContent = isNop ? 'Đã nộp lưu trữ' : (isDossierClosed ? 'Đã đóng' : 'Đang thu thập');

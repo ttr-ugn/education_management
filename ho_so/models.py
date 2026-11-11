@@ -30,15 +30,26 @@ class HoSoLuuTru(models.Model):
         return f"{self.ma_ho_so} - {self.tieu_de}"
 
     def to_dict(self):
+        dept_officers = {
+            'Phòng Khảo thí & Quản lý chất lượng': 'Nguyễn Minh Hoàng',
+            'Văn phòng Sở GD&ĐT': 'Nguyễn Thị Thu Hằng',
+            'Phòng Tổ chức cán bộ': 'Phạm Thị Thùy Dung',
+            'Phòng Giáo dục Trung học': 'Nguyễn Văn Nam',
+            'Phòng Kế hoạch - Tài chính': 'Lê Thị Thảo',
+            'Phòng Giáo dục Mầm non - Tiểu học': 'Phan Thị Lan',
+        }
+        creator = self.nguoi_lap.ho_va_ten if self.nguoi_lap else dept_officers.get(self.don_vi, 'Nguyễn Thị Thu Hằng')
         return {
             'ho_so_id': self.ho_so_id,
             'ma_ho_so': self.ma_ho_so,
             'tieu_de': self.tieu_de,
             'don_vi': self.don_vi,
+            'nguoi_lap': creator,
             'nam_tai_lieu': self.nam_tai_lieu,
             'thoi_han_bao_quan': self.thoi_han_bao_quan,
             'so_luong_van_ban': self.so_luong_van_ban,
             'tinh_trang': self.tinh_trang,
+            'mo_ta': self.mo_ta or '',
         }
 
 class VanBanBanHanh(models.Model):
