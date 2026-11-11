@@ -832,7 +832,7 @@
 
   <script src="../../js/core/auth-guard.js?v=20261111_07"></script>
 
-  <script src="../../js/mock/du-lieu-cong-viec.js"></script>
+  <script src="../../js/mock/du-lieu-cong-viec.js?v=20261111_16"></script>
 
   <script>
 
@@ -951,152 +951,86 @@
       // Tải và vẽ Biểu đồ & KPI
 
       async function loadStatistics() {
+        try {
+          const stats = await window.congViecService.getStatistics();
+          if (!stats) return;
 
-        const stats = await window.congViecService.getStatistics();
+          document.getElementById('statTongSo').innerText = stats.tong_so || 0;
+          document.getElementById('statDangLam').innerText = stats.theo_trang_thai?.DANG_THUC_HIEN || 0;
+          document.getElementById('statChoDuyet').innerText = stats.theo_trang_thai?.CHO_DANH_GIA || 0;
+          document.getElementById('statQuaHan').innerText = stats.theo_trang_thai?.QUA_HAN || 0;
+          document.getElementById('statTyLeDungHan').innerText = `${stats.ty_le_dung_han !== undefined ? stats.ty_le_dung_han : 0}%`;
 
-        if (!stats) return;
-
-
-
-        document.getElementById('statTongSo').innerText = stats.tong_so || 0;
-
-        document.getElementById('statDangLam').innerText = stats.theo_trang_thai?.DANG_THUC_HIEN || 0;
-
-        document.getElementById('statChoDuyet').innerText = stats.theo_trang_thai?.CHO_DANH_GIA || 0;
-
-        document.getElementById('statQuaHan').innerText = stats.theo_trang_thai?.QUA_HAN || 0;
-
-        document.getElementById('statTyLeDungHan').innerText = `${stats.ty_le_dung_han || 0}%`;
-
-
-
-        // Render Biểu đồ tròn (Doughnut)
-
-        const ctxDoughnut = document.getElementById('statusDoughnutChart').getContext('2d');
-
-        if (doughnutChart) doughnutChart.destroy();
-
-        doughnutChart = new Chart(ctxDoughnut, {
-
-          type: 'doughnut',
-
-          data: {
-
-            labels: stats.chart_doughnut.labels,
-
-            datasets: [{
-
-              data: stats.chart_doughnut.data,
-
-              backgroundColor: stats.chart_doughnut.colors,
-
-              borderWidth: 2,
-
-              borderColor: '#ffffff'
-
-            }]
-
-          },
-
-          options: {
-
-            responsive: true,
-
-            maintainAspectRatio: false,
-
-            plugins: {
-
-              legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }
-
-            }
-
-          }
-
-        });
-
-
-
-        // Render Biểu đồ cột (Bar)
-
-        const ctxBar = document.getElementById('deptBarChart').getContext('2d');
-
-        if (barChart) barChart.destroy();
-
-        barChart = new Chart(ctxBar, {
-
-          type: 'bar',
-
-          data: {
-
-            labels: stats.chart_bar.labels,
-
-            datasets: [
-
-              {
-
-                label: 'Được giao',
-
-                data: stats.chart_bar.duoc_giao,
-
-                backgroundColor: '#0d6efd',
-
-                borderRadius: 4
-
+          // Render Biểu đồ tròn (Doughnut)
+          if (typeof Chart !== 'undefined' && stats.chart_doughnut && stats.chart_doughnut.labels) {
+            const ctxDoughnut = document.getElementById('statusDoughnutChart').getContext('2d');
+            if (doughnutChart) doughnutChart.destroy();
+            doughnutChart = new Chart(ctxDoughnut, {
+              type: 'doughnut',
+              data: {
+                labels: stats.chart_doughnut.labels,
+                datasets: [{
+                  data: stats.chart_doughnut.data,
+                  backgroundColor: stats.chart_doughnut.colors,
+                  borderWidth: 2,
+                  borderColor: '#ffffff'
+                }]
               },
-
-              {
-
-                label: 'Đã xong',
-
-                data: stats.chart_bar.da_xong,
-
-                backgroundColor: '#10b981',
-
-                borderRadius: 4
-
-              },
-
-              {
-
-                label: 'Trễ hạn',
-
-                data: stats.chart_bar.qua_han,
-
-                backgroundColor: '#ef4444',
-
-                borderRadius: 4
-
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }
+                }
               }
-
-            ]
-
-          },
-
-          options: {
-
-            responsive: true,
-
-            maintainAspectRatio: false,
-
-            scales: {
-
-              y: { beginAtZero: true, ticks: { precision: 0 } }
-
-            },
-
-            plugins: {
-
-              legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }
-
-            }
-
+            });
           }
 
-        });
-
+          // Render Biểu đồ cột (Bar)
+          if (typeof Chart !== 'undefined' && stats.chart_bar && stats.chart_bar.labels) {
+            const ctxBar = document.getElementById('deptBarChart').getContext('2d');
+            if (barChart) barChart.destroy();
+            barChart = new Chart(ctxBar, {
+              type: 'bar',
+              data: {
+                labels: stats.chart_bar.labels,
+                datasets: [
+                  {
+                    label: 'Được giao',
+                    data: stats.chart_bar.duoc_giao,
+                    backgroundColor: '#0d6efd',
+                    borderRadius: 4
+                  },
+                  {
+                    label: 'Đã xong',
+                    data: stats.chart_bar.da_xong,
+                    backgroundColor: '#10b981',
+                    borderRadius: 4
+                  },
+                  {
+                    label: 'Trễ hạn',
+                    data: stats.chart_bar.qua_han,
+                    backgroundColor: '#ef4444',
+                    borderRadius: 4
+                  }
+                ]
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                  y: { beginAtZero: true, ticks: { precision: 0 } }
+                },
+                plugins: {
+                  legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }
+                }
+              }
+            });
+          }
+        } catch (err) {
+          console.error('Lỗi khi tải biểu đồ thống kê:', err);
+        }
       }
-
-
 
       // Tải bảng danh sách
 
@@ -1370,12 +1304,9 @@
 
 
 
-      // Khởi tạo ban đầu
-
-      await loadStatistics();
-
-      await loadData();
-
+            // Khởi tạo ban đầu
+      try { await loadStatistics(); } catch (e) { console.error('Init stat error:', e); }
+      try { await loadData(); } catch (e) { console.error('Init data error:', e); }
     });
 
   </script>
