@@ -1,6 +1,7 @@
 /**
  * API.JS - FETCH WRAPPER CHUẨN CHO BACKEND HỆ THỐNG
- * Hỗ trợ credentials (session cookie), xử lý mã lỗi HTTP, JSON trả về và CORS đa nguồn.
+ * Hỗ trợ credentials (session cookie), xử lý mã lỗi HTTP, JSON trả về, CORS đa nguồn
+ * và vô hiệu hóa triệt để bộ nhớ đệm (cache: 'no-store').
  */
 
 (function (window) {
@@ -20,7 +21,9 @@
     const url = endpoint.startsWith('http') ? endpoint : `${API_BASE}${endpoint}`;
     
     const defaultHeaders = {
-      'Accept': 'application/json'
+      'Accept': 'application/json',
+      'Cache-Control': 'no-cache',
+      'Pragma': 'no-cache'
     };
 
     if (options.body && typeof options.body === 'object' && !(options.body instanceof FormData)) {
@@ -30,6 +33,7 @@
 
     const config = {
       credentials: 'include', // Bắt buộc gửi kèm session cookie HttpOnly
+      cache: 'no-store',      // Vô hiệu hóa cache HTTP fetch
       headers: {
         ...defaultHeaders,
         ...(options.headers || {})
