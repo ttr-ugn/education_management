@@ -9,33 +9,6 @@
   <link rel="stylesheet" href="../../css/layout.css?v=20261111_15">
   <link rel="stylesheet" href="../../css/components.css?v=20261111_09">
   <style>
-    .back-link {
-      color: #64748b;
-      font-size: 13px;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      margin-bottom: 12px;
-      font-weight: 500;
-      transition: color 0.15s ease;
-    }
-    .back-link:hover {
-      color: #7e22ce;
-    }
-
-    .leader-form-grid {
-      display: grid;
-      grid-template-columns: 1fr 340px;
-      gap: 24px;
-      align-items: start;
-    }
-    @media (max-width: 992px) {
-      .leader-form-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
     .form-card {
       background: #ffffff;
       border: 1px solid var(--border-color);
@@ -217,190 +190,6 @@
       opacity: 0.65;
       cursor: not-allowed;
     }
-
-    /* Preview Sidebar */
-    .preview-card {
-      background: #ffffff;
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-md);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-      overflow: hidden;
-    }
-    .preview-header {
-      background: #f8fafc;
-      padding: 12px 18px;
-      border-bottom: 1px solid #f1f5f9;
-    }
-    .preview-tag {
-      font-size: 11px;
-      font-weight: 700;
-      color: #64748b;
-      letter-spacing: 0.5px;
-    }
-    .preview-body {
-      padding: 24px 20px;
-      text-align: center;
-    }
-    .preview-avatar-wrapper {
-      position: relative;
-      width: 68px;
-      height: 68px;
-      margin: 0 auto 12px;
-    }
-    .preview-avatar {
-      width: 68px;
-      height: 68px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #7e22ce 0%, #6b21a8 100%);
-      color: #ffffff;
-      font-size: 22px;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 12px rgba(126, 34, 206, 0.25);
-      letter-spacing: 0.5px;
-    }
-    .preview-avatar-badge {
-      position: absolute;
-      bottom: -2px;
-      right: -2px;
-      width: 22px;
-      height: 22px;
-      background: #ffffff;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-    }
-    .preview-name {
-      font-size: 16px;
-      font-weight: 700;
-      color: #0f172a;
-      margin-bottom: 6px;
-    }
-    .preview-role-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      background: #faf5ff;
-      color: #7e22ce;
-      border: 1px solid #e9d5ff;
-      padding: 3px 12px;
-      border-radius: 16px;
-      font-size: 11.5px;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-    .preview-position {
-      font-size: 13px;
-      font-weight: 600;
-      color: #334155;
-    }
-    .preview-dept {
-      font-size: 12px;
-      color: #64748b;
-      margin-top: 2px;
-    }
-    .preview-divider {
-      height: 1px;
-      background: #f1f5f9;
-      margin: 18px 0;
-    }
-    .preview-meta-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 12px;
-      margin-bottom: 10px;
-      text-align: left;
-    }
-    .preview-meta-row:last-child {
-      margin-bottom: 0;
-    }
-    .meta-label {
-      color: #64748b;
-      font-weight: 500;
-    }
-    .meta-value {
-      color: #1e293b;
-      font-weight: 600;
-      max-width: 170px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    .meta-value-code {
-      background: #f0f7ff;
-      border: 1px solid #bae6fd;
-      color: #0284c7;
-      padding: 2px 7px;
-      border-radius: 4px;
-      font-family: 'JetBrains Mono', Consolas, monospace;
-      font-size: 11px;
-      font-weight: 600;
-    }
-
-    .handover-card {
-      background: #ffffff;
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-md);
-      padding: 18px;
-      margin-top: 18px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    }
-    .handover-title {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 12px;
-      font-weight: 700;
-      color: #475569;
-      letter-spacing: 0.5px;
-      margin-bottom: 14px;
-    }
-    .handover-steps {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .handover-steps li {
-      display: flex;
-      gap: 10px;
-      align-items: flex-start;
-    }
-    .step-num {
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      background: #eff6ff;
-      border: 1px solid #bfdbfe;
-      color: #1d4ed8;
-      font-size: 11px;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      margin-top: 1px;
-    }
-    .step-text b {
-      font-size: 12px;
-      color: #1e293b;
-      display: block;
-      margin-bottom: 2px;
-    }
-    .step-text p {
-      font-size: 11.5px;
-      color: #64748b;
-      margin: 0;
-      line-height: 1.4;
-    }
   </style>
 </head>
 <body>
@@ -448,36 +237,26 @@
       </header>
 
       <main class="content-wrapper">
-        <!-- BREADCRUMB & HEADER -->
-        <div style="margin-bottom: 22px;">
-          <a href="quan-ly-nguoi-dung.html" class="back-link">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="19" y1="12" x2="5" y2="12"></line>
-              <polyline points="12 19 5 12 12 5"></polyline>
-            </svg>
-            Quay lại Quản lý tài khoản người dùng
-          </a>
-          <div class="page-header" style="margin-bottom: 0;">
-            <div>
-              <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px; flex-wrap: wrap;">
-                <h1 class="page-title" style="margin-bottom: 0;">Khởi tạo tài khoản Lãnh đạo cơ quan</h1>
-                <span class="badge" style="background: #faf5ff; color: #7e22ce; border: 1px solid #e9d5ff; font-weight: 700; font-size: 11.5px; padding: 4px 10px; border-radius: 20px;">
-                  🏛️ Ban Giám đốc Sở GD&ĐT
-                </span>
-              </div>
-              <p class="page-subtitle">Chức năng cấp phát tài khoản dành riêng cho Văn thư Sở để thiết lập cán bộ Lãnh đạo chủ chốt</p>
+        <!-- HEADER -->
+        <div class="page-header" style="margin-bottom: 24px;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px; flex-wrap: wrap;">
+              <h1 class="page-title" style="margin-bottom: 0;">Khởi tạo tài khoản Lãnh đạo cơ quan</h1>
+              <span class="badge" style="background: #faf5ff; color: #7e22ce; border: 1px solid #e9d5ff; font-weight: 700; font-size: 11.5px; padding: 4px 10px; border-radius: 20px;">
+                🏛️ Ban Giám đốc Sở GD&ĐT
+              </span>
             </div>
-            <div>
-              <a href="quan-ly-nguoi-dung.html" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
-                👥 Xem danh sách cán bộ
-              </a>
-            </div>
+            <p class="page-subtitle">Chức năng cấp phát tài khoản dành riêng cho Văn thư Sở để thiết lập cán bộ Lãnh đạo chủ chốt</p>
+          </div>
+          <div>
+            <a href="quan-ly-nguoi-dung.html" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 6px;">
+              ← Quay lại danh sách
+            </a>
           </div>
         </div>
 
-        <!-- MAIN 2-COLUMN GRID -->
-        <div class="leader-form-grid">
-          <!-- FORM COLUMN (LEFT) -->
+        <!-- CENTERED FORM CONTAINER -->
+        <div style="max-width: 840px; margin: 0 auto;">
           <div class="form-card">
             <div class="accent-bar"></div>
 
@@ -598,79 +377,6 @@
               </form>
             </div>
           </div>
-
-          <!-- SIDEBAR PREVIEW COLUMN (RIGHT) -->
-          <div class="preview-sidebar">
-            <!-- LIVE PREVIEW CARD -->
-            <div class="preview-card">
-              <div class="preview-header">
-                <div style="display: flex; align-items: center; justify-content: space-between;">
-                  <span class="preview-tag">👁️ XEM TRƯỚC ĐỊNH DANH</span>
-                  <span class="badge" style="background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px;">
-                    ● Sẵn sàng
-                  </span>
-                </div>
-              </div>
-              <div class="preview-body">
-                <div class="preview-avatar-wrapper">
-                  <div class="preview-avatar" id="prevAvatar">LĐ</div>
-                  <div class="preview-avatar-badge">🏛️</div>
-                </div>
-                <div class="preview-name" id="prevName">Lê Thị Bích Thuận</div>
-                <div class="preview-role-pill">
-                  <span>🏛️ Lãnh đạo</span>
-                </div>
-                <div class="preview-position" id="prevPosition">Giám đốc Sở GD&ĐT</div>
-                <div class="preview-dept" id="prevDept">Ban Giám đốc Sở GD&ĐT</div>
-
-                <div class="preview-divider"></div>
-
-                <div class="preview-meta-row">
-                  <span class="meta-label">Tên đăng nhập:</span>
-                  <span class="meta-value-code" id="prevUsername">giamdoc_thuan</span>
-                </div>
-                <div class="preview-meta-row">
-                  <span class="meta-label">Email:</span>
-                  <span class="meta-value" id="prevEmail" title="lanhdao@danang.edu.vn">lanhdao@danang.edu.vn</span>
-                </div>
-                <div class="preview-meta-row">
-                  <span class="meta-label">Điện thoại:</span>
-                  <span class="meta-value" id="prevPhone">Chưa có SĐT</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- HANDOVER GUIDE CARD -->
-            <div class="handover-card">
-              <div class="handover-title">
-                <span>📋</span>
-                <span>QUY TRÌNH BÀN GIAO 3 BƯỚC</span>
-              </div>
-              <ul class="handover-steps">
-                <li>
-                  <div class="step-num">1</div>
-                  <div class="step-text">
-                    <b>Văn thư khởi tạo</b>
-                    <p>Nhập thông tin cán bộ và bấm nút khởi tạo tài khoản vào hệ thống.</p>
-                  </div>
-                </li>
-                <li>
-                  <div class="step-num">2</div>
-                  <div class="step-text">
-                    <b>Nhận mật khẩu tạm</b>
-                    <p>Sao chép mật khẩu tạm từ hộp thoại popup (chỉ hiển thị duy nhất 01 lần).</p>
-                  </div>
-                </li>
-                <li>
-                  <div class="step-num">3</div>
-                  <div class="step-text">
-                    <b>Bàn giao bảo mật</b>
-                    <p>Chuyển giao trực tiếp cho Lãnh đạo để đăng nhập và đổi mật khẩu mới.</p>
-                  </div>
-                </li>
-              </ul>
-            </div>
-          </div>
         </div>
       </main>
 
@@ -699,50 +405,6 @@
       const resetBtn = document.getElementById('resetBtn');
       const btnAutoSuggest = document.getElementById('btnAutoSuggest');
 
-      // Live Preview elements
-      const prevAvatar = document.getElementById('prevAvatar');
-      const prevName = document.getElementById('prevName');
-      const prevPosition = document.getElementById('prevPosition');
-      const prevDept = document.getElementById('prevDept');
-      const prevUsername = document.getElementById('prevUsername');
-      const prevEmail = document.getElementById('prevEmail');
-      const prevPhone = document.getElementById('prevPhone');
-
-      function updatePreview() {
-        const nameVal = document.getElementById('ho_va_ten').value.trim();
-        const chucVuVal = document.getElementById('chuc_vu').value;
-        const deptVal = document.getElementById('phong_ban').value.trim();
-        const emailVal = document.getElementById('email').value.trim();
-        const sdtVal = document.getElementById('sdt').value.trim();
-        const usernameVal = document.getElementById('ten_dang_nhap').value.trim();
-
-        prevName.innerText = nameVal || 'Lê Thị Bích Thuận';
-        prevPosition.innerText = chucVuVal || 'Chức vụ Lãnh đạo';
-        prevDept.innerText = deptVal || 'Ban Giám đốc Sở GD&ĐT';
-        prevEmail.innerText = emailVal || 'lanhdao@danang.edu.vn';
-        prevEmail.title = emailVal || 'lanhdao@danang.edu.vn';
-        prevPhone.innerText = sdtVal || 'Chưa có SĐT';
-        prevUsername.innerText = usernameVal || 'ten_dang_nhap';
-
-        const displayName = nameVal || 'Lê Thị Bích Thuận';
-        const words = displayName.split(/\s+/).filter(Boolean);
-        let initials = 'LĐ';
-        if (words.length >= 2) {
-          initials = (words[words.length - 2][0] + words[words.length - 1][0]).toUpperCase();
-        } else if (words.length === 1) {
-          initials = words[0].slice(0, 2).toUpperCase();
-        }
-        prevAvatar.innerText = initials;
-      }
-
-      ['ho_va_ten', 'chuc_vu', 'phong_ban', 'email', 'sdt', 'ten_dang_nhap'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) {
-          el.addEventListener('input', updatePreview);
-          el.addEventListener('change', updatePreview);
-        }
-      });
-
       // Gợi ý tên đăng nhập tự động từ Họ tên
       if (btnAutoSuggest) {
         btnAutoSuggest.addEventListener('click', () => {
@@ -766,7 +428,6 @@
 
           const input = document.getElementById('ten_dang_nhap');
           input.value = suggested;
-          updatePreview();
           window.Toast.success(`Đã tạo gợi ý tên đăng nhập: "${suggested}"`);
         });
       }
@@ -774,7 +435,6 @@
       resetBtn.addEventListener('click', () => {
         setTimeout(() => {
           document.getElementById('phong_ban').value = 'Ban Giám đốc Sở GD&ĐT';
-          updatePreview();
         }, 50);
       });
 
@@ -808,7 +468,6 @@
           window.Toast.success('Khởi tạo tài khoản Lãnh đạo thành công!');
           form.reset();
           document.getElementById('phong_ban').value = 'Ban Giám đốc Sở GD&ĐT';
-          updatePreview();
 
           // Hiển thị modal mật khẩu tạm cho Văn thư
           window.AdminUserModule.showPasswordModal(
@@ -828,9 +487,6 @@
           btnText.textContent = 'Khởi tạo tài khoản Lãnh đạo';
         }
       });
-
-      // Initial preview setup
-      updatePreview();
     });
   </script>
 </body>
