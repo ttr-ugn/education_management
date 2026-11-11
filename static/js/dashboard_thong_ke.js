@@ -13,6 +13,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (document.getElementById('kpiTyLeDungHan')) document.getElementById('kpiTyLeDungHan').innerText = `${data.summary.ty_le_dung_han}%`;
       }
 
+      // Kiểm tra thư viện Chart.js đã sẵn sàng chưa
+      if (typeof Chart === 'undefined') {
+        console.warn('Thư viện Chart.js chưa sẵn sàng.');
+        return;
+      }
+
       // Font chung và tùy chọn bảng màu
       Chart.defaults.font.family = "system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
       Chart.defaults.color = "#64748b";

@@ -131,7 +131,7 @@
         <div class="stats-grid">
           <div class="stat-card">
             <div>
-              <div class="stat-value text-primary" id="kpiTongVB">1,285</div>
+              <div class="stat-value text-primary" id="kpiTongVB">30</div>
               <div class="stat-label">Tổng văn bản tiếp nhận</div>
             </div>
             <div class="stat-icon" style="background: #e0f2fe; color: #0284c7;">
@@ -141,7 +141,7 @@
 
           <div class="stat-card">
             <div>
-              <div class="stat-value" style="color: #2563eb;" id="kpiVbDen">742</div>
+              <div class="stat-value" style="color: #2563eb;" id="kpiVbDen">15</div>
               <div class="stat-label">Văn bản đến các cấp</div>
             </div>
             <div class="stat-icon" style="background: #dbeafe; color: #2563eb;">
@@ -151,7 +151,7 @@
 
           <div class="stat-card">
             <div>
-              <div class="stat-value text-success" id="kpiVbDi">543</div>
+              <div class="stat-value text-success" id="kpiVbDi">15</div>
               <div class="stat-label">Văn bản đi & phát hành</div>
             </div>
             <div class="stat-icon" style="background: #dcfce7; color: #16a34a;">
@@ -161,7 +161,7 @@
 
           <div class="stat-card">
             <div>
-              <div class="stat-value" style="color: #059669;" id="kpiTyLeDungHan">96.8%</div>
+              <div class="stat-value" style="color: #059669;" id="kpiTyLeDungHan">94.7%</div>
               <div class="stat-label">Tỷ lệ xử lý đúng hạn</div>
             </div>
             <div class="stat-icon" style="background: #d1fae5; color: #059669;">
@@ -242,7 +242,13 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="../js/mock/du-lieu-thong-ke.js?v=20261111_19"></script>
-
-<script src="/static/js/dashboard_thong_ke.js"></script>
+<!-- Nạp thư viện Chart.js (hỗ trợ cả offline cục bộ và CDN) -->
+<script src="/static/libs/chart.min.js"></script>
+<script>
+  if (typeof Chart === 'undefined') {
+    document.write('<script src="https://cdn.jsdelivr.net/npm/chart.js"><\/script>');
+  }
+</script>
+<script src="/js/mock/du-lieu-thong-ke.js?v=20261111_22"></script>
+<script src="/static/js/dashboard_thong_ke.js?v=20261111_22"></script>
 {% endblock %}

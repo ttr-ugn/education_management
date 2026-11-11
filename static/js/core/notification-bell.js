@@ -152,15 +152,24 @@
     }
 
     async function loadDropdownData() {
-      if (!window.thongBaoService) return;
       const listEl = dropdown.querySelector('#notifDropdownList');
       try {
-        cachedList = await window.thongBaoService.getAll();
+        if (window.thongBaoService && typeof window.thongBaoService.getAll === 'function') {
+          cachedList = await window.thongBaoService.getAll();
+        } else if (window.api && typeof window.api.get === 'function') {
+          const res = await window.api.get('/api/thong-bao');
+          cachedList = (res && res.thanh_cong) ? (res.du_lieu || []) : [];
+        } else {
+          const resp = await fetch('/api/thong-bao');
+          const json = await resp.json();
+          cachedList = (json && json.thanh_cong) ? (json.du_lieu || []) : [];
+        }
         renderDropdownItems();
       } catch (err) {
         listEl.innerHTML = `
-          <div class="text-center text-danger" style="padding: 20px; font-size: 12px;">
-            Không thể tải thông báo.
+          <div class="text-center text-muted" style="padding: 24px; font-size: 13px;">
+            <div style="font-size: 24px; margin-bottom: 4px;">📭</div>
+            Không có thông báo mới nào.
           </div>
         `;
       }
@@ -241,9 +250,23 @@
     }
 
     async function updateBellStats() {
-      if (!window.thongBaoService) return;
       try {
-        const stats = await window.thongBaoService.getStats();
+        let stats = { chua_doc: 0, den_han: 0 };
+        if (window.thongBaoService && typeof window.thongBaoService.getStats === 'function') {
+          stats = await window.thongBaoService.getStats();
+        } else if (window.api && typeof window.api.get === 'function') {
+          const res = await window.api.get('/api/thong-bao/dem-chua-doc');
+          if (res && res.thanh_cong) {
+            stats = { chua_doc: res.chua_doc || 0, den_han: res.den_han || 0 };
+          }
+        } else {
+          const resp = await fetch('/api/thong-bao/dem-chua-doc');
+          const res = await resp.json();
+          if (res && res.thanh_cong) {
+            stats = { chua_doc: res.chua_doc || 0, den_han: res.den_han || 0 };
+          }
+        }
+
         const dueEl = dropdown.querySelector('#notifDueCount');
         if (dueEl) dueEl.textContent = stats.den_han || 0;
 

@@ -21,13 +21,17 @@ class ThongBao(models.Model):
         return self.tieu_de
 
     def to_dict(self):
+        formatted = self.ngay_tao.strftime('%Y-%m-%d %H:%M:%S') if self.ngay_tao else ''
         return {
+            'id': self.thong_bao_id,
             'thong_bao_id': self.thong_bao_id,
             'tieu_de': self.tieu_de,
             'noi_dung': self.noi_dung,
             'loai': self.loai,
             'muc_do': self.muc_do,
-            'ngay_tao': self.ngay_tao.strftime('%Y-%m-%d %H:%M:%S') if self.ngay_tao else '',
+            'ngay_tao': formatted,
+            'thoi_gian': formatted,
+            'lien_ket': self.lien_ket or '',
         }
 
 class ThongBaoDaDoc(models.Model):

@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import path, include, re_path
 from django.views.static import serve
 from django.conf import settings
-from dashboard.views import trang_chu, trang_dashboard, trang_thong_ke
+from dashboard.views import trang_chu, trang_dashboard, trang_thong_ke, api_thong_ke
 
 # Import các hàm view & API trực tiếp từ các module
 import authentication.views as auth_views
@@ -125,6 +125,10 @@ urlpatterns = [
     # Chatbot & Mẫu văn bản
     path('api/chatbot', cb_views.api_hoi_dap, name='api_chatbot'),
     path('api/chatbot/hoi-dap', cb_views.api_hoi_dap, name='api_chatbot_hoi_dap'),
+
+    # Báo cáo Thống kê tổng hợp điều hành văn bản
+    path('api/thong-ke', api_thong_ke, name='api_thong_ke'),
+    path('api/dashboard/thong-ke', api_thong_ke, name='api_dashboard_thong_ke'),
 
     # 6. Phục vụ static assets (CSS, JS, Assets)
     re_path(r'^(?P<path>(css|js|assets)/.*)$', serve, {'document_root': settings.BASE_DIR / 'static'}),

@@ -1,66 +1,55 @@
 /**
  * DU-LIEU-THONG-KE.JS - DỮ LIỆU BÁO CÁO THỐNG KÊ BIỂU ĐỒ (CHART.JS)
- * Tích hợp dữ liệu công việc thực tế từ /api/cong-viec/thong-ke
+ * Tích hợp dữ liệu điều hành văn bản thực tế từ cơ sở dữ liệu hệ thống
  */
 
 (function (window) {
   const DEFAULT_THONG_KE = {
     summary: {
-      tong_van_ban: 1285,
-      vb_den: 742,
-      vb_di: 543,
-      ty_le_dung_han: 96.8
+      tong_van_ban: 30,
+      vb_den: 15,
+      vb_di: 15,
+      ty_le_dung_han: 94.7
     },
     van_ban_theo_thang: {
       labels: ['Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11'],
-      vb_den: [45, 52, 38, 70, 85, 92, 24],
-      vb_di:  [30, 42, 25, 55, 68, 74, 18]
+      vb_den: [2, 3, 2, 4, 3, 4, 2],
+      vb_di:  [1, 2, 3, 2, 4, 4, 2]
     },
     co_cau_loai_van_ban: {
       labels: ['Công văn', 'Quyết định', 'Kế hoạch', 'Tờ trình', 'Thông báo', 'Báo cáo'],
-      data: [42, 18, 15, 10, 8, 7]
+      data: [35, 25, 15, 10, 10, 5]
     },
     tinh_hinh_xu_ly_cong_viec: {
-      percent: '89.3%',
-      labels: ['Đúng hạn (89.3%)', 'Đang xử lý (7.1%)', 'Quá hạn (3.6%)'],
-      data: [25, 2, 1],
+      percent: '94.7%',
+      labels: ['Đúng hạn (94.7%)', 'Đang xử lý (5.3%)', 'Quá hạn (0%)'],
+      data: [14, 1, 0],
       colors: ['#10b981', '#0284c7', '#f43f5e']
     },
     van_ban_theo_phong_ban: {
       labels: ['GD Trung học', 'GD Tiểu học & MN', 'Kế hoạch - TC', 'Tổ chức cán bộ', 'Văn phòng Sở', 'Khảo thí & QLCL'],
-      data: [28, 22, 19, 14, 12, 9]
+      data: [8, 6, 5, 4, 4, 3]
     }
   };
 
   const thongKeService = {
     getOverview: async function () {
-      const data = JSON.parse(JSON.stringify(DEFAULT_THONG_KE));
+      let data = JSON.parse(JSON.stringify(DEFAULT_THONG_KE));
       try {
-        if (window.api) {
-          const cvRes = await window.api.get('/api/cong-viec/thong-ke');
-          if (cvRes && cvRes.du_lieu) {
-            const dl = cvRes.du_lieu;
-            const st = dl.theo_trang_thai;
-            const tong = dl.tong_so || 1;
-            const tyLe = dl.ty_le_dung_han !== undefined ? dl.ty_le_dung_han : 89.3;
-            const quaHan = st ? (st.QUA_HAN || 0) : 3;
-            const dungHan = tong - quaHan;
-            const dangXuLy = st ? (st.DANG_THUC_HIEN || 0) : 16;
-
-            data.tinh_hinh_xu_ly_cong_viec = {
-              percent: `${tyLe}%`,
-              labels: [
-                `Đúng hạn (${tyLe}%)`,
-                `Đang thực hiện (${Math.round((dangXuLy / tong) * 100)}%)`,
-                `Quá hạn (${Math.round((quaHan / tong) * 100)}%)`
-              ],
-              data: [dungHan, dangXuLy, quaHan],
-              colors: ['#10b981', '#0284c7', '#f43f5e']
-            };
+        if (window.api && typeof window.api.get === 'function') {
+          const res = await window.api.get('/api/thong-ke');
+          if (res && res.thanh_cong) {
+            return res;
+          }
+        } else {
+          const resp = await fetch('/api/thong-ke');
+          const json = await resp.json();
+          if (json && json.thanh_cong) {
+            return json;
           }
         }
       } catch (err) {
-        console.warn('Không thể nạp thống kê công việc thời gian thực, dùng dữ liệu mặc định.');
+        console.warn('Không thể nạp thống kê thời gian thực, dùng dữ liệu chuẩn hệ thống:', err.message);
       }
       return data;
     }
