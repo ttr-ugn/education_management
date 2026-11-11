@@ -778,7 +778,7 @@ def seed():
             'nguoi_xu_ly': u_thao,
             'phong_ban': 'Phòng Kế hoạch - Tài chính',
             'han_hoan_thanh': date(2026, 11, 22),
-            'do_uu_tien': 'KHAM_CAP',
+            'do_uu_tien': 'KHAN_CAP',
             'tien_do': 70,
             'trang_thai': 'DANG_THUC_HIEN',
             'so_ky_hieu_vb': '215/UBND-TH',

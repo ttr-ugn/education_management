@@ -90,9 +90,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       const PRIORITY_LABELS = {
         'KHAN_CAP': '<span class="badge" style="background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; padding: 3px 8px; border-radius: 20px; font-weight: 700; font-size: 11px; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap;">🔥 Khẩn cấp</span>',
+        'KHAM_CAP': '<span class="badge" style="background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; padding: 3px 8px; border-radius: 20px; font-weight: 700; font-size: 11px; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap;">🔥 Khẩn cấp</span>',
+        'Khẩn cấp': '<span class="badge" style="background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; padding: 3px 8px; border-radius: 20px; font-weight: 700; font-size: 11px; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap;">🔥 Khẩn cấp</span>',
         'CAO': '<span class="badge" style="background: #ffedd5; color: #c2410c; border: 1px solid #fed7aa; padding: 3px 8px; border-radius: 20px; font-weight: 600; font-size: 11px; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap;">⚡ Cao</span>',
+        'Cao': '<span class="badge" style="background: #ffedd5; color: #c2410c; border: 1px solid #fed7aa; padding: 3px 8px; border-radius: 20px; font-weight: 600; font-size: 11px; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap;">⚡ Cao</span>',
         'TRUNG_BINH': '<span class="badge" style="background: #fef3c7; color: #b45309; border: 1px solid #fde68a; padding: 3px 8px; border-radius: 20px; font-weight: 600; font-size: 11px; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap;">🟡 Trung bình</span>',
-        'THAP': '<span class="badge" style="background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; padding: 3px 8px; border-radius: 20px; font-weight: 600; font-size: 11px; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap;">⚪ Thấp</span>'
+        'Trung bình': '<span class="badge" style="background: #fef3c7; color: #b45309; border: 1px solid #fde68a; padding: 3px 8px; border-radius: 20px; font-weight: 600; font-size: 11px; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap;">🟡 Trung bình</span>',
+        'THAP': '<span class="badge" style="background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; padding: 3px 8px; border-radius: 20px; font-weight: 600; font-size: 11px; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap;">⚪ Thấp</span>',
+        'Thấp': '<span class="badge" style="background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; padding: 3px 8px; border-radius: 20px; font-weight: 600; font-size: 11px; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap;">⚪ Thấp</span>'
       };
 
       // Tải và vẽ Biểu đồ & KPI
