@@ -1,8 +1,13 @@
 import json
+import os
+import re
+import html
+from datetime import datetime
 from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q
+from django.conf import settings
 
 from .models import MauVanBan, LichSuChat
 from .services import ChatbotNLPService
@@ -13,7 +18,8 @@ from authentication.models import NguoiDung
 
 def trang_chatbot(request):
     """Trang giao diện Trợ lý ảo AI tư vấn văn bản điều hành và kho lưu trữ."""
-    return render(request, 'chatbot/chatbot.html')
+    total_docs = MauVanBan.objects.count()
+    return render(request, 'chatbot/chatbot.html', {'total_docs': total_docs})
 
 
 @csrf_exempt
@@ -136,6 +142,9 @@ def api_mau_van_ban_tai_ve(request, mau_id):
         mau.luot_tai += 1
         mau.save(update_fields=['luot_tai'])
 
+        clean_html = re.sub(r'<div class="pdf-preview-embed".*?</div>\s*</div>', '', mau.noi_dung_html, flags=re.DOTALL)
+        clean_html = re.sub(r'<iframe.*?</iframe>', '', clean_html, flags=re.DOTALL)
+
         word_html = f"""<!DOCTYPE html>
 <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
 <head>
@@ -175,7 +184,7 @@ td {{ border: none; padding: 2px 4px; }}
 </style>
 </head>
 <body>
-{mau.noi_dung_html}
+{clean_html}
 </body>
 </html>"""
         response = HttpResponse(word_html, content_type='application/msword; charset=utf-8')
@@ -211,13 +220,12 @@ def api_xem_truoc_tai_lieu(request, loai, item_id):
     elif loai == 'van_ban_di':
         try:
             vb = VanBanDi.objects.get(pk=item_id)
-            html = ChatbotNLPService.generate_van_ban_di_html(vb)
+            html_content = ChatbotNLPService.generate_van_ban_di_html(vb)
             return JsonResponse({
                 'thanh_cong': True,
                 'tieu_de': f"{vb.so_ky_hieu or 'Dự thảo'} - {vb.trich_yeu}",
-                'noi_dung_html': html,
-                'loai_tep': 'van_ban_di',
-                'download_url': f"/api/van-ban-di/{vb.van_ban_id}/download"
+                'noi_dung_html': html_content,
+                'loai_tep': 'van_ban_di'
             })
         except VanBanDi.DoesNotExist:
             return JsonResponse({'thanh_cong': False, 'thong_bao': 'Không tìm thấy văn bản đi'}, status=404)
@@ -236,3 +244,101 @@ def api_xem_truoc_tai_lieu(request, loai, item_id):
             return JsonResponse({'thanh_cong': False, 'thong_bao': 'Không tìm thấy văn bản đến'}, status=404)
 
     return JsonResponse({'thanh_cong': False, 'thong_bao': 'Loại tài liệu không hỗ trợ'}, status=400)
+
+
+@csrf_exempt
+def api_upload_kho_luu_tru(request):
+    """Tiếp nhận văn bản tải lên kho lưu trữ để AI đọc và trích xuất dữ liệu."""
+    if request.method != 'POST':
+        return JsonResponse({'thanh_cong': False, 'thong_bao': 'Phương thức không hỗ trợ'}, status=405)
+
+    files = request.FILES.getlist('files') or ([request.FILES['file']] if 'file' in request.FILES else [])
+    if not files:
+        return JsonResponse({'thanh_cong': False, 'thong_bao': 'Vui lòng chọn ít nhất một tệp văn bản PDF'}, status=400)
+
+    dest_dir = settings.BASE_DIR / 'media' / 'van_ban_dieu_hanh'
+    dest_dir.mkdir(parents=True, exist_ok=True)
+
+    imported_items = []
+    ts = int(datetime.now().timestamp())
+    for idx, f in enumerate(files):
+        safe_filename = os.path.basename(f.name)
+        file_path = dest_dir / safe_filename
+        with open(file_path, 'wb+') as destination:
+            for chunk in f.chunks():
+                destination.write(chunk)
+
+        ext = os.path.splitext(safe_filename)[1].lower()
+        extracted_text = ""
+        num_pages = 0
+        if ext == '.txt':
+            try:
+                with open(file_path, 'r', encoding='utf-8', errors='ignore') as tf:
+                    extracted_text = tf.read()
+            except Exception:
+                extracted_text = safe_filename
+        else:
+            try:
+                import pypdf
+                reader = pypdf.PdfReader(str(file_path))
+                num_pages = len(reader.pages)
+                for page in reader.pages:
+                    extracted_text += (page.extract_text() or "") + "\n"
+            except Exception:
+                extracted_text = ""
+
+        extracted_text = extracted_text.strip() or f"Văn bản điều hành số hóa: {safe_filename}"
+        base_name = os.path.splitext(safe_filename)[0]
+        item_code = f"DOC-{ts}-{idx + 1}"
+        media_url = f"/media/van_ban_dieu_hanh/{safe_filename}"
+
+        paragraphs_html = "".join(
+            f"<p>{html.escape(line.strip())}</p>"
+            for line in extracted_text[:3000].splitlines()
+            if line.strip()
+        ) or f"<p>{html.escape(base_name)}</p>"
+
+        pdf_embed_html = f"""
+  <div class="pdf-preview-embed" style="margin-top: 18px; border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; background: #f8fafc;">
+    <div style="padding: 8px 14px; background: #1e293b; color: #f8fafc; font-size: 12px; font-weight: 600; display: flex; justify-content: space-between; align-items: center;">
+      <span>📑 BẢN XEM TRƯỚC PDF TRỰC TIẾP ({num_pages} trang)</span>
+      <a href="{media_url}" target="_blank" style="color: #38bdf8; text-decoration: none;">Mở tab mới ↗</a>
+    </div>
+    <iframe src="{media_url}" style="width: 100%; height: 760px; border: none; display: block;" title="PDF Preview"></iframe>
+  </div>""" if ext == '.pdf' else ""
+
+        obj = MauVanBan.objects.create(
+            ma_mau=item_code,
+            ten_mau=base_name,
+            loai_van_ban='Văn bản điều hành',
+            linh_vuc='Kho lưu trữ số',
+            co_quan_ban_hanh='SỞ GIÁO DỤC VÀ ĐÀO TẠO TP. ĐÀ NẴNG',
+            noi_dung_text=extracted_text[:10000],
+            noi_dung_html=f"""
+<div class="vb-container">
+  <div style="margin-bottom: 20px; padding: 12px 16px; background: #e0f2fe; border: 1px solid #7dd3fc; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+    <span>📄 Tệp gốc: <b>{html.escape(safe_filename)}</b></span>
+    <div style="display: flex; gap: 8px;">
+      <a href="{media_url}" target="_blank" class="btn btn-sm btn-primary" style="padding: 5px 12px; background: #0284c7; color: #fff; text-decoration: none; border-radius: 6px; font-size: 12px; font-weight: 600;">👁️ Mở tệp gốc ↗</a>
+      <a href="{media_url}" download class="btn btn-sm" style="padding: 5px 12px; background: #f1f5f9; color: #334155; text-decoration: none; border-radius: 6px; font-size: 12px; font-weight: 600; border: 1px solid #cbd5e1;">📥 Tải xuống</a>
+    </div>
+  </div>
+  <div class="vb-title-block">
+    <div class="vb-title-type">VĂN BẢN ĐIỀU HÀNH</div>
+    <div class="vb-subject">{html.escape(base_name)}</div>
+  </div>
+  <div class="vb-content">
+    {paragraphs_html}
+  </div>
+  {pdf_embed_html}
+</div>
+"""
+        )
+        imported_items.append(obj.to_dict())
+
+    return JsonResponse({
+        'thanh_cong': True,
+        'thong_bao': f'Đã nạp thành công {len(imported_items)} tệp văn bản vào kho lưu trữ.',
+        'du_lieu': imported_items,
+        'tong_so': MauVanBan.objects.count()
+    })

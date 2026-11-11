@@ -69,7 +69,21 @@ class ChatbotNLPService:
         """
         lower_msg = message.lower().strip()
 
+        # Nhận diện chào hỏi thuần túy (tránh nhầm lẫn với cụm nội dung văn bản như "Xin chào Đà Nẵng")
+        doc_context_words = [
+            'đà nẵng', 'dự án', 'kế hoạch', 'quyết định', 'công văn', 'thông tư',
+            'nghị định', 'tờ trình', 'văn bản', 'tệp', 'file', 'hồ sơ', 'mẫu',
+            'truyền thông', 'tuyển sinh', 'giáo dục'
+        ]
+        has_doc_context = any(dw in lower_msg for dw in doc_context_words)
+        if not has_doc_context:
+            for kw in cls.INTENT_KEYWORDS[IntentType.CHAO_HOI]:
+                if kw in lower_msg:
+                    return IntentType.CHAO_HOI
+
         for intent, keywords in cls.INTENT_KEYWORDS.items():
+            if intent == IntentType.CHAO_HOI:
+                continue
             for kw in keywords:
                 if kw in lower_msg:
                     return intent
@@ -224,7 +238,8 @@ class ChatbotNLPService:
         4. Kho hồ sơ lưu trữ (HoSoLuuTru)
         """
         results: List[Dict[str, Any]] = []
-        raw_words = [w.strip() for w in query.lower().split() if len(w.strip()) >= 2]
+        raw_words = [w.strip('.,;:!?()"“”\'`') for w in query.lower().split()]
+        raw_words = [w for w in raw_words if len(w) >= 2]
         stopwords = {'tôi', 'cần', 'muốn', 'xin', 'tìm', 'xem', 'cho', 'của', 'và', 'các', 'về', 'trong', 'với'}
         keywords = [w for w in raw_words if w not in stopwords]
         if not keywords:
@@ -233,18 +248,29 @@ class ChatbotNLPService:
         # 1. Tìm trong Kho mẫu văn bản (MauVanBan)
         q_mau = Q()
         for kw in keywords:
-            q_mau |= Q(ten_mau__icontains=kw) | Q(loai_van_ban__icontains=kw) | Q(linh_vuc__icontains=kw) | Q(noi_dung_text__icontains=kw)
+            q_mau |= (
+                Q(ma_mau__icontains=kw) |
+                Q(ten_mau__icontains=kw) |
+                Q(loai_van_ban__icontains=kw) |
+                Q(linh_vuc__icontains=kw) |
+                Q(noi_dung_text__icontains=kw)
+            )
 
         for m in MauVanBan.objects.filter(q_mau):
             score = 0
+            code_low = m.ma_mau.lower()
             t_low = m.ten_mau.lower()
             c_low = f"{m.loai_van_ban} {m.linh_vuc}".lower()
             b_low = m.noi_dung_text.lower()
             phrase = query.lower().strip()
-            if phrase and phrase in t_low:
+            if phrase and (phrase in t_low or phrase in code_low):
                 score += 100
+            elif phrase and phrase in b_low:
+                score += 60
             for kw in keywords:
-                if kw in t_low:
+                if kw in code_low:
+                    score += 50
+                elif kw in t_low:
                     score += 30
                 elif kw in c_low:
                     score += 15

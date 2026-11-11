@@ -129,12 +129,14 @@ urlpatterns = [
     path('api/chatbot/mau-van-ban/<int:mau_id>', cb_views.api_mau_van_ban_detail, name='api_chatbot_mau_detail'),
     path('api/chatbot/mau-van-ban/<int:mau_id>/tai-ve', cb_views.api_mau_van_ban_tai_ve, name='api_chatbot_mau_tai_ve'),
     path('api/chatbot/xem-truoc/<str:loai>/<int:item_id>', cb_views.api_xem_truoc_tai_lieu, name='api_chatbot_xem_truoc'),
+    path('api/chatbot/upload', cb_views.api_upload_kho_luu_tru, name='api_chatbot_upload'),
 
     # Báo cáo Thống kê tổng hợp điều hành văn bản
     path('api/thong-ke', api_thong_ke, name='api_thong_ke'),
     path('api/dashboard/thong-ke', api_thong_ke, name='api_dashboard_thong_ke'),
 
-    # 6. Phục vụ static assets (CSS, JS, Assets)
+    # 6. Phục vụ static & media assets (CSS, JS, Assets, Uploads)
     re_path(r'^(?P<path>(css|js|assets)/.*)$', serve, {'document_root': settings.BASE_DIR / 'static'}),
     re_path(r'^static/(?P<path>.*)$', serve, {'document_root': settings.BASE_DIR / 'static'}),
+    re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
 ]

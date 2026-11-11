@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const btnZoomOut = document.getElementById('btnZoomOut');
       const btnZoomReset = document.getElementById('btnZoomReset');
 
-      // Các phần tử modal kho lưu trữ
+      // Các phần tử modal kho lưu trữ & tải lên
       const repoModal = document.getElementById('repoModal');
       const btnOpenRepo = document.getElementById('btnOpenRepo');
       const btnCloseRepo = document.getElementById('btnCloseRepo');
@@ -29,25 +29,47 @@ document.addEventListener('DOMContentLoaded', async () => {
       const repoTypeSelect = document.getElementById('repoTypeSelect');
       const repoFieldSelect = document.getElementById('repoFieldSelect');
       const btnRefreshRepo = document.getElementById('btnRefreshRepo');
+      const uploadRepoInput = document.getElementById('uploadRepoInput');
+      const repoCountBtn = document.getElementById('repoCountBtn');
 
       let currentZoom = 1.0;
       let currentLoadedMau = null;
+
+      function escapeHtml(str) {
+        if (str === null || str === undefined) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      function formatBotText(text) {
+        return escapeHtml(text)
+          .replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')
+          .replace(/\*(.+?)\*/g, '<i>$1</i>')
+          .replace(/\n/g, '<br>');
+      }
 
       // Hàm lấy class màu cho loại văn bản
       function getBadgeClass(loai) {
         switch (loai) {
           case 'Tờ trình': return 'badge-to-trinh';
           case 'Quyết định': return 'badge-quyet-dinh';
+          case 'Nghị định': return 'badge-nghi-dinh';
+          case 'Thông tư': return 'badge-thong-tu';
           case 'Công văn': return 'badge-cong-van';
           case 'Kế hoạch': return 'badge-ke-hoach';
           case 'Thông báo': return 'badge-thong-bao';
           case 'Biên bản': return 'badge-bien-ban';
           case 'Báo cáo': return 'badge-bao-cao';
+          case 'Văn bản điều hành': return 'badge-cong-van';
           default: return 'badge-cong-van';
         }
       }
 
-      // Render danh sách card mẫu văn bản trong khung chat
+      // Render danh sách card mẫu văn bản / tài liệu trong khung chat
       function renderTemplateCards(templates) {
         if (!templates || templates.length === 0) return '';
 
@@ -55,26 +77,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         templates.forEach(t => {
           const badgeClass = getBadgeClass(t.loai_van_ban);
           const loaiTep = t.loai_tep || 'mau';
+          const isMau = (loaiTep === 'mau' || loaiTep === 'mau_van_ban');
           const downloadUrl = `/api/chatbot/mau-van-ban/${t.mau_id}/tai-ve`;
 
           html += `
-            <div class="template-card" style="cursor: pointer;" onclick="if (!event.target.closest('a')) window.showPreviewModal(${t.mau_id}, '${loaiTep}')" title="Nhấn vào thẻ để xem trước file">
+            <div class="template-card" style="cursor: pointer;" onclick="if (!event.target.closest('a, button')) window.showPreviewModal(${Number(t.mau_id)}, '${escapeHtml(loaiTep)}')" title="Nhấn vào thẻ để xem trước file">
               <div>
                 <div class="template-card-header">
-                  <span class="template-badge ${badgeClass}">${t.loai_van_ban}</span>
-                  <span class="template-code">${t.ma_mau || ''}</span>
+                  <span class="template-badge ${badgeClass}">${escapeHtml(t.loai_van_ban)}</span>
+                  <span class="template-code">${escapeHtml(t.ma_mau || '')}</span>
                 </div>
-                <div class="template-title">${t.ten_mau}</div>
-                <div class="template-field">📂 ${t.linh_vuc || 'Sở GD&ĐT'} | ✍️ ${t.tham_quyen_ky || 'Lãnh đạo Sở'}</div>
-                <div class="template-desc">${t.mo_ta || ''}</div>
+                <div class="template-title">${escapeHtml(t.ten_mau)}</div>
+                <div class="template-field">📂 ${escapeHtml(t.linh_vuc || 'Sở GD&ĐT')} | ✍️ ${escapeHtml(t.tham_quyen_ky || 'Lãnh đạo Sở')}</div>
+                <div class="template-desc">${escapeHtml(t.mo_ta || '')}</div>
               </div>
               <div class="template-actions">
-                <button type="button" class="btn-preview" onclick="event.stopPropagation(); window.showPreviewModal(${t.mau_id}, '${loaiTep}')">
+                <button type="button" class="btn-preview" onclick="event.stopPropagation(); window.showPreviewModal(${Number(t.mau_id)}, '${escapeHtml(loaiTep)}')">
                   <span>👁️ Xem trước (Preview)</span>
                 </button>
+                ${isMau ? `
                 <a href="${downloadUrl}" class="btn-download-doc" download title="Tải file Word mẫu" onclick="event.stopPropagation();">
                   <span>📥 Tải Word (.doc)</span>
-                </a>
+                </a>` : ''}
               </div>
             </div>
           `;
@@ -88,7 +112,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const bubble = document.createElement('div');
         bubble.className = `chat-bubble ${isUser ? 'bubble-user' : 'bubble-bot'}`;
 
-        let content = isUser ? text : `<b>${sender}:</b><br>${text}`;
+        let content = isUser ? escapeHtml(text) : `<b>${escapeHtml(sender)}:</b><br>${formatBotText(text)}`;
         if (templates && templates.length > 0) {
           content += renderTemplateCards(templates);
         }
@@ -113,7 +137,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           </span>
         `;
         chips.forEach(c => {
-          html += `<button class="chip-btn" data-query="${c}">${c}</button>`;
+          html += `<button class="chip-btn" data-query="${escapeHtml(c)}">${escapeHtml(c)}</button>`;
         });
         container.innerHTML = html;
         attachChipEvents();
@@ -171,7 +195,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         previewModalTitle.textContent = 'Đang tải...';
         previewModal.classList.add('active');
         currentZoom = 1.0;
-        printableArea.style.transform = `scale(${currentZoom})`;
+        printableArea.style.transform = 'scale(1)';
+        btnZoomReset.textContent = '100%';
+        const modalBody = previewModal.querySelector('.preview-modal-body');
+        if (modalBody) modalBody.scrollTop = 0;
 
         try {
           let res;
@@ -203,7 +230,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             printableArea.innerHTML = '<div style="color:red; text-align:center; padding: 30px;">Không thể tải dữ liệu mẫu văn bản này.</div>';
           }
         } catch (err) {
-          printableArea.innerHTML = `<div style="color:red; text-align:center; padding: 30px;">Lỗi: ${err.message}</div>`;
+          printableArea.innerHTML = `<div style="color:red; text-align:center; padding: 30px;">Lỗi: ${escapeHtml(err.message)}</div>`;
         }
       };
 
@@ -235,7 +262,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
       btnZoomReset.addEventListener('click', () => {
         currentZoom = 1.0;
-        printableArea.style.transform = `scale(1.0)`;
+        printableArea.style.transform = 'scale(1.0)';
         btnZoomReset.textContent = '100%';
       });
 
@@ -256,10 +283,55 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
 
       // ===================================================================
+      // XỬ LÝ TẢI LÊN VĂN BẢN VÀO KHO LƯU TRỮ (/api/chatbot/upload)
+      // ===================================================================
+      if (uploadRepoInput) {
+        uploadRepoInput.addEventListener('change', async (e) => {
+          const files = e.target.files;
+          if (!files || files.length === 0) return;
+
+          const formData = new FormData();
+          for (let i = 0; i < files.length; i++) {
+            formData.append('files', files[i]);
+          }
+
+          if (window.Toast) window.Toast.info(`Đang đọc và nạp ${files.length} tệp vào kho lưu trữ...`);
+
+          try {
+            const res = await window.api.post('/api/chatbot/upload', formData);
+            if (res.thanh_cong) {
+              if (window.Toast) window.Toast.success(res.thong_bao);
+              if (repoCountBtn && typeof res.tong_so === 'number') {
+                repoCountBtn.textContent = `Kho lưu trữ văn bản (${res.tong_so})`;
+              }
+              if (repoModal.classList.contains('active')) {
+                loadRepository();
+              }
+              const uploadedDocs = res.du_lieu || [];
+              if (uploadedDocs.length > 0) {
+                appendMessage(
+                  'Trợ lý ảo',
+                  `Tôi đã tiếp nhận và trích xuất nội dung **${uploadedDocs.length} tài liệu mới** vào kho lưu trữ để phục vụ tra cứu AI. Đồng chí có thể nhấn vào tài liệu bên dưới để xem trước ngay:`,
+                  false,
+                  uploadedDocs
+                );
+              }
+            } else {
+              if (window.Toast) window.Toast.error(res.thong_bao || 'Không thể tải tệp lên kho lưu trữ.');
+            }
+          } catch (err) {
+            if (window.Toast) window.Toast.error('Lỗi tải tệp: ' + err.message);
+          } finally {
+            uploadRepoInput.value = '';
+          }
+        });
+      }
+
+      // ===================================================================
       // XỬ LÝ KHÁM PHÁ TOÀN BỘ KHO LƯU TRỮ (MODAL REPO)
       // ===================================================================
       async function loadRepository() {
-        repoGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #64748b;">Đang tải danh sách biểu mẫu...</div>';
+        repoGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #64748b;">Đang tải danh sách văn bản & biểu mẫu...</div>';
 
         const keyword = repoSearchInput.value.trim();
         const loai = repoTypeSelect.value;
@@ -269,17 +341,20 @@ document.addEventListener('DOMContentLoaded', async () => {
           const res = await window.api.get('/api/chatbot/kho-mau', { keyword, loai, linh_vuc });
           if (res.thanh_cong) {
             renderRepoGrid(res.danh_sach_mau);
+            if (!keyword && !loai && !linh_vuc && repoCountBtn && typeof res.tong_so === 'number') {
+              repoCountBtn.textContent = `Kho lưu trữ văn bản (${res.tong_so})`;
+            }
           } else {
-            repoGrid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: red;">${res.thong_bao}</div>`;
+            repoGrid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: red;">${escapeHtml(res.thong_bao)}</div>`;
           }
         } catch (err) {
-          repoGrid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: red;">Lỗi tải kho mẫu: ${err.message}</div>`;
+          repoGrid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: red;">Lỗi tải kho mẫu: ${escapeHtml(err.message)}</div>`;
         }
       }
 
       function renderRepoGrid(list) {
         if (!list || list.length === 0) {
-          repoGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #64748b;">Không tìm thấy mẫu văn bản nào phù hợp với bộ lọc.</div>';
+          repoGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #64748b;">Không tìm thấy văn bản nào phù hợp với bộ lọc.</div>';
           return;
         }
 
@@ -289,18 +364,18 @@ document.addEventListener('DOMContentLoaded', async () => {
           const downloadUrl = `/api/chatbot/mau-van-ban/${t.mau_id}/tai-ve`;
 
           html += `
-            <div class="template-card" style="cursor: pointer;" onclick="if (!event.target.closest('a')) window.showPreviewModal(${t.mau_id}, 'mau')" title="Nhấn vào thẻ để xem trước file">
+            <div class="template-card" style="cursor: pointer;" onclick="if (!event.target.closest('a, button')) window.showPreviewModal(${Number(t.mau_id)}, 'mau')" title="Nhấn vào thẻ để xem trước file">
               <div>
                 <div class="template-card-header">
-                  <span class="template-badge ${badgeClass}">${t.loai_van_ban}</span>
-                  <span class="template-code">${t.ma_mau}</span>
+                  <span class="template-badge ${badgeClass}">${escapeHtml(t.loai_van_ban)}</span>
+                  <span class="template-code">${escapeHtml(t.ma_mau)}</span>
                 </div>
-                <div class="template-title">${t.ten_mau}</div>
-                <div class="template-field">📂 ${t.linh_vuc} | ✍️ ${t.tham_quyen_ky || 'Lãnh đạo Sở'}</div>
-                <div class="template-desc">${t.mo_ta || ''}</div>
+                <div class="template-title">${escapeHtml(t.ten_mau)}</div>
+                <div class="template-field">📂 ${escapeHtml(t.linh_vuc)} | ✍️ ${escapeHtml(t.tham_quyen_ky || 'Lãnh đạo Sở')}</div>
+                <div class="template-desc">${escapeHtml(t.mo_ta || '')}</div>
               </div>
               <div class="template-actions">
-                <button type="button" class="btn-preview" onclick="event.stopPropagation(); window.showPreviewModal(${t.mau_id}, 'mau')">
+                <button type="button" class="btn-preview" onclick="event.stopPropagation(); window.showPreviewModal(${Number(t.mau_id)}, 'mau')">
                   <span>👁️ Xem trước</span>
                 </button>
                 <a href="${downloadUrl}" class="btn-download-doc" download title="Tải file Word mẫu" onclick="event.stopPropagation();">
@@ -324,6 +399,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       repoModal.addEventListener('click', (e) => {
         if (e.target === repoModal) repoModal.classList.remove('active');
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          if (previewModal.classList.contains('active')) {
+            closePreviewModal();
+          } else if (repoModal.classList.contains('active')) {
+            repoModal.classList.remove('active');
+          }
+        }
       });
 
       repoSearchInput.addEventListener('input', () => {

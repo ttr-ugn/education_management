@@ -51,3 +51,30 @@ class ChatbotServiceTestCase(TestCase):
 
         # Kiểm tra bản ghi lịch sử chat được lưu trong database
         self.assertEqual(LichSuChat.objects.count(), 1)
+
+    def test_xin_chao_da_nang_not_swallowed_by_greeting(self):
+        MauVanBan.objects.create(
+            ma_mau="128/KH-UBND",
+            ten_mau="Kế hoạch thực hiện Dự án truyền thông “Xin chào Đà Nẵng - Global Greetings to Da Nang”",
+            loai_van_ban="Kế hoạch",
+            linh_vuc="Hành chính - Đối ngoại",
+            noi_dung_html="<p>Xin chào Đà Nẵng</p>",
+            noi_dung_text="Dự án truyền thông Xin chào Đà Nẵng Global Greetings to Da Nang"
+        )
+        res = ChatbotNLPService.process_message("Xin chào Đà Nẵng")
+        self.assertNotEqual(res['intent'], IntentType.CHAO_HOI)
+        self.assertGreaterEqual(len(res['suggested_templates']), 1)
+        self.assertEqual(res['suggested_templates'][0]['ma_mau'], "128/KH-UBND")
+
+    def test_search_repository_by_code(self):
+        MauVanBan.objects.create(
+            ma_mau="1752/QĐ-SGDĐT",
+            ten_mau="Quyết định phê duyệt chỉ tiêu tuyển sinh lớp 10",
+            loai_van_ban="Quyết định",
+            linh_vuc="Giáo dục Trung học",
+            noi_dung_html="<p>1752</p>",
+            noi_dung_text="chỉ tiêu tuyển sinh lớp 10 THPT tư thục"
+        )
+        results = ChatbotNLPService.search_repository("1752")
+        self.assertGreaterEqual(len(results), 1)
+        self.assertEqual(results[0]['ma_mau'], "1752/QĐ-SGDĐT")
