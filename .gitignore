@@ -4,8 +4,7 @@ env/
 .venv/
 
 # PyCharm & VS Code
-.idea/*
-!.idea/runConfigurations/
+.idea/
 .vscode/
 *.swp
 *.swo
@@ -15,12 +14,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# Biến môi trường bí mật (chỉ commit .env.example)
+# Biến môi trường cục bộ
 .env
 
 # Cơ sở dữ liệu SQLite
-database/*.db
-database/*.sqlite3
 *.db
 *.sqlite3
 
