@@ -54,10 +54,10 @@ function openPreviewModal(docId, fileType, fileName, trichYeu, soKyHieu) {
       if (user.vai_tro === 'VAN_THU') {
         headerActions.innerHTML = `
           <a href="kiem-tra.html" class="btn btn-warning">
-            📥 Tiếp nhận dự thảo Chuyên viên gửi
+            Tiếp nhận dự thảo Chuyên viên gửi
           </a>
           <a href="ban-hanh.html" class="btn btn-success">
-            📑 Cấp số & Ban hành
+            Cấp số & Ban hành
           </a>
           <a href="soan-thao.html" class="btn btn-primary">
             + Soạn thảo mới
@@ -66,7 +66,7 @@ function openPreviewModal(docId, fileType, fileName, trichYeu, soKyHieu) {
       } else if (user.vai_tro === 'LANH_DAO') {
         headerActions.innerHTML = `
           <a href="phe-duyet.html" class="btn btn-warning">
-            ✍ Ký số & Duyệt văn bản
+            Ký số & Duyệt văn bản
           </a>
         `;
       } else {
@@ -83,15 +83,15 @@ function openPreviewModal(docId, fileType, fileName, trichYeu, soKyHieu) {
       const reloadBtn = document.getElementById('reloadBtn');
 
       const STATUS_LABELS = {
-        'CHO_VAN_THU_KIEM_TRA': '<span class="badge" style="background: #fef3c7; color: #b45309; border: 1px solid #fde68a; padding: 4px 10px; border-radius: 20px; font-weight: 600; font-size: 11.5px; display: inline-flex; align-items: center; gap: 4px;">⏳ Chờ VT kiểm tra</span>',
-        'VAN_THU_TRA_LAI': '<span class="badge" style="background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; padding: 4px 10px; border-radius: 20px; font-weight: 600; font-size: 11.5px; display: inline-flex; align-items: center; gap: 4px;">↩️ VT trả lại</span>',
-        'CHO_LANH_DAO_KY': '<span class="badge" style="background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; padding: 4px 10px; border-radius: 20px; font-weight: 600; font-size: 11.5px; display: inline-flex; align-items: center; gap: 4px;">✍️ Chờ LĐ ký</span>',
-        'CHO_LANH_DAO_DUYET': '<span class="badge" style="background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; padding: 4px 10px; border-radius: 20px; font-weight: 600; font-size: 11.5px; display: inline-flex; align-items: center; gap: 4px;">✍️ Chờ LĐ ký</span>',
-        'LANH_DAO_TRA_LAI': '<span class="badge" style="background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; padding: 4px 10px; border-radius: 20px; font-weight: 600; font-size: 11.5px; display: inline-flex; align-items: center; gap: 4px;">↩️ LĐ trả lại</span>',
-        'DA_KY_CHO_BAN_HANH': '<span class="badge" style="background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; padding: 4px 10px; border-radius: 20px; font-weight: 600; font-size: 11.5px; display: inline-flex; align-items: center; gap: 4px;">📝 Chờ ban hành</span>',
-        'DA_DUYET': '<span class="badge" style="background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; padding: 4px 10px; border-radius: 20px; font-weight: 600; font-size: 11.5px; display: inline-flex; align-items: center; gap: 4px;">📝 Chờ ban hành</span>',
-        'DA_BAN_HANH': '<span class="badge" style="background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; padding: 4px 10px; border-radius: 20px; font-weight: 600; font-size: 11.5px; display: inline-flex; align-items: center; gap: 4px;">✅ Đã ban hành</span>',
-        'YEU_CAU_CHINH_SUA': '<span class="badge" style="background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; padding: 4px 10px; border-radius: 20px; font-weight: 600; font-size: 11.5px; display: inline-flex; align-items: center; gap: 4px;">⚠️ Cần sửa</span>'
+        'CHO_VAN_THU_KIEM_TRA': '<span class="badge" style="background: #fef3c7; color: #b45309; border: 1px solid #fde68a; padding: 4px 10px; border-radius: 20px; font-weight: 600; font-size: 11.5px; display: inline-flex; align-items: center; gap: 4px;">Chờ VT kiểm tra</span>',
+        'VAN_THU_TRA_LAI': '<span class="badge" style="background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; padding: 4px 10px; border-radius: 20px; font-weight: 600; font-size: 11.5px; display: inline-flex; align-items: center; gap: 4px;">VT trả lại</span>',
+        'CHO_LANH_DAO_KY': '<span class="badge" style="background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; padding: 4px 10px; border-radius: 20px; font-weight: 600; font-size: 11.5px; display: inline-flex; align-items: center; gap: 4px;">Chờ LĐ ký</span>',
+        'CHO_LANH_DAO_DUYET': '<span class="badge" style="background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; padding: 4px 10px; border-radius: 20px; font-weight: 600; font-size: 11.5px; display: inline-flex; align-items: center; gap: 4px;">Chờ LĐ ký</span>',
+        'LANH_DAO_TRA_LAI': '<span class="badge" style="background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; padding: 4px 10px; border-radius: 20px; font-weight: 600; font-size: 11.5px; display: inline-flex; align-items: center; gap: 4px;">LĐ trả lại</span>',
+        'DA_KY_CHO_BAN_HANH': '<span class="badge" style="background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; padding: 4px 10px; border-radius: 20px; font-weight: 600; font-size: 11.5px; display: inline-flex; align-items: center; gap: 4px;">Chờ ban hành</span>',
+        'DA_DUYET': '<span class="badge" style="background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; padding: 4px 10px; border-radius: 20px; font-weight: 600; font-size: 11.5px; display: inline-flex; align-items: center; gap: 4px;">Chờ ban hành</span>',
+        'DA_BAN_HANH': '<span class="badge" style="background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; padding: 4px 10px; border-radius: 20px; font-weight: 600; font-size: 11.5px; display: inline-flex; align-items: center; gap: 4px;">Đã ban hành</span>',
+        'YEU_CAU_CHINH_SUA': '<span class="badge" style="background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; padding: 4px 10px; border-radius: 20px; font-weight: 600; font-size: 11.5px; display: inline-flex; align-items: center; gap: 4px;">Cần sửa</span>'
       };
 
       async function loadData() {
@@ -161,7 +161,7 @@ function openPreviewModal(docId, fileType, fileName, trichYeu, soKyHieu) {
                 <a href="chi-tiet.html?id=${docId}" style="color: #0f172a; font-weight: 600; font-size: 13.5px; line-height: 1.45; text-decoration: none; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;" title="${safeTrichYeu}">
                   ${item.trich_yeu || ''}
                 </a>
-                ${item.ly_do_chinh_sua ? `<div style="font-size: 11.5px; color: #dc2626; background: #fef2f2; border: 1px solid #fecaca; padding: 2px 8px; border-radius: 4px; margin-top: 5px; display: inline-flex; align-items: center; gap: 4px;">⚠️ Ý kiến: ${item.ly_do_chinh_sua}</div>` : ''}
+                ${item.ly_do_chinh_sua ? `<div style="font-size: 11.5px; color: #dc2626; background: #fef2f2; border: 1px solid #fecaca; padding: 2px 8px; border-radius: 4px; margin-top: 5px; display: inline-flex; align-items: center; gap: 4px;">Ý kiến: ${item.ly_do_chinh_sua}</div>` : ''}
               </div>
             `;
 
@@ -196,7 +196,7 @@ function openPreviewModal(docId, fileType, fileName, trichYeu, soKyHieu) {
             const leaderName = item.lanh_dao_ky || item.lanh_dao_ky_ten || 'Lãnh đạo Sở';
             const lanhDaoHtml = `
               <span style="display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; background: #faf5ff; color: #7e22ce; border: 1px solid #e9d5ff; border-radius: 20px; font-size: 12px; font-weight: 600; white-space: nowrap;">
-                <span>🏛️</span>
+                
                 <span>${leaderName}</span>
               </span>
             `;
@@ -208,9 +208,9 @@ function openPreviewModal(docId, fileType, fileName, trichYeu, soKyHieu) {
             const ngaySoanHtml = `
               <div style="white-space: nowrap;">
                 <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; color: #334155;">
-                  📅 ${datePart}
+                  ${datePart}
                 </span>
-                ${timePart ? `<div style="font-size: 11px; color: #94a3b8; margin-top: 2px; padding-left: 18px;">${timePart}</div>` : ''}
+                ${timePart ? `<div style="font-size: 11px; color: #94a3b8; margin-top: 2px;">${timePart}</div>` : ''}
               </div>
             `;
 
@@ -243,7 +243,7 @@ function openPreviewModal(docId, fileType, fileName, trichYeu, soKyHieu) {
           }).join('');
         } catch (err) {
           console.error('Lỗi khi tải dữ liệu văn bản đi:', err);
-          tbody.innerHTML = `<tr><td colspan="8" class="text-center p-4 text-danger">⚠️ Đã xảy ra lỗi khi tải danh sách: ${err.message}</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="8" class="text-center p-4 text-danger">Đã xảy ra lỗi khi tải danh sách: ${err.message}</td></tr>`;
         }
       }
 

@@ -82,16 +82,15 @@
     dropdown.innerHTML = `
       <div class="notif-dropdown-header">
         <div class="notif-dropdown-title">
-          <span>🔔</span>
           <span>Thông báo & Lời nhắc</span>
         </div>
         <button type="button" class="btn btn-outline-secondary btn-sm" id="btnQuickMarkAll" style="font-size: 11px; padding: 2px 8px;">
-          ✓ Đọc tất cả
+          Đọc tất cả
         </button>
       </div>
       <div class="notif-dropdown-tabs">
         <button class="notif-tab-btn active" data-tab="all">Tất cả</button>
-        <button class="notif-tab-btn" data-tab="due">⏰ Đến hạn (<span id="notifDueCount">0</span>)</button>
+        <button class="notif-tab-btn" data-tab="due">Đến hạn (<span id="notifDueCount">0</span>)</button>
       </div>
       <div class="notif-dropdown-list" id="notifDropdownList">
         <div class="text-center text-muted" style="padding: 24px; font-size: 13px;">
@@ -168,7 +167,6 @@
       } catch (err) {
         listEl.innerHTML = `
           <div class="text-center text-muted" style="padding: 24px; font-size: 13px;">
-            <div style="font-size: 24px; margin-bottom: 4px;">📭</div>
             Không có thông báo mới nào.
           </div>
         `;
@@ -186,7 +184,6 @@
       if (displayItems.length === 0) {
         listEl.innerHTML = `
           <div class="text-center text-muted" style="padding: 30px 16px; font-size: 13px;">
-            <div style="font-size: 24px; margin-bottom: 4px;">📭</div>
             Không có ${activeTab === 'due' ? 'nhắc nhở nào đến hạn' : 'thông báo nào'}.
           </div>
         `;
@@ -196,7 +193,7 @@
       listEl.innerHTML = displayItems.slice(0, 8).map(item => {
         let badgeHtml = '';
         if (item.da_den_han) {
-          badgeHtml = '<span class="badge badge-danger">⏰ ĐẾN HẠN</span>';
+          badgeHtml = '<span class="badge badge-danger">ĐẾN HẠN</span>';
         } else if (item.muc_do === 'Khẩn cấp') {
           badgeHtml = '<span class="badge badge-danger">Hỏa tốc</span>';
         } else if (item.muc_do === 'Quan trọng') {
@@ -221,7 +218,7 @@
             <div class="notif-item-desc">${item.noi_dung}</div>
             ${item.ngay_hen_gio ? `
               <div style="font-size: 11px; color: #dc2626; font-weight: 600; margin-top: 2px;">
-                ⏰ Hạn xử lý: ${item.ngay_hen_gio}
+                Hạn xử lý: ${item.ngay_hen_gio}
               </div>
             ` : ''}
           </div>
@@ -311,7 +308,7 @@
             alertedIds.add(item.id);
             hasNewDue = true;
             if (window.Toast) {
-              window.Toast.warning(`⏰ [NHẮC NHỞ ĐẾN HẠN] ${item.tieu_de}\nNội dung: ${item.noi_dung.substring(0, 80)}...`);
+              window.Toast.warning(`[NHẮC NHỞ ĐẾN HẠN] ${item.tieu_de}\nNội dung: ${item.noi_dung.substring(0, 80)}...`);
             }
           }
         });

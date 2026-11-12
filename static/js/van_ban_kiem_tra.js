@@ -128,7 +128,7 @@ let currentFilterStatus = 'CHO_VAN_THU_KIEM_TRA';
               <a href="chi-tiet.html?id=${d.id}" style="color: #0f172a; font-weight: 600; font-size: 13.5px; line-height: 1.45; text-decoration: none; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;" title="${d.trich_yeu || ''}">
                 ${d.trich_yeu || ''}
               </a>
-              ${d.ly_do_chinh_sua ? `<div style="font-size: 11.5px; color: #dc2626; background: #fef2f2; border: 1px solid #fecaca; padding: 2px 8px; border-radius: 4px; margin-top: 5px; display: inline-flex; align-items: center; gap: 4px;">⚠️ Ý kiến: ${d.ly_do_chinh_sua}</div>` : ''}
+              ${d.ly_do_chinh_sua ? `<div style="font-size: 11.5px; color: #dc2626; background: #fef2f2; border: 1px solid #fecaca; padding: 2px 8px; border-radius: 4px; margin-top: 5px; display: inline-flex; align-items: center; gap: 4px;">Ý kiến: ${d.ly_do_chinh_sua}</div>` : ''}
             </div>
           `;
 
@@ -162,7 +162,7 @@ let currentFilterStatus = 'CHO_VAN_THU_KIEM_TRA';
           // 5. Lãnh đạo ký chip
           const lanhDaoHtml = `
             <span style="display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; background: #faf5ff; color: #7e22ce; border: 1px solid #e9d5ff; border-radius: 20px; font-size: 12px; font-weight: 600; white-space: nowrap;">
-              <span>🏛️</span>
+              
               <span>${d.lanh_dao_ky_ten || d.lanh_dao_ky || 'Lãnh đạo Sở'}</span>
             </span>
           `;
@@ -187,9 +187,9 @@ let currentFilterStatus = 'CHO_VAN_THU_KIEM_TRA';
           const ngayGuiHtml = `
             <div style="white-space: nowrap;">
               <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; color: #334155;">
-                📅 ${datePart}
+                ${datePart}
               </span>
-              ${timePart ? `<div style="font-size: 11px; color: #94a3b8; margin-top: 2px; padding-left: 18px;">${timePart}</div>` : ''}
+              ${timePart ? `<div style="font-size: 11px; color: #94a3b8; margin-top: 2px;">${timePart}</div>` : ''}
             </div>
           `;
 
@@ -218,14 +218,14 @@ let currentFilterStatus = 'CHO_VAN_THU_KIEM_TRA';
             actionsHtml = `
               <span class="badge" style="display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; font-size: 12px; font-weight: 600; border-radius: 20px; background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; box-shadow: 0 1px 2px rgba(29, 78, 216, 0.05); white-space: nowrap;">
                 <span style="width: 6px; height: 6px; border-radius: 50%; background: #2563eb; display: inline-block;"></span>
-                <span>✍️ Đang chờ LĐ ký số</span>
+                <span>Đang chờ LĐ ký số</span>
               </span>
             `;
           } else if (d.trang_thai === 'VAN_THU_TRA_LAI') {
             actionsHtml = `
               <span class="badge" style="display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; font-size: 12px; font-weight: 600; border-radius: 20px; background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; box-shadow: 0 1px 2px rgba(185, 28, 28, 0.05); white-space: nowrap;">
                 <span style="width: 6px; height: 6px; border-radius: 50%; background: #ef4444; display: inline-block;"></span>
-                <span>↩️ Đã trả lại Chuyên viên</span>
+                <span>Đã trả lại Chuyên viên</span>
               </span>
             `;
           } else {

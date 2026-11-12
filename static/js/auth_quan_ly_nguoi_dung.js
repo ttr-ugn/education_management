@@ -79,7 +79,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           // 3. Email
           const emailHtml = `
             <div style="display: inline-flex; align-items: center; gap: 5px; color: #475569; font-size: 12px;">
-              <span style="opacity: 0.7;">✉️</span>
               <span>${u.email}</span>
             </div>
           `;
@@ -95,12 +94,11 @@ document.addEventListener('DOMContentLoaded', async () => {
           // 5. Đăng nhập cuối
           const lastLoginHtml = u.lan_dang_nhap_cuoi ? `
             <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: #334155; font-weight: 500;">
-              <span>📅</span>
               <span>${u.lan_dang_nhap_cuoi}</span>
             </span>
           ` : `
             <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 11.5px; color: #94a3b8; background: #f8fafc; border: 1px solid #e2e8f0; padding: 2px 8px; border-radius: 6px;">
-              <span>⏱️ Chưa đăng nhập</span>
+              <span>Chưa đăng nhập</span>
             </span>
           `;
 
@@ -108,22 +106,22 @@ document.addEventListener('DOMContentLoaded', async () => {
           let actionBtns = '';
           if (u.trang_thai === 'CHO_DUYET') {
             actionBtns += `
-              <button class="btn-action-soft btn-action-unlock btn-approve" data-id="${u.nguoi_dung_id}" data-name="${u.ho_va_ten}">✓ Duyệt</button>
-              <button class="btn-action-soft btn-action-lock btn-reject" data-id="${u.nguoi_dung_id}" data-name="${u.ho_va_ten}">✕ Từ chối</button>
+              <button class="btn-action-soft btn-action-unlock btn-approve" data-id="${u.nguoi_dung_id}" data-name="${u.ho_va_ten}">Duyệt</button>
+              <button class="btn-action-soft btn-action-lock btn-reject" data-id="${u.nguoi_dung_id}" data-name="${u.ho_va_ten}">Từ chối</button>
             `;
           } else {
             if (u.trang_thai === 'HOAT_DONG') {
               if (isSelf) {
-                actionBtns += `<span style="border: 1px solid #e2e8f0; background: #f8fafc; color: #64748b; padding: 5px 12px; border-radius: 6px; font-size: 11.5px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">👤 Bạn</span>`;
+                actionBtns += `<span style="border: 1px solid #e2e8f0; background: #f8fafc; color: #64748b; padding: 5px 12px; border-radius: 6px; font-size: 11.5px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">Bạn</span>`;
               } else {
-                actionBtns += `<button class="btn-action-soft btn-action-lock btn-lock" data-id="${u.nguoi_dung_id}" data-name="${u.ho_va_ten}" title="Khóa tài khoản cán bộ này">🔒 Khóa</button>`;
+                actionBtns += `<button class="btn-action-soft btn-action-lock btn-lock" data-id="${u.nguoi_dung_id}" data-name="${u.ho_va_ten}" title="Khóa tài khoản cán bộ này">Khóa</button>`;
               }
             } else if (u.trang_thai === 'BI_KHOA') {
-              actionBtns += `<button class="btn-action-soft btn-action-unlock btn-unlock" data-id="${u.nguoi_dung_id}" data-name="${u.ho_va_ten}" title="Mở khóa tài khoản">🔓 Mở khóa</button>`;
+              actionBtns += `<button class="btn-action-soft btn-action-unlock btn-unlock" data-id="${u.nguoi_dung_id}" data-name="${u.ho_va_ten}" title="Mở khóa tài khoản">Mở khóa</button>`;
             }
 
             if (u.trang_thai !== 'TU_CHOI' && !isSelf) {
-              actionBtns += `<button class="btn-action-soft btn-action-reset btn-reset-pwd" data-id="${u.nguoi_dung_id}" data-name="${u.ho_va_ten}" title="Cấp lại mật khẩu mới cho cán bộ">🔑 Đặt lại MK</button>`;
+              actionBtns += `<button class="btn-action-soft btn-action-reset btn-reset-pwd" data-id="${u.nguoi_dung_id}" data-name="${u.ho_va_ten}" title="Cấp lại mật khẩu mới cho cán bộ">Đặt lại MK</button>`;
             }
           }
 

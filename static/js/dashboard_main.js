@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
           <a href="van-ban-di/kiem-tra.html" class="btn btn-warning">
 
-            📥 Kiểm tra dự thảo Chuyên viên (${draftCount})
+            Kiểm tra dự thảo Chuyên viên (${draftCount})
 
           </a>
 
@@ -120,19 +120,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
           <a href="van-ban-di/phe-duyet.html" class="btn btn-warning">
 
-            ✍ Ký số & Phê duyệt VB
+            Ký số & Phê duyệt VB
 
           </a>
 
           <a href="ho-so/danh-sach.html" class="btn btn-primary">
 
-            📁 Xem Hồ sơ tài liệu
+            Xem Hồ sơ tài liệu
 
           </a>
 
           <a href="thong-ke.html" class="btn btn-secondary">
 
-            📊 Xem Báo cáo thống kê
+            Xem Báo cáo thống kê
 
           </a>
 
@@ -191,7 +191,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           const statusConfig = {
             'CHO_LANH_DAO_KY': {
               label: 'Chờ LĐ ký',
-              icon: '✍️',
               bg: '#eff6ff',
               color: '#1d4ed8',
               border: '#bfdbfe',
@@ -199,7 +198,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             },
             'CHO_LANH_DAO_DUYET': {
               label: 'Chờ LĐ duyệt',
-              icon: '✍️',
               bg: '#eff6ff',
               color: '#1d4ed8',
               border: '#bfdbfe',
@@ -207,7 +205,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             },
             'CHO_VAN_THU_KIEM_TRA': {
               label: 'Chờ VT kiểm tra',
-              icon: '⏳',
               bg: '#fffbeb',
               color: '#b45309',
               border: '#fde68a',
@@ -215,7 +212,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             },
             'DA_KY_CHO_BAN_HANH': {
               label: 'Chờ ban hành',
-              icon: '📝',
               bg: '#f0fdf4',
               color: '#15803d',
               border: '#bbf7d0',
@@ -223,7 +219,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             },
             'DA_DUYET': {
               label: 'Chờ ban hành',
-              icon: '📝',
               bg: '#f0fdf4',
               color: '#15803d',
               border: '#bbf7d0',
@@ -231,7 +226,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             },
             'DA_BAN_HANH': {
               label: 'Đã ban hành',
-              icon: '✅',
               bg: '#ecfdf5',
               color: '#047857',
               border: '#a7f3d0',
@@ -239,7 +233,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             },
             'VAN_THU_TRA_LAI': {
               label: 'VT trả lại',
-              icon: '↩️',
               bg: '#fef2f2',
               color: '#b91c1c',
               border: '#fecaca',
@@ -247,7 +240,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             },
             'LANH_DAO_TRA_LAI': {
               label: 'LĐ trả lại',
-              icon: '↩️',
               bg: '#fef2f2',
               color: '#b91c1c',
               border: '#fecaca',
@@ -278,7 +270,6 @@ document.addEventListener('DOMContentLoaded', async () => {
               // 2. Huy hiệu trạng thái cao cấp
               const cfg = statusConfig[d.trang_thai] || {
                 label: d.trang_thai || 'Đang xử lý',
-                icon: '📌',
                 bg: '#f1f5f9',
                 color: '#475569',
                 border: '#cbd5e1',
@@ -288,7 +279,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               const badgeHtml = `
                 <span class="badge" style="display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; font-size: 12px; font-weight: 600; border-radius: 20px; background: ${cfg.bg}; color: ${cfg.color}; border: 1px solid ${cfg.border}; box-shadow: 0 1px 2px rgba(0,0,0,0.04); white-space: nowrap;">
                   <span style="width: 7px; height: 7px; border-radius: 50%; background: ${cfg.dot}; display: inline-block;"></span>
-                  <span>${cfg.icon} ${cfg.label}</span>
+                  <span>${cfg.label}</span>
                 </span>
               `;
 
@@ -321,7 +312,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                   </a>
                   <div style="display: flex; align-items: center; gap: 6px; margin-top: 4px; flex-wrap: wrap;">
                     ${d.loai_van_ban ? `<span style="font-size: 11px; padding: 1px 7px; background: #f1f5f9; color: #475569; border-radius: 4px; border: 1px solid #e2e8f0; font-weight: 500;">${escapeHtml(d.loai_van_ban)}</span>` : ''}
-                    ${d.do_khan && d.do_khan === 'Khẩn' ? `<span style="font-size: 10.5px; padding: 1px 6px; background: #fef2f2; color: #dc2626; border-radius: 4px; border: 1px solid #fecaca; font-weight: 600;">⚡ Khẩn</span>` : ''}
+                    ${d.do_khan && d.do_khan === 'Khẩn' ? `<span style="font-size: 10.5px; padding: 1px 6px; background: #fef2f2; color: #dc2626; border-radius: 4px; border: 1px solid #fecaca; font-weight: 600;">Khẩn</span>` : ''}
                   </div>
                 </div>
               `;

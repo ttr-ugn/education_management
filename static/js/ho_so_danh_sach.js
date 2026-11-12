@@ -26,7 +26,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       const statusConfig = {
         'DA_LUU_TRU': {
           label: 'Đã lưu trữ',
-          icon: '📦',
           bg: '#ecfdf5',
           color: '#047857',
           border: '#a7f3d0',
@@ -34,7 +33,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         },
         'DA_NOP_LUU_TRU': {
           label: 'Đã lưu trữ',
-          icon: '📦',
           bg: '#ecfdf5',
           color: '#047857',
           border: '#a7f3d0',
@@ -42,7 +40,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         },
         'DANG_THU_THAP': {
           label: 'Đang thu thập',
-          icon: '📂',
           bg: '#fffbeb',
           color: '#b45309',
           border: '#fde68a',
@@ -50,7 +47,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         },
         'DA_DONG': {
           label: 'Đã đóng hồ sơ',
-          icon: '🔒',
           bg: '#f1f5f9',
           color: '#475569',
           border: '#cbd5e1',
@@ -85,7 +81,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Tình trạng badge
             const cfg = statusConfig[item.tinh_trang] || {
               label: item.tinh_trang || 'Đang xử lý',
-              icon: '📌',
               bg: '#f1f5f9',
               color: '#475569',
               border: '#cbd5e1',
@@ -95,7 +90,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const badgeHtml = `
               <span class="badge" style="display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; font-size: 12px; font-weight: 600; border-radius: 20px; background: ${cfg.bg}; color: ${cfg.color}; border: 1px solid ${cfg.border}; box-shadow: 0 1px 2px rgba(0,0,0,0.04); white-space: nowrap;">
                 <span style="width: 6px; height: 6px; border-radius: 50%; background: ${cfg.dot}; display: inline-block;"></span>
-                <span>${cfg.icon} ${cfg.label}</span>
+                <span>${cfg.label}</span>
               </span>
             `;
 
@@ -130,17 +125,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <td style="vertical-align: middle; padding: 12px 16px;">${authorHtml}</td>
                 <td style="vertical-align: middle; padding: 12px 16px; text-align: center;">
                   <span style="display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 12px; font-weight: 600; color: #475569;">
-                    📅 ${escapeHtml(item.nam_tai_lieu || '2026')}
+                    ${escapeHtml(item.nam_tai_lieu || '2026')}
                   </span>
                 </td>
                 <td style="vertical-align: middle; padding: 12px 16px; text-align: center;">
                   <span class="badge" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; font-size: 11.5px; font-weight: 600; border-radius: 20px; background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; white-space: nowrap;">
-                    ⏱️ ${escapeHtml(item.thoi_han_bao_quan || 'Vĩnh viễn')}
+                    ${escapeHtml(item.thoi_han_bao_quan || 'Vĩnh viễn')}
                   </span>
                 </td>
                 <td style="vertical-align: middle; padding: 12px 16px; text-align: center;">
                   <span style="display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 14px; font-size: 12px; font-weight: 700; color: #1e293b; white-space: nowrap;">
-                    📄 ${item.so_luong_van_ban || 0} VB
+                    ${item.so_luong_van_ban || 0} VB
                   </span>
                 </td>
                 <td style="vertical-align: middle; padding: 12px 16px;">${badgeHtml}</td>

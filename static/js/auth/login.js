@@ -53,9 +53,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // 3. Hàm hiển thị thông báo
-  function showAlert(message, type = 'danger', icon = '⚠') {
+  function showAlert(message, type = 'danger', icon = '') {
     alertBox.className = `auth-alert auth-alert-${type} show`;
-    alertIcon.textContent = icon;
+    alertIcon.textContent = '';
     alertMsg.textContent = message;
   }
 
@@ -73,13 +73,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const mat_khau = passwordInput.value;
 
     if (!ten_dang_nhap) {
-      showAlert('Vui lòng nhập tên đăng nhập.', 'warning', '⚠');
+      showAlert('Vui lòng nhập tên đăng nhập.', 'warning');
       usernameInput.focus();
       return;
     }
 
     if (!mat_khau) {
-      showAlert('Vui lòng nhập mật khẩu.', 'warning', '⚠');
+      showAlert('Vui lòng nhập mật khẩu.', 'warning');
       passwordInput.focus();
       return;
     }
@@ -117,21 +117,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Xử lý thông báo theo từng trạng thái cụ thể
       if (status === 423) {
-        showAlert(errorMsg, 'warning', '🔒');
+        showAlert(errorMsg, 'warning');
       } else if (status === 403) {
         if (errorMsg.includes('chờ Văn thư')) {
-          showAlert('Tài khoản của bạn đang ở trạng thái CHỜ DUYỆT. Vui lòng liên hệ Văn thư Sở để được phê duyệt trước khi đăng nhập.', 'info', '⏳');
+          showAlert('Tài khoản của bạn đang ở trạng thái CHỜ DUYỆT. Vui lòng liên hệ Văn thư Sở để được phê duyệt trước khi đăng nhập.', 'info');
         } else if (errorMsg.includes('từ chối')) {
-          showAlert(errorMsg, 'danger', '🚫');
+          showAlert(errorMsg, 'danger');
         } else if (errorMsg.includes('đã bị khóa')) {
-          showAlert('Tài khoản của bạn đã bị KHÓA bởi Quản trị viên. Vui lòng liên hệ bộ phận Văn thư Sở để được hỗ trợ mở khóa.', 'danger', '⛔');
+          showAlert('Tài khoản của bạn đã bị KHÓA bởi Quản trị viên. Vui lòng liên hệ bộ phận Văn thư Sở để được hỗ trợ mở khóa.', 'danger');
         } else {
-          showAlert(errorMsg, 'danger', '⚠');
+          showAlert(errorMsg, 'danger');
         }
       } else if (errorMsg.includes('Failed to fetch') || err.name === 'TypeError') {
-        showAlert('Không thể kết nối đến máy chủ Django backend. Hãy truy cập đúng http://127.0.0.1:8000 và bấm Ctrl + F5 để làm mới bộ nhớ đệm.', 'danger', '⚠');
+        showAlert('Không thể kết nối đến máy chủ Django backend. Hãy truy cập đúng http://127.0.0.1:8000 và bấm Ctrl + F5 để làm mới bộ nhớ đệm.', 'danger');
       } else {
-        showAlert(errorMsg, 'danger', '⚠');
+        showAlert(errorMsg, 'danger');
       }
     } finally {
       submitBtn.disabled = false;

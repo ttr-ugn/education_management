@@ -62,12 +62,11 @@ let currentPublishDocId = null;
               <td style="vertical-align: middle; padding: 12px 16px; max-width: 380px;">
                 <div style="font-weight: 600; color: #0f172a; font-size: 13.5px; line-height: 1.45;">${d.trich_yeu}</div>
                 <div style="font-size: 11.5px; color: #059669; background: #ecfdf5; border: 1px solid #a7f3d0; padding: 2px 8px; border-radius: 4px; margin-top: 5px; display: inline-flex; align-items: center; gap: 4px;">
-                  ✓ Đã phê duyệt bởi: ${d.lanh_dao_ky || 'Lãnh đạo Sở'}
+                  Đã phê duyệt bởi: ${d.lanh_dao_ky || 'Lãnh đạo Sở'}
                 </div>
               </td>
               <td style="vertical-align: middle; padding: 12px 16px;">
                 <span style="display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; background: #faf5ff; color: #7e22ce; border: 1px solid #e9d5ff; border-radius: 20px; font-size: 12px; font-weight: 600; white-space: nowrap;">
-                  <span>🏛️</span>
                   <span>${d.lanh_dao_ky || 'Lãnh đạo Sở'}</span>
                 </span>
               </td>
@@ -92,7 +91,7 @@ let currentPublishDocId = null;
           });
         } catch (err) {
           console.error('Lỗi nạp dữ liệu văn bản chờ ban hành:', err);
-          tbody.innerHTML = `<tr><td colspan="5" class="text-center p-4 text-danger">⚠️ Lỗi nạp dữ liệu: ${err.message}</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="5" class="text-center p-4 text-danger">Lỗi nạp dữ liệu: ${err.message}</td></tr>`;
         }
       }
 

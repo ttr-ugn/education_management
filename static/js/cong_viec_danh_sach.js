@@ -88,23 +88,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 
       const STATUS_LABELS = {
-        'DANG_THUC_HIEN': '<span class="badge" style="background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; padding: 4px 10px; border-radius: 20px; font-weight: 600; font-size: 11.5px; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;">⚙️ Đang thực hiện</span>',
-        'CHO_DANH_GIA': '<span class="badge" style="background: #fef3c7; color: #b45309; border: 1px solid #fde68a; padding: 4px 10px; border-radius: 20px; font-weight: 600; font-size: 11.5px; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;">⏳ Chờ nghiệm thu</span>',
-        'HOAN_THANH': '<span class="badge" style="background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; padding: 4px 10px; border-radius: 20px; font-weight: 600; font-size: 11.5px; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;">✅ Đã hoàn thành</span>',
-        'QUA_HAN': '<span class="badge" style="background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; padding: 4px 10px; border-radius: 20px; font-weight: 700; font-size: 11.5px; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; animation: pulse 2s infinite;">⚠️ Quá hạn</span>',
-        'CHUA_THUC_HIEN': '<span class="badge" style="background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; padding: 4px 10px; border-radius: 20px; font-weight: 600; font-size: 11.5px; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;">⏸️ Chưa thực hiện</span>'
+        'DANG_THUC_HIEN': '<span class="badge" style="background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; padding: 4px 10px; border-radius: 20px; font-weight: 600; font-size: 11.5px; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;">Đang thực hiện</span>',
+        'CHO_DANH_GIA': '<span class="badge" style="background: #fef3c7; color: #b45309; border: 1px solid #fde68a; padding: 4px 10px; border-radius: 20px; font-weight: 600; font-size: 11.5px; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;">Chờ nghiệm thu</span>',
+        'HOAN_THANH': '<span class="badge" style="background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; padding: 4px 10px; border-radius: 20px; font-weight: 600; font-size: 11.5px; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;">Đã hoàn thành</span>',
+        'QUA_HAN': '<span class="badge" style="background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; padding: 4px 10px; border-radius: 20px; font-weight: 700; font-size: 11.5px; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; animation: pulse 2s infinite;">Quá hạn</span>',
+        'CHUA_THUC_HIEN': '<span class="badge" style="background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; padding: 4px 10px; border-radius: 20px; font-weight: 600; font-size: 11.5px; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;">Chưa thực hiện</span>'
       };
 
       const PRIORITY_LABELS = {
-        'KHAN_CAP': '<span class="badge" style="background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; padding: 3px 8px; border-radius: 20px; font-weight: 700; font-size: 11px; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap;">🔥 Khẩn cấp</span>',
-        'KHAM_CAP': '<span class="badge" style="background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; padding: 3px 8px; border-radius: 20px; font-weight: 700; font-size: 11px; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap;">🔥 Khẩn cấp</span>',
-        'Khẩn cấp': '<span class="badge" style="background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; padding: 3px 8px; border-radius: 20px; font-weight: 700; font-size: 11px; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap;">🔥 Khẩn cấp</span>',
-        'CAO': '<span class="badge" style="background: #ffedd5; color: #c2410c; border: 1px solid #fed7aa; padding: 3px 8px; border-radius: 20px; font-weight: 600; font-size: 11px; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap;">⚡ Cao</span>',
-        'Cao': '<span class="badge" style="background: #ffedd5; color: #c2410c; border: 1px solid #fed7aa; padding: 3px 8px; border-radius: 20px; font-weight: 600; font-size: 11px; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap;">⚡ Cao</span>',
-        'TRUNG_BINH': '<span class="badge" style="background: #fef3c7; color: #b45309; border: 1px solid #fde68a; padding: 3px 8px; border-radius: 20px; font-weight: 600; font-size: 11px; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap;">🟡 Trung bình</span>',
-        'Trung bình': '<span class="badge" style="background: #fef3c7; color: #b45309; border: 1px solid #fde68a; padding: 3px 8px; border-radius: 20px; font-weight: 600; font-size: 11px; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap;">🟡 Trung bình</span>',
-        'THAP': '<span class="badge" style="background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; padding: 3px 8px; border-radius: 20px; font-weight: 600; font-size: 11px; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap;">⚪ Thấp</span>',
-        'Thấp': '<span class="badge" style="background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; padding: 3px 8px; border-radius: 20px; font-weight: 600; font-size: 11px; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap;">⚪ Thấp</span>'
+        'KHAN_CAP': '<span class="badge" style="background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; padding: 3px 8px; border-radius: 20px; font-weight: 700; font-size: 11px; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap;">Khẩn cấp</span>',
+        'KHAM_CAP': '<span class="badge" style="background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; padding: 3px 8px; border-radius: 20px; font-weight: 700; font-size: 11px; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap;">Khẩn cấp</span>',
+        'Khẩn cấp': '<span class="badge" style="background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; padding: 3px 8px; border-radius: 20px; font-weight: 700; font-size: 11px; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap;">Khẩn cấp</span>',
+        'CAO': '<span class="badge" style="background: #ffedd5; color: #c2410c; border: 1px solid #fed7aa; padding: 3px 8px; border-radius: 20px; font-weight: 600; font-size: 11px; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap;">Cao</span>',
+        'Cao': '<span class="badge" style="background: #ffedd5; color: #c2410c; border: 1px solid #fed7aa; padding: 3px 8px; border-radius: 20px; font-weight: 600; font-size: 11px; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap;">Cao</span>',
+        'TRUNG_BINH': '<span class="badge" style="background: #fef3c7; color: #b45309; border: 1px solid #fde68a; padding: 3px 8px; border-radius: 20px; font-weight: 600; font-size: 11px; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap;">Trung bình</span>',
+        'Trung bình': '<span class="badge" style="background: #fef3c7; color: #b45309; border: 1px solid #fde68a; padding: 3px 8px; border-radius: 20px; font-weight: 600; font-size: 11px; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap;">Trung bình</span>',
+        'THAP': '<span class="badge" style="background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; padding: 3px 8px; border-radius: 20px; font-weight: 600; font-size: 11px; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap;">Thấp</span>',
+        'Thấp': '<span class="badge" style="background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; padding: 3px 8px; border-radius: 20px; font-weight: 600; font-size: 11px; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap;">Thấp</span>'
       };
 
       // Tải và vẽ Biểu đồ & KPI
@@ -305,7 +305,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           const attachPill = item.tep_dinh_kem ? `
             <div style="margin-top: 4px;">
               <a href="${previewHref}" target="_blank" rel="noopener" title="${attachName}" style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 7px; background: #ecfeff; border: 1px solid #a5f3fc; border-radius: 5px; font-size: 11px; font-weight: 600; color: #0e7490; text-decoration: none; max-width: 210px;">
-                <span>📎</span>
+                
                 <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${attachName}</span>
               </a>
             </div>
@@ -328,7 +328,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             </div>
           ` : `
             <span style="display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 11.5px; color: #64748b;">
-              <span>📌</span>
+              
               <span>Chỉ đạo trực tiếp</span>
             </span>
           `;
@@ -337,7 +337,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           const leaderName = item.nguoi_giao || item.nguoi_giao_ten || 'Lãnh đạo Sở';
           const leaderHtml = `
             <span style="display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; background: #faf5ff; color: #7e22ce; border: 1px solid #e9d5ff; border-radius: 20px; font-size: 12px; font-weight: 600; white-space: nowrap;">
-              <span>🏛️</span>
+              
               <span>${leaderName}</span>
             </span>
           `;
@@ -367,7 +367,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           const deadlineHtml = `
             <div style="white-space: nowrap;">
               <span style="display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; color: ${isOverdue ? '#dc2626' : '#334155'}; ${isOverdue ? 'background: #fef2f2; border: 1px solid #fecaca; padding: 2px 7px; border-radius: 4px;' : ''}">
-                <span>📅</span>
+                
                 <span>${item.han_hoan_thanh || '---'}</span>
               </span>
               ${isOverdue ? '<div style="font-size: 10.5px; color: #dc2626; font-weight: 600; margin-top: 2px;">Quá hạn!</div>' : ''}

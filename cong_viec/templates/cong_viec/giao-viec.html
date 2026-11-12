@@ -281,7 +281,7 @@
             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px; flex-wrap: wrap;">
               <h1 class="page-title" style="margin-bottom: 0;">Giao nhiệm vụ & Điều phối công việc</h1>
               <span class="badge" style="background: #f0f9ff; color: #0284c7; border: 1px solid #bae6fd; font-weight: 700; font-size: 11.5px; padding: 4px 10px; border-radius: 20px;">
-                ⚡ Điều hành cơ quan
+                Điều hành cơ quan
               </span>
             </div>
             <p class="page-subtitle">Dành cho Văn thư & Lãnh đạo Sở: lập phiếu giao nhiệm vụ gắn liền căn cứ văn bản và phân công chuyên viên</p>
@@ -300,9 +300,6 @@
             <div class="accent-bar-blue"></div>
 
             <div style="padding: 20px 24px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; gap: 14px;">
-              <div class="header-icon-box-blue">
-                📋
-              </div>
               <div>
                 <h2 style="font-size: 17px; font-weight: 700; color: #0f172a; margin: 0;">Phiếu giao nhiệm vụ công việc</h2>
                 <p style="font-size: 12.5px; color: #64748b; margin: 3px 0 0 0;">Thiết lập thông tin chỉ đạo, căn cứ pháp lý và phân công chuyên viên xử lý</p>
@@ -314,14 +311,12 @@
                 <!-- THÔNG TIN VĂN BẢN LIÊN KẾT (CĂN CỨ PHÁP LÝ) -->
                 <div class="legal-basis-box">
                   <div class="legal-basis-header">
-                    <span style="font-size: 16px;">📄</span>
                     <span class="legal-basis-title">Căn cứ văn bản điều hành / Văn bản đến liên quan</span>
                   </div>
 
                   <div class="fields-grid" style="gap: 14px 16px;">
                     <div class="form-group full-width">
                       <label for="vb_goi_y_select" class="custom-form-label">
-                        <span class="label-icon">🗂️</span>
                         <span>Chọn nhanh từ kho văn bản hệ thống (tùy chọn)</span>
                       </label>
                       <select id="vb_goi_y_select" class="custom-select">
@@ -331,7 +326,6 @@
 
                     <div class="form-group">
                       <label for="so_ky_hieu_vb" class="custom-form-label">
-                        <span class="label-icon">📑</span>
                         <span>Số / Ký hiệu văn bản</span>
                       </label>
                       <input type="text" id="so_ky_hieu_vb" class="custom-input" placeholder="Ví dụ: 452/BGDĐT-GDTrH hoặc 89/UBND-VX">
@@ -339,7 +333,6 @@
 
                     <div class="form-group">
                       <label for="ngay_van_ban" class="custom-form-label">
-                        <span class="label-icon">📅</span>
                         <span>Ngày văn bản</span>
                       </label>
                       <input type="date" id="ngay_van_ban" class="custom-input">
@@ -347,7 +340,6 @@
 
                     <div class="form-group full-width">
                       <label for="trich_yeu_vb" class="custom-form-label">
-                        <span class="label-icon">📝</span>
                         <span>Trích yếu nội dung văn bản</span>
                       </label>
                       <input type="text" id="trich_yeu_vb" class="custom-input" placeholder="Tóm tắt nội dung văn bản chỉ đạo của cấp trên...">
@@ -355,13 +347,12 @@
 
                     <div class="form-group full-width">
                       <label for="tep_dinh_kem_file" class="custom-form-label">
-                        <span class="label-icon">📎</span>
                         <span>Văn bản đính kèm (tài liệu căn cứ giao việc)</span>
                       </label>
                       <input type="file" id="tep_dinh_kem_file" accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.txt" hidden>
                       <div id="attachmentDropzone" class="attachment-dropzone" role="button" tabindex="0" aria-label="Chọn tệp văn bản đính kèm">
                         <div class="attachment-dropzone-info">
-                          <div class="attachment-dropzone-icon">📎</div>
+                          
                           <div style="min-width: 0;">
                             <div style="font-size: 13px; font-weight: 600; color: #0f172a;">Kéo thả tệp văn bản vào đây hoặc nhấn để tải lên</div>
                             <div style="font-size: 11.5px; color: #64748b; margin-top: 2px;">Hỗ trợ PDF, Word (.doc/.docx), Excel (.xls/.xlsx), Hình ảnh (.png/.jpg), TXT • Tối đa 15MB</div>
@@ -372,15 +363,15 @@
 
                       <div id="selectedAttachmentBar" class="attachment-preview-card">
                         <div class="attachment-preview-meta">
-                          <span id="selectedFileIcon" style="font-size: 20px; flex-shrink: 0;">📄</span>
+                          <span id="selectedFileIcon" style="display: none;"></span>
                           <div style="min-width: 0;">
                             <div id="selectedFileName" style="font-size: 13px; font-weight: 600; color: #0369a1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></div>
                             <div id="selectedFileMeta" style="font-size: 11.5px; color: #64748b;"></div>
                           </div>
                         </div>
                         <div class="attachment-preview-actions">
-                          <button type="button" id="previewAttachmentBtn" class="btn-attach-chip primary">👁 Xem trước</button>
-                          <button type="button" id="removeAttachmentBtn" class="btn-attach-chip danger">✕ Xóa tệp</button>
+                          <button type="button" id="previewAttachmentBtn" class="btn-attach-chip primary">Xem trước</button>
+                          <button type="button" id="removeAttachmentBtn" class="btn-attach-chip danger">&times; Xóa tệp</button>
                         </div>
                       </div>
                     </div>
@@ -392,8 +383,7 @@
                   <!-- Tên nhiệm vụ -->
                   <div class="form-group full-width">
                     <label for="ten_cong_viec" class="custom-form-label required">
-                      <span class="label-icon">🎯</span>
-                      <span>Tên nhiệm vụ / Tiêu đề công việc</span>
+                                            <span>Tên nhiệm vụ / Tiêu đề công việc</span>
                     </label>
                     <input type="text" id="ten_cong_viec" class="custom-input" placeholder="Ví dụ: Rà soát cơ sở vật chất phòng học tin học cấp THCS..." required>
                   </div>
@@ -401,8 +391,7 @@
                   <!-- Cán bộ xử lý -->
                   <div class="form-group">
                     <label for="nguoi_xu_ly" class="custom-form-label required">
-                      <span class="label-icon">👤</span>
-                      <span>Cán bộ / Chuyên viên xử lý</span>
+                                            <span>Cán bộ / Chuyên viên xử lý</span>
                     </label>
                     <select id="nguoi_xu_ly" class="custom-select" required>
                       <option value="">-- Đang nạp danh sách chuyên viên --</option>
@@ -412,8 +401,7 @@
                   <!-- Hạn hoàn thành -->
                   <div class="form-group">
                     <label for="han_hoan_thanh" class="custom-form-label required">
-                      <span class="label-icon">⏰</span>
-                      <span>Hạn hoàn thành</span>
+                                            <span>Hạn hoàn thành</span>
                     </label>
                     <input type="date" id="han_hoan_thanh" class="custom-input" required>
                   </div>
@@ -421,21 +409,19 @@
                   <!-- Độ ưu tiên -->
                   <div class="form-group">
                     <label for="do_uu_tien" class="custom-form-label required">
-                      <span class="label-icon">⚡</span>
                       <span>Mức độ ưu tiên</span>
                     </label>
                     <select id="do_uu_tien" class="custom-select" required>
-                      <option value="KHAN_CAP">🔥 Khẩn cấp</option>
-                      <option value="CAO">⚡ Ưu tiên cao</option>
-                      <option value="TRUNG_BINH" selected>● Trung bình</option>
-                      <option value="THAP">⚪ Thấp</option>
+                      <option value="KHAN_CAP">Khẩn cấp</option>
+                      <option value="CAO">Ưu tiên cao</option>
+                      <option value="TRUNG_BINH" selected>Trung bình</option>
+                      <option value="THAP">Thấp</option>
                     </select>
                   </div>
 
                   <!-- Phòng ban phụ trách -->
                   <div class="form-group">
                     <label for="phong_ban" class="custom-form-label">
-                      <span class="label-icon">🏢</span>
                       <span>Phòng ban phụ trách</span>
                     </label>
                     <input type="text" id="phong_ban" class="custom-input" placeholder="Tự động điền theo chuyên viên" readonly style="background-color: #f8fafc; color: #475569;">
@@ -444,7 +430,6 @@
                   <!-- Nội dung yêu cầu chi tiết -->
                   <div class="form-group full-width">
                     <label for="noi_dung" class="custom-form-label required">
-                      <span class="label-icon">📋</span>
                       <span>Nội dung yêu cầu chi tiết</span>
                     </label>
                     <textarea id="noi_dung" class="custom-textarea" rows="4" placeholder="Mô tả cụ thể mục tiêu, sản phẩm đầu ra, yêu cầu thời gian và các phòng ban phối hợp..." required></textarea>
@@ -469,7 +454,6 @@
                   </button>
                   <button type="submit" id="submitBtn" class="btn-action-submit-blue">
                     <span id="btnSpinner" class="spinner d-none"></span>
-                    <span id="btnIcon">🚀</span>
                     <span id="btnText">Ban hành & Giao nhiệm vụ</span>
                   </button>
                 </div>
@@ -520,11 +504,11 @@
 
       function getFileIcon(filename) {
         const ext = (filename || '').split('.').pop().toLowerCase();
-        if (ext === 'pdf') return '📕';
-        if (ext === 'doc' || ext === 'docx') return '📘';
-        if (ext === 'xls' || ext === 'xlsx') return '📗';
-        if (['png', 'jpg', 'jpeg'].includes(ext)) return '🖼️';
-        return '📄';
+        if (ext === 'pdf') return '';
+        if (ext === 'doc' || ext === 'docx') return '';
+        if (ext === 'xls' || ext === 'xlsx') return '';
+        if (['png', 'jpg', 'jpeg'].includes(ext)) return '';
+        return '';
       }
 
       function formatBytes(bytes) {
@@ -714,7 +698,6 @@
 
         submitBtn.disabled = true;
         if (btnSpinner) btnSpinner.classList.remove('d-none');
-        if (btnIcon) btnIcon.classList.add('d-none');
         btnText.textContent = 'Đang ban hành nhiệm vụ...';
 
         try {
@@ -757,7 +740,6 @@
         } catch (err) {
           submitBtn.disabled = false;
           if (btnSpinner) btnSpinner.classList.add('d-none');
-          if (btnIcon) btnIcon.classList.remove('d-none');
           btnText.textContent = 'Ban hành & Giao nhiệm vụ';
         }
       });

@@ -301,8 +301,8 @@ def api_upload_kho_luu_tru(request):
         pdf_embed_html = f"""
   <div class="pdf-preview-embed" style="margin-top: 18px; border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; background: #f8fafc;">
     <div style="padding: 8px 14px; background: #1e293b; color: #f8fafc; font-size: 12px; font-weight: 600; display: flex; justify-content: space-between; align-items: center;">
-      <span>📑 BẢN XEM TRƯỚC PDF TRỰC TIẾP ({num_pages} trang)</span>
-      <a href="{media_url}" target="_blank" style="color: #38bdf8; text-decoration: none;">Mở tab mới ↗</a>
+      <span>BẢN XEM TRƯỚC PDF TRỰC TIẾP ({num_pages} trang)</span>
+      <a href="{media_url}" target="_blank" style="color: #38bdf8; text-decoration: none;">Mở tab mới &rarr;</a>
     </div>
     <iframe src="{media_url}" style="width: 100%; height: 760px; border: none; display: block;" title="PDF Preview"></iframe>
   </div>""" if ext == '.pdf' else ""
@@ -317,10 +317,10 @@ def api_upload_kho_luu_tru(request):
             noi_dung_html=f"""
 <div class="vb-container">
   <div style="margin-bottom: 20px; padding: 12px 16px; background: #e0f2fe; border: 1px solid #7dd3fc; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-    <span>📄 Tệp gốc: <b>{html.escape(safe_filename)}</b></span>
+    <span>Tệp gốc: <b>{html.escape(safe_filename)}</b></span>
     <div style="display: flex; gap: 8px;">
-      <a href="{media_url}" target="_blank" class="btn btn-sm btn-primary" style="padding: 5px 12px; background: #0284c7; color: #fff; text-decoration: none; border-radius: 6px; font-size: 12px; font-weight: 600;">👁️ Mở tệp gốc ↗</a>
-      <a href="{media_url}" download class="btn btn-sm" style="padding: 5px 12px; background: #f1f5f9; color: #334155; text-decoration: none; border-radius: 6px; font-size: 12px; font-weight: 600; border: 1px solid #cbd5e1;">📥 Tải xuống</a>
+      <a href="{media_url}" target="_blank" class="btn btn-sm btn-primary" style="padding: 5px 12px; background: #0284c7; color: #fff; text-decoration: none; border-radius: 6px; font-size: 12px; font-weight: 600;">Mở tệp gốc &rarr;</a>
+      <a href="{media_url}" download class="btn btn-sm" style="padding: 5px 12px; background: #f1f5f9; color: #334155; text-decoration: none; border-radius: 6px; font-size: 12px; font-weight: 600; border: 1px solid #cbd5e1;">Tải xuống</a>
     </div>
   </div>
   <div class="vb-title-block">

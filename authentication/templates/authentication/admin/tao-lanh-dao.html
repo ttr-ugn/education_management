@@ -195,7 +195,7 @@
             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px; flex-wrap: wrap;">
               <h1 class="page-title" style="margin-bottom: 0;">Khởi tạo tài khoản Lãnh đạo cơ quan</h1>
               <span class="badge" style="background: #faf5ff; color: #7e22ce; border: 1px solid #e9d5ff; font-weight: 700; font-size: 11.5px; padding: 4px 10px; border-radius: 20px;">
-                🏛️ Ban Giám đốc Sở GD&ĐT
+                Ban Giám đốc Sở GD&ĐT
               </span>
             </div>
             <p class="page-subtitle">Chức năng cấp phát tài khoản dành riêng cho Văn thư Sở để thiết lập cán bộ Lãnh đạo chủ chốt</p>
@@ -213,9 +213,6 @@
             <div class="accent-bar"></div>
 
             <div style="padding: 20px 24px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; gap: 14px;">
-              <div class="header-icon-box">
-                🏛️
-              </div>
               <div>
                 <h2 style="font-size: 17px; font-weight: 700; color: #0f172a; margin: 0;">Thông tin tài khoản Lãnh đạo mới</h2>
                 <p style="font-size: 12.5px; color: #64748b; margin: 3px 0 0 0;">Điền thông tin định danh cán bộ và thông tin liên hệ công vụ</p>
@@ -232,7 +229,7 @@
                   </svg>
                 </div>
                 <div class="security-alert-content">
-                  <div class="security-alert-title">🛡️ QUY ĐỊNH BẢO MẬT & BÀN GIAO MẬT KHẨU</div>
+                  <div class="security-alert-title">QUY ĐỊNH BẢO MẬT & BÀN GIAO MẬT KHẨU</div>
                   <div class="security-alert-text">
                     Lãnh đạo <b>không tự đăng ký</b> tài khoản. Hệ thống tự động sinh <b>mật khẩu tạm ngẫu nhiên</b> có độ an toàn cao và chỉ hiển thị duy nhất <b>01 lần</b> cho Văn thư sau khi khởi tạo thành công để bàn giao. Tài khoản sẽ được kích hoạt ngay và bắt buộc đổi mật khẩu ở lần đăng nhập đầu tiên.
                   </div>
@@ -245,7 +242,6 @@
                   <!-- Họ và tên -->
                   <div class="form-group full-width">
                     <label for="ho_va_ten" class="custom-form-label required">
-                      <span class="label-icon">👤</span>
                       <span>Họ và tên Lãnh đạo</span>
                     </label>
                     <input type="text" id="ho_va_ten" name="ho_va_ten" class="custom-input" placeholder="Ví dụ: Lê Thị Bích Thuận" required autocomplete="off">
@@ -254,7 +250,6 @@
                   <!-- Chức vụ -->
                   <div class="form-group">
                     <label for="chuc_vu" class="custom-form-label required">
-                      <span class="label-icon">🎖️</span>
                       <span>Chức vụ</span>
                     </label>
                     <select id="chuc_vu" name="chuc_vu" class="custom-select" required>
@@ -269,7 +264,6 @@
                   <!-- Phòng ban -->
                   <div class="form-group">
                     <label for="phong_ban" class="custom-form-label required">
-                      <span class="label-icon">🏢</span>
                       <span>Phòng ban / Đơn vị</span>
                     </label>
                     <input type="text" id="phong_ban" name="phong_ban" class="custom-input" value="Ban Giám đốc Sở GD&ĐT" required>
@@ -278,7 +272,6 @@
                   <!-- Email công vụ -->
                   <div class="form-group">
                     <label for="email" class="custom-form-label required">
-                      <span class="label-icon">✉️</span>
                       <span>Email công vụ</span>
                     </label>
                     <input type="email" id="email" name="email" class="custom-input" placeholder="lanhdao@danang.edu.vn" required>
@@ -287,7 +280,6 @@
                   <!-- Số điện thoại -->
                   <div class="form-group">
                     <label for="sdt" class="custom-form-label">
-                      <span class="label-icon">📱</span>
                       <span>Số điện thoại di động</span>
                     </label>
                     <input type="tel" id="sdt" name="sdt" class="custom-input" placeholder="0905xxxxxx">
@@ -297,11 +289,10 @@
                   <div class="form-group full-width">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px;">
                       <label for="ten_dang_nhap" class="custom-form-label required" style="margin-bottom: 0;">
-                        <span class="label-icon">🆔</span>
                         <span>Tên đăng nhập hệ thống</span>
                       </label>
                       <button type="button" id="btnAutoSuggest" class="btn-suggest">
-                        ✨ Gợi ý tên đăng nhập
+                        Gợi ý tên đăng nhập
                       </button>
                     </div>
                     <input type="text" id="ten_dang_nhap" name="ten_dang_nhap" class="custom-input" placeholder="Ví dụ: giamdoc_thuan hoặc thuan.ltb" required autocomplete="off">
@@ -322,8 +313,7 @@
                   </button>
                   <button type="submit" id="submitBtn" class="btn-action-submit">
                     <span id="btnSpinner" class="spinner d-none"></span>
-                    <span id="btnIcon">✨</span>
-                    <span id="btnText">Khởi tạo tài khoản Lãnh đạo</span>
+                      <span id="btnText">Khởi tạo tài khoản Lãnh đạo</span>
                   </button>
                 </div>
               </form>
@@ -344,7 +334,6 @@
       const submitBtn = document.getElementById('submitBtn');
       const btnSpinner = document.getElementById('btnSpinner');
       const btnText = document.getElementById('btnText');
-      const btnIcon = document.getElementById('btnIcon');
       const resetBtn = document.getElementById('resetBtn');
       const btnAutoSuggest = document.getElementById('btnAutoSuggest');
 
@@ -399,7 +388,6 @@
 
         submitBtn.disabled = true;
         btnSpinner.classList.remove('d-none');
-        btnIcon.classList.add('d-none');
         btnText.textContent = 'Đang khởi tạo tài khoản...';
 
         try {
@@ -426,7 +414,6 @@
         } finally {
           submitBtn.disabled = false;
           btnSpinner.classList.add('d-none');
-          btnIcon.classList.remove('d-none');
           btnText.textContent = 'Khởi tạo tài khoản Lãnh đạo';
         }
       });

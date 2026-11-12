@@ -44,9 +44,9 @@ document.addEventListener('DOMContentLoaded', () => {
     hideAlert();
   });
 
-  function showAlert(message, type = 'danger', icon = '⚠') {
+  function showAlert(message, type = 'danger', icon = '') {
     alertBox.className = `auth-alert auth-alert-${type} show`;
-    alertIcon.textContent = icon;
+    alertIcon.textContent = '';
     alertMsg.textContent = message;
     alertBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
@@ -151,7 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
     } catch (err) {
-      showAlert(err.message || 'Đăng ký không thành công. Vui lòng kiểm tra lại thông tin.', 'danger', '⚠');
+      showAlert(err.message || 'Đăng ký không thành công. Vui lòng kiểm tra lại thông tin.', 'danger', '');
     } finally {
       submitBtn.disabled = false;
       btnSpinner.classList.add('d-none');

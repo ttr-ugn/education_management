@@ -126,7 +126,7 @@ class ChatbotNLPService:
         da_ky = vb.trang_thai in ('DA_KY_CHO_BAN_HANH', 'DA_BAN_HANH')
         sign_box = f"""
         <div style="margin: 10px 0; padding: 6px 14px; display: inline-block; border: 2px dashed #16a34a; border-radius: 6px; background: #f0fdf4; color: #166534; font-size: 11pt; font-weight: bold; text-align: left;">
-          🔒 [ĐÃ KÝ SỐ ĐIỆN TỬ]<br>
+          [ĐÃ KÝ SỐ ĐIỆN TỬ]<br>
           <span style="font-size: 9.5pt; font-weight: normal; color: #15803d;">Cơ quan: Sở Giáo dục và Đào tạo TP. Đà Nẵng</span><br>
           <span style="font-size: 9pt; font-weight: normal; color: #4b5563;">Người ký: {lanh_dao}</span>
         </div>
@@ -474,8 +474,8 @@ class ChatbotNLPService:
             count = len(suggested_templates)
             answer = (
                 f"Tôi đã kiểm tra kho lưu trữ của Sở GD&ĐT và tìm thấy **{count} văn bản/tệp tài liệu** phù hợp nhất "
-                f"với yêu cầu của đồng chí. Đồng chí có thể nhấn nút **'👁️ Xem trước (Preview)'** để mở chế độ xem trước "
-                f"toàn văn chuẩn trang in A4, hoặc nhấn **'📥 Tải về'** để sử dụng."
+                f"với yêu cầu của đồng chí. Đồng chí có thể nhấn nút **'Xem trước (Preview)'** để mở chế độ xem trước "
+                f"toàn văn chuẩn trang in A4, hoặc nhấn **'Tải về'** để sử dụng."
             )
             next_suggestions = [
                 "Mẫu quyết định khen thưởng giáo viên và học sinh giỏi",

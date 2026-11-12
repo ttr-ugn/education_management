@@ -19,11 +19,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       // Tùy biến giao diện theo vai trò người dùng
       if (user.vai_tro === 'VAN_THU') {
-        btnOpenCreateModal.innerHTML = '📢 Phát hành thông báo (Văn thư)';
+        btnOpenCreateModal.innerHTML = 'Phát hành thông báo (Văn thư)';
         modalTitleText.textContent = 'PHÁT HÀNH THÔNG BÁO ĐIỀU HÀNH NỘI BỘ (VĂN THƯ)';
         btnSubmitNotification.textContent = 'Phát hành thông báo';
       } else {
-        btnOpenCreateModal.innerHTML = '⏰ Tạo lời nhắc cá nhân (Hẹn giờ)';
+        btnOpenCreateModal.innerHTML = 'Tạo lời nhắc cá nhân (Hẹn giờ)';
         modalTitleText.textContent = 'TẠO LỜI NHẮC CÔNG VIỆC CÁ NHÂN';
         btnSubmitNotification.textContent = 'Lưu lời nhắc';
         if (tbPhamVi) {
@@ -62,12 +62,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const unreadTotal = allNotifications.filter(item => !item.da_doc).length;
         const dueTotal = allNotifications.filter(item => item.da_den_han).length;
-        countStats.textContent = `Tổng số: ${allNotifications.length} | Chưa đọc: ${unreadTotal} | ⏰ Đến hạn: ${dueTotal}`;
+        countStats.textContent = `Tổng số: ${allNotifications.length} | Chưa đọc: ${unreadTotal} | Đến hạn: ${dueTotal}`;
 
         if (filtered.length === 0) {
           container.innerHTML = `
             <div class="card" style="padding: 40px; text-align: center; color: #64748b;">
-              <div style="font-size: 36px; margin-bottom: 8px;">📭</div>
               <b>Không có thông báo hoặc lời nhắc nào trong mục này.</b>
             </div>
           `;
@@ -88,11 +87,11 @@ document.addEventListener('DOMContentLoaded', async () => {
               <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                   <div>
-                    ${item.da_den_han ? '<span class="badge badge-due-alert mr-1">⏰ ĐÃ ĐẾN HẠN!</span>' : ''}
+                    ${item.da_den_han ? '<span class="badge badge-due-alert mr-1">ĐÃ ĐẾN HẠN!</span>' : ''}
                     <span class="badge ${badgeColor}">${item.muc_do}</span>
                     <span class="badge badge-secondary ml-1">${item.loai}</span>
                     ${!item.da_doc ? '<span class="badge badge-warning ml-1">Mới</span>' : ''}
-                    ${item.nguoi_nhan_id ? '<span class="badge badge-info ml-1">🔒 Lời nhắc riêng</span>' : '<span class="badge badge-secondary ml-1">🌐 Toàn cơ quan</span>'}
+                    ${item.nguoi_nhan_id ? '<span class="badge badge-info ml-1">Lời nhắc riêng</span>' : '<span class="badge badge-secondary ml-1">Toàn cơ quan</span>'}
                   </div>
                   <small class="text-muted">${item.thoi_gian}</small>
                 </div>
@@ -104,7 +103,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 </p>
                 ${item.ngay_hen_gio ? `
                   <div style="font-size: 12.5px; color: ${item.da_den_han ? '#dc2626' : '#2563eb'}; font-weight: 600; margin-bottom: 10px; background: #f8fafc; padding: 6px 10px; border-radius: 6px; display: inline-block;">
-                    ⏰ Lịch hẹn / Hạn hoàn thành: <b>${item.ngay_hen_gio}</b>
+                    Lịch hẹn / Hạn hoàn thành: <b>${item.ngay_hen_gio}</b>
                   </div>
                 ` : ''}
                 <div class="d-flex justify-content-between align-items-center text-muted" style="font-size: 12px; border-top: 1px solid var(--border-color); padding-top: 8px;">
@@ -112,11 +111,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                   <div class="d-flex align-items-center gap-2">
                     ${!item.da_doc ? `
                       <button class="btn btn-outline-primary btn-sm btn-mark-read" data-id="${item.id}">
-                        ✓ Đánh dấu đã đọc
+                        Đánh dấu đã đọc
                       </button>
-                    ` : '<span class="text-muted" style="font-size: 12px;">✓ Đã đọc</span>'}
+                    ` : '<span class="text-muted" style="font-size: 12px;">Đã đọc</span>'}
                     ${(user.vai_tro === 'VAN_THU' || user.ho_va_ten === item.nguoi_gui) ? `
-                      <button class="btn-delete-tb" data-id="${item.id}" title="Xóa thông báo này">🗑 Xóa</button>
+                      <button class="btn-delete-tb" data-id="${item.id}" title="Xóa thông báo này">Xóa</button>
                     ` : ''}
                   </div>
                 </div>

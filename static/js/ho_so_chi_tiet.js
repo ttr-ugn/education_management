@@ -129,7 +129,7 @@ let currentHsId = 1;
                     data-trich="${encodeURIComponent(d.trich_yeu)}"
                     style="padding: 2px 8px; font-size: 11.5px; border-radius: 4px; display: inline-flex; align-items: center; gap: 3px;" 
                     title="Xem nội dung trực tiếp">
-              👁 ${d.tep_dinh_kem || 'Xem file'}
+              ${d.tep_dinh_kem || 'Xem file'}
             </button>
           `;
 
@@ -139,7 +139,7 @@ let currentHsId = 1;
                     data-nguon="${d.nguon}"
                     style="padding: 2px 7px; font-size: 11.5px;" 
                     title="Gỡ văn bản khỏi hồ sơ">
-              🗑 Gỡ
+              Gỡ
             </button>
           ` : '<span class="text-muted" style="font-size: 11.5px;">-</span>';
 
@@ -158,7 +158,7 @@ let currentHsId = 1;
               <td>
                 <div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start;">
                   ${previewBtn}
-                  <a href="${d.download_url}" download style="font-size: 11px; color: #64748b; text-decoration: none;">📥 Tải về máy</a>
+                  <a href="${d.download_url}" download style="font-size: 11px; color: #64748b; text-decoration: none;">Tải về máy</a>
                 </div>
               </td>
               <td style="text-align: center;">${deleteBtn}</td>

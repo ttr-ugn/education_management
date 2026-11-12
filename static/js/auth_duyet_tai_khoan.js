@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           (u.phong_ban && u.phong_ban.toLowerCase().includes(query))
         );
 
-        counterEl.innerHTML = `⏳ Đang chờ duyệt: <b>${filtered.length}</b>`;
+        counterEl.innerHTML = `Đang chờ duyệt: <b>${filtered.length}</b>`;
 
         if (filtered.length === 0) {
           tbody.innerHTML = `
@@ -66,14 +66,12 @@ document.addEventListener('DOMContentLoaded', async () => {
               </td>
               <td>
                 <span style="display: inline-flex; align-items: center; gap: 5px; color: #475569; font-size: 12px;">
-                  <span>✉️</span>
                   <span>${u.email}</span>
                 </span>
               </td>
               <td>
                 ${u.sdt ? `
                   <span style="display: inline-flex; align-items: center; gap: 4px; color: #475569; font-size: 12px;">
-                    <span>📱</span>
                     <span>${u.sdt}</span>
                   </span>
                 ` : '<span style="color: #94a3b8; font-size: 12px; font-style: italic;">Chưa có</span>'}
@@ -86,16 +84,16 @@ document.addEventListener('DOMContentLoaded', async () => {
               </td>
               <td>
                 <span style="font-size: 12px; color: #334155; font-weight: 500;">
-                  📅 ${u.ngay_tao || 'Hôm nay'}
+                  ${u.ngay_tao || 'Hôm nay'}
                 </span>
               </td>
               <td style="text-align: center;">
                 <div class="d-flex justify-content-center gap-1">
                   <button class="btn-action-soft btn-action-approve btn-approve" data-id="${u.nguoi_dung_id}" data-name="${u.ho_va_ten}">
-                    ✓ Phê duyệt
+                    Phê duyệt
                   </button>
                   <button class="btn-action-soft btn-action-reject btn-reject" data-id="${u.nguoi_dung_id}" data-name="${u.ho_va_ten}">
-                    ✕ Từ chối
+                    Từ chối
                   </button>
                 </div>
               </td>

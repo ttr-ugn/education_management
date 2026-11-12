@@ -91,15 +91,15 @@ function openPreviewModal(docId, fileType, fileName, trichYeu, soKyHieu) {
             attachContainer.innerHTML = doc.tep_dinh_kem.map(f => `
               <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; background-color: #f1f5f9; border-radius: 6px; flex-wrap: wrap; gap: 8px;">
                 <div>
-                  <b style="font-size: 13.5px;">📄 ${f.ten_tep}</b>
-                  <div style="font-size: 11.5px; color: #64748b;">${f.dung_luong} | ${f.loai === 'da_ky' ? '<b style="color: #10b981;">✓ Bản có chữ ký số</b>' : 'Bản dự thảo'}</div>
+                  <b style="font-size: 13.5px;">${f.ten_tep}</b>
+                  <div style="font-size: 11.5px; color: #64748b;">${f.dung_luong} | ${f.loai === 'da_ky' ? '<b style="color: #10b981;">Bản có chữ ký số</b>' : 'Bản dự thảo'}</div>
                 </div>
                 <div class="d-flex gap-2">
                   <button type="button" class="btn btn-primary btn-sm" onclick="openPreviewModal(${docId}, '${f.loai}', '${f.ten_tep.replace(/'/g, "\\'")}', '${(doc.trich_yeu || '').replace(/'/g, "\\'")}', '${doc.so_ky_hieu || ''}')" title="Xem trước tài liệu trực tiếp">
-                    👁 Xem trước
+                    Xem trước
                   </button>
                   <a href="${f.download_url || `/api/van-ban-di/${docId}/download?type=${f.loai}`}" target="_blank" class="btn btn-outline-secondary btn-sm" download="${f.ten_tep}" title="Tải tệp về máy tính">
-                    📥 Tải về
+                    Tải về
                   </a>
                 </div>
               </div>
@@ -139,10 +139,10 @@ function openPreviewModal(docId, fileType, fileName, trichYeu, soKyHieu) {
           promptText.textContent = 'Dự thảo mới do Chuyên viên trình. Văn thư kiểm tra thể thức và quyết định xử lý:';
           buttonsContainer.innerHTML = `
             <button class="btn btn-success btn-sm" id="btnForwardLeader">
-              📤 Trình Lãnh đạo ký
+              Trình Lãnh đạo ký
             </button>
             <button class="btn btn-danger btn-sm" id="btnRejectClerk">
-              ↩ Trả lại Chuyên viên
+              Trả lại Chuyên viên
             </button>
           `;
 
@@ -169,10 +169,10 @@ function openPreviewModal(docId, fileType, fileName, trichYeu, soKyHieu) {
           promptText.textContent = 'Dự thảo đã được Văn thư kiểm tra. Lãnh đạo xem xét ký số điện tử hoặc hoàn trả:';
           buttonsContainer.innerHTML = `
             <button class="btn btn-success btn-sm" id="btnSignDoc">
-              ✍ Ký số điện tử & Phê duyệt
+              Ký số điện tử & Phê duyệt
             </button>
             <button class="btn btn-danger btn-sm" id="btnLeaderReject">
-              ✕ Yêu cầu chỉnh sửa
+              Yêu cầu chỉnh sửa
             </button>
           `;
 
@@ -204,7 +204,7 @@ function openPreviewModal(docId, fileType, fileName, trichYeu, soKyHieu) {
           promptText.textContent = 'Lãnh đạo đã ký số điện tử hoàn tất. Văn thư vào sổ lấy số và phát hành chính thức:';
           buttonsContainer.innerHTML = `
             <button class="btn btn-success btn-sm" id="btnPublishDoc">
-              📑 Cấp số hiệu & Ban hành chính thức
+              Cấp số hiệu & Ban hành chính thức
             </button>
           `;
 
@@ -223,11 +223,11 @@ function openPreviewModal(docId, fileType, fileName, trichYeu, soKyHieu) {
 
         } else if (doc.trang_thai === 'DA_BAN_HANH') {
           panel.style.display = 'block';
-          promptText.innerHTML = `<span style="color: #10b981;">✓ Văn bản đã được ban hành chính thức. Tất cả cán bộ có thể tải tệp có chữ ký số điện tử bên dưới.</span>`;
+          promptText.innerHTML = `<span style="color: #10b981;">Văn bản đã được ban hành chính thức. Tất cả cán bộ có thể tải tệp có chữ ký số điện tử bên dưới.</span>`;
           if (doc.co_file_da_ky) {
             buttonsContainer.innerHTML = `
               <a href="/api/van-ban-di/${doc.id}/download?type=da_ky" target="_blank" class="btn btn-success btn-sm">
-                📥 Tải văn bản đã ký số (PDF)
+                Tải văn bản đã ký số (PDF)
               </a>
             `;
           }

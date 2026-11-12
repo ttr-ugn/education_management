@@ -88,16 +88,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                   <span class="template-code">${escapeHtml(t.ma_mau || '')}</span>
                 </div>
                 <div class="template-title">${escapeHtml(t.ten_mau)}</div>
-                <div class="template-field">📂 ${escapeHtml(t.linh_vuc || 'Sở GD&ĐT')} | ✍️ ${escapeHtml(t.tham_quyen_ky || 'Lãnh đạo Sở')}</div>
+                <div class="template-field">${escapeHtml(t.linh_vuc || 'Sở GD&ĐT')} | ${escapeHtml(t.tham_quyen_ky || 'Lãnh đạo Sở')}</div>
                 <div class="template-desc">${escapeHtml(t.mo_ta || '')}</div>
               </div>
               <div class="template-actions">
                 <button type="button" class="btn-preview" onclick="event.stopPropagation(); window.showPreviewModal(${Number(t.mau_id)}, '${escapeHtml(loaiTep)}')">
-                  <span>👁️ Xem trước (Preview)</span>
+                  <span>Xem trước (Preview)</span>
                 </button>
                 ${isMau ? `
                 <a href="${downloadUrl}" class="btn-download-doc" download title="Tải file Word mẫu" onclick="event.stopPropagation();">
-                  <span>📥 Tải Word (.doc)</span>
+                  <span>Tải Word (.doc)</span>
                 </a>` : ''}
               </div>
             </div>
@@ -371,15 +371,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                   <span class="template-code">${escapeHtml(t.ma_mau)}</span>
                 </div>
                 <div class="template-title">${escapeHtml(t.ten_mau)}</div>
-                <div class="template-field">📂 ${escapeHtml(t.linh_vuc)} | ✍️ ${escapeHtml(t.tham_quyen_ky || 'Lãnh đạo Sở')}</div>
+                <div class="template-field">${escapeHtml(t.linh_vuc)} | ${escapeHtml(t.tham_quyen_ky || 'Lãnh đạo Sở')}</div>
                 <div class="template-desc">${escapeHtml(t.mo_ta || '')}</div>
               </div>
               <div class="template-actions">
                 <button type="button" class="btn-preview" onclick="event.stopPropagation(); window.showPreviewModal(${Number(t.mau_id)}, 'mau')">
-                  <span>👁️ Xem trước</span>
+                  <span>Xem trước</span>
                 </button>
                 <a href="${downloadUrl}" class="btn-download-doc" download title="Tải file Word mẫu" onclick="event.stopPropagation();">
-                  <span>📥 Tải Word</span>
+                  <span>Tải Word</span>
                 </a>
               </div>
             </div>

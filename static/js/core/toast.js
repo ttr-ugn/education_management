@@ -28,8 +28,8 @@
       const iconMap = {
         success: '✓',
         error: '✕',
-        warning: '⚠',
-        info: 'ℹ'
+        warning: '!',
+        info: 'i'
       };
 
       const titleMap = {
@@ -40,7 +40,7 @@
       };
 
       toast.innerHTML = `
-        <div style="font-size: 16px; font-weight: bold;">${iconMap[type] || 'ℹ'}</div>
+        <div style="font-size: 16px; font-weight: bold;">${iconMap[type] || 'i'}</div>
         <div class="toast-content">
           <div class="toast-title">${titleMap[type]}</div>
           <div>${message}</div>

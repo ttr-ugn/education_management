@@ -126,8 +126,8 @@
 
               <div style="font-size: 11.5px; color: #64748b;">${item.phong_ban}</div>
 
-              ${item.so_ky_hieu_vb ? `<div style="font-size: 11px; color: #0284c7; margin-top: 2px;">📄 Căn cứ: ${escapeHtml(item.so_ky_hieu_vb)}</div>` : ''}
-              ${item.tep_dinh_kem ? `<div style="font-size: 11px; margin-top: 2px;"><a href="${item.xem_dinh_kem_url || `/api/cong-viec/${item.id}/tai-dinh-kem?xem_truoc=1`}" target="_blank" rel="noopener" style="color: #0e7490; font-weight: 600; text-decoration: none;">📎 ${escapeHtml(item.ten_tep_dinh_kem || 'Văn bản đính kèm')}</a></div>` : ''}
+              ${item.so_ky_hieu_vb ? `<div style="font-size: 11px; color: #0284c7; margin-top: 2px;">Căn cứ: ${escapeHtml(item.so_ky_hieu_vb)}</div>` : ''}
+              ${item.tep_dinh_kem ? `<div style="font-size: 11px; margin-top: 2px;"><a href="${item.xem_dinh_kem_url || `/api/cong-viec/${item.id}/tai-dinh-kem?xem_truoc=1`}" target="_blank" rel="noopener" style="color: #0e7490; font-weight: 600; text-decoration: none;">${escapeHtml(item.ten_tep_dinh_kem || 'Văn bản đính kèm')}</a></div>` : ''}
 
             </td>
 
@@ -151,13 +151,13 @@
 
                 <button class="btn btn-success btn-sm btn-accept" data-id="${item.id}">
 
-                  ✓ Nghiệm thu Đạt
+                  Nghiệm thu Đạt
 
                 </button>
 
                 <button class="btn btn-warning btn-sm btn-retry" data-id="${item.id}">
 
-                  ↺ Yêu cầu làm lại
+                  Yêu cầu làm lại
 
                 </button>
 
