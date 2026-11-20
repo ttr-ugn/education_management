@@ -294,4 +294,21 @@
     getRootPath: getRootPath,
     getRoleName: (role) => ROLE_NAMES[role] || role
   };
+
+  // Tự động kiểm tra phiên và hiển thị thanh bên Sidebar nếu trang chưa chủ động gọi check()
+  document.addEventListener('DOMContentLoaded', () => {
+    const currentPath = window.location.pathname;
+    const isAuthPage = currentPath.endsWith('login.html') ||
+                       currentPath.endsWith('register.html') ||
+                       currentPath.endsWith('index.html') ||
+                       currentPath === '/' ||
+                       currentPath === '';
+    if (!isAuthPage) {
+      setTimeout(() => {
+        if (!currentUser && window.AuthGuard && typeof window.AuthGuard.check === 'function') {
+          window.AuthGuard.check();
+        }
+      }, 50);
+    }
+  });
 })(window);

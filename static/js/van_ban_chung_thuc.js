@@ -4,7 +4,13 @@
  * Tương thích chuẩn API Django và Nghị định 30/2020/NĐ-CP
  */
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  // 0. Xác thực phiên người dùng & dựng thanh điều hướng Sidebar
+  if (window.AuthGuard && typeof window.AuthGuard.check === 'function') {
+    const user = await window.AuthGuard.check();
+    if (!user) return;
+  }
+
   let allDocs = [];
   let selectedFile = null;
 
