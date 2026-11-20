@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       } else if (user.vai_tro === 'LANH_DAO') {
 
-        subtextEl.textContent = 'Vai trò: Lãnh đạo Sở. Xem xét phê duyệt, ký số điện tử văn bản nội bộ, xem hồ sơ lưu trữ và theo dõi báo cáo thống kê.';
+        subtextEl.textContent = 'Vai trò: Lãnh đạo Sở. Xem xét phê duyệt, ký số điện tử văn bản nội bộ, giao việc chỉ đạo điều hành và theo dõi báo cáo thống kê.';
 
         statRoleLabel.textContent = 'Văn bản chờ duyệt';
 
@@ -124,21 +124,27 @@ document.addEventListener('DOMContentLoaded', async () => {
 
           </a>
 
-          <a href="ho-so/danh-sach.html" class="btn btn-primary">
+          <a href="cong-viec/giao-viec.html" class="btn btn-outline-primary" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3);">
 
-            Xem Hồ sơ tài liệu
+            + Giao việc mới
+
+          </a>
+
+          <a href="cong-viec/danh-sach.html" class="btn btn-outline-primary" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3);">
+
+            Tiến độ công việc
+
+          </a>
+
+          <a href="van-ban-di/chung-thuc-chu-ky-so.html" class="btn btn-outline-primary" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3);">
+
+            Chứng thực chữ ký số
 
           </a>
 
           <a href="thong-ke.html" class="btn btn-secondary">
 
-            Xem Báo cáo thống kê
-
-          </a>
-
-          <a href="van-ban-di/danh-sach.html" class="btn btn-outline-primary" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3);">
-
-            Sổ theo dõi văn bản
+            Báo cáo thống kê
 
           </a>
 
@@ -171,6 +177,12 @@ document.addEventListener('DOMContentLoaded', async () => {
           <a href="cong-viec/xu-ly.html" class="btn btn-warning">
 
             Báo cáo tiến độ CV
+
+          </a>
+
+          <a href="van-ban-di/chung-thuc-chu-ky-so.html" class="btn btn-outline-primary" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3);">
+
+            Chứng thực chữ ký số
 
           </a>
 

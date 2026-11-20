@@ -84,6 +84,14 @@
           ]
         },
         {
+          title: 'Chỉ đạo & Giao nhiệm vụ',
+          items: [
+            { label: 'Giao nhiệm vụ mới', href: `${root}pages/cong-viec/giao-viec.html`, icon: ICONS.giaoViec, id: 'nav-giao-viec' },
+            { label: 'Theo dõi tiến độ công việc', href: `${root}pages/cong-viec/danh-sach.html`, icon: ICONS.tienDo, id: 'nav-cong-viec' },
+            { label: 'Nghiệm thu kết quả', href: `${root}pages/cong-viec/phe-duyet-ket-qua.html`, icon: ICONS.checkDraft, id: 'nav-cong-viec-nghiemthu' }
+          ]
+        },
+        {
           title: 'Lưu trữ & Báo cáo thống kê',
           items: [
             { label: 'Hồ sơ tài liệu', href: `${root}pages/ho-so/danh-sach.html`, icon: ICONS.folder, id: 'nav-ho-so' },

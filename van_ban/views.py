@@ -536,18 +536,17 @@ def api_van_ban_di_ky_so(request, van_ban_id):
     # Phát sinh thông báo sau khi ký số
     try:
         from thong_bao.models import ThongBao
-        # 1. Thông báo cho người ký (Lãnh đạo)
-        if user:
-            ThongBao.objects.create(
-                tieu_de=f"Đã ký số phê duyệt: {vb.trich_yeu[:60]}",
-                noi_dung=f"Đồng chí đã ký số điện tử phê duyệt dự thảo văn bản: '{vb.trich_yeu}'. Chuyển Văn thư cấp số và ban hành.",
-                loai='Văn bản đi',
-                muc_do='Bình thường',
-                nguoi_gui=user,
-                nguoi_nhan=user,
-                lien_ket=f"/pages/van-ban-di/danh-sach.html",
-            )
-        # 2. Thông báo cho tất cả Văn thư cấp số & ban hành
+        # 1. Phát sóng thông báo chung toàn cơ quan (nguoi_nhan=None) -> Để mọi tài khoản Lãnh đạo, Chuyên viên, Văn thư đều thấy trên chuông
+        ThongBao.objects.create(
+            tieu_de=f"Lãnh đạo đã ký số: {vb.trich_yeu[:60]}",
+            noi_dung=f"Lãnh đạo ({vb.lanh_dao_ky_ten}) đã ký số điện tử phê duyệt văn bản: '{vb.trich_yeu}'. Chuyển Văn thư cấp số và ban hành.",
+            loai='Văn bản đi',
+            muc_do='Quan trọng',
+            nguoi_gui=user,
+            nguoi_nhan=None,
+            lien_ket=f"/pages/van-ban-di/ban-hanh.html?id={vb.van_ban_id}",
+        )
+        # 2. Thông báo riêng cho Văn thư cấp số & ban hành
         van_thus = NguoiDung.objects.filter(vai_tro='VAN_THU', trang_thai='HOAT_DONG')
         for vt in van_thus:
             if user and vt.pk == user.pk:
@@ -626,7 +625,18 @@ def api_van_ban_di_trinh_lanh_dao(request, van_ban_id):
         note_str = f" (Ý kiến: {ghi_chu})" if ghi_chu else ""
         sender_name = user.ho_va_ten if user else "Văn thư"
 
-        # 1. Thông báo riêng cho toàn bộ Lãnh đạo Sở
+        # 1. Phát sóng thông báo chung toàn cơ quan (nguoi_nhan=None) -> Để toàn bộ Lãnh đạo, Văn thư và mọi Chuyên viên đều thấy trên chuông
+        ThongBao.objects.create(
+            tieu_de=f"Trình Lãnh đạo ký dự thảo: {vb.trich_yeu[:60]}",
+            noi_dung=f"Dự thảo văn bản từ phòng {vb.don_vi_soan_thao} ('{vb.trich_yeu}') đã được Văn thư ({sender_name}) kiểm tra thể thức và trình Lãnh đạo ký số phê duyệt.{note_str}",
+            loai='Văn bản đi',
+            muc_do='Quan trọng',
+            nguoi_gui=user,
+            nguoi_nhan=None,
+            lien_ket=f"/pages/van-ban-di/phe-duyet.html?id={vb.van_ban_id}",
+        )
+
+        # 2. Thông báo riêng cho toàn bộ Lãnh đạo Sở
         lanh_daos = NguoiDung.objects.filter(vai_tro='LANH_DAO', trang_thai='HOAT_DONG')
         for ld in lanh_daos:
             ThongBao.objects.create(
@@ -639,7 +649,7 @@ def api_van_ban_di_trinh_lanh_dao(request, van_ban_id):
                 lien_ket=f"/pages/van-ban-di/phe-duyet.html?id={vb.van_ban_id}",
             )
 
-        # 2. Thông báo cho người soạn thảo (Chuyên viên)
+        # 3. Thông báo cho người soạn thảo (Chuyên viên)
         if vb.nguoi_soan:
             ThongBao.objects.create(
                 tieu_de=f"Dự thảo đã được trình Lãnh đạo: {vb.trich_yeu[:60]}",
@@ -649,18 +659,6 @@ def api_van_ban_di_trinh_lanh_dao(request, van_ban_id):
                 nguoi_gui=user,
                 nguoi_nhan=vb.nguoi_soan,
                 lien_ket=f"/pages/van-ban-di/danh-sach.html?id={vb.van_ban_id}",
-            )
-
-        # 3. Thông báo cho người thực hiện thao tác (Văn thư) để ngay lập tức hiển thị số trên chuông
-        if user:
-            ThongBao.objects.create(
-                tieu_de=f"Đã chuyển trình Lãnh đạo ký: {vb.trich_yeu[:60]}",
-                noi_dung=f"Đồng chí đã kiểm tra thể thức và chuyển trình dự thảo '{vb.trich_yeu}' lên Lãnh đạo Sở phê duyệt.{note_str}",
-                loai='Văn bản đi',
-                muc_do='Bình thường',
-                nguoi_gui=user,
-                nguoi_nhan=user,
-                lien_ket=f"/pages/van-ban-di/kiem-tra.html",
             )
     except Exception as e:
         print("Error creating trinh lanh dao notification:", e)

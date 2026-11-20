@@ -79,14 +79,14 @@
 }
 
 .stat-number {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 700;
   color: var(--text-main);
   line-height: 1.2;
 }
 
 .stat-label {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--text-muted);
 }
 
@@ -96,8 +96,8 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 8px 16px;
-  font-size: 13.5px;
+  padding: 9px 18px;
+  font-size: 14.5px;
   font-weight: 600;
   border-radius: var(--radius-md);
   border: 1px solid transparent;
@@ -166,27 +166,27 @@
 }
 
 .btn-sm {
-  padding: 4px 10px;
-  font-size: 12px;
+  padding: 5px 12px;
+  font-size: 13px;
   border-radius: var(--radius-sm);
 }
 
 .btn-lg {
-  padding: 12px 24px;
-  font-size: 15px;
+  padding: 14px 28px;
+  font-size: 16.5px;
 }
 
 /* 3. BIỂU MẪU & NHẬP LIỆU (FORMS) */
 .form-group {
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
 .form-label {
   display: block;
-  font-size: 13px;
+  font-size: 14.5px;
   font-weight: 600;
   color: var(--text-main);
-  margin-bottom: 6px;
+  margin-bottom: 7px;
 }
 
 .form-label.required::after {
@@ -196,8 +196,8 @@
 
 .form-control, .form-select {
   width: 100%;
-  padding: 9px 12px;
-  font-size: 14px;
+  padding: 10px 14px;
+  font-size: 15px;
   color: var(--text-main);
   background-color: #ffffff;
   border: 1px solid var(--border-color-dark);
@@ -217,14 +217,14 @@
 }
 
 textarea.form-control {
-  min-height: 80px;
+  min-height: 85px;
   resize: vertical;
 }
 
 .form-hint {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--text-muted);
-  margin-top: 4px;
+  margin-top: 5px;
 }
 
 /* 4. HUY HIỆU TRẠNG THÁI (BADGES) */
@@ -232,11 +232,11 @@ textarea.form-control {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 4px 10px;
-  font-size: 12px;
+  padding: 5px 12px;
+  font-size: 13px;
   font-weight: 600;
   border-radius: 20px;
-  line-height: 1.2;
+  line-height: 1.25;
   white-space: nowrap;
 }
 
@@ -259,12 +259,12 @@ textarea.form-control {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 10px;
+  padding: 5px 12px;
   background: #f0f7ff;
   border: 1px solid #bae6fd;
   border-radius: 6px;
   font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, Menlo, monospace;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   color: #0284c7;
   white-space: nowrap;
@@ -277,13 +277,13 @@ textarea.form-control {
   gap: 10px;
 }
 .user-chip-avatar {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
   color: #ffffff;
   font-weight: 700;
-  font-size: 11.5px;
+  font-size: 12.5px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -293,11 +293,11 @@ textarea.form-control {
 .user-chip-name {
   font-weight: 600;
   color: #1e293b;
-  font-size: 13px;
-  line-height: 1.2;
+  font-size: 14.5px;
+  line-height: 1.25;
 }
 .user-chip-dept {
-  font-size: 11px;
+  font-size: 12.5px;
   color: #64748b;
   margin-top: 2px;
 }
@@ -312,23 +312,23 @@ textarea.form-control {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
-  font-size: 13.5px;
+  font-size: 14.5px;
 }
 
 .data-table th {
   background-color: #f8fafc;
   color: var(--text-muted);
   font-weight: 600;
-  font-size: 12.5px;
+  font-size: 13.5px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  padding: 12px 16px;
+  padding: 13px 16px;
   border-bottom: 2px solid var(--border-color);
   white-space: nowrap;
 }
 
 .data-table td {
-  padding: 12px 16px;
+  padding: 13px 16px;
   border-bottom: 1px solid var(--border-color);
   color: var(--text-main);
   vertical-align: middle;
@@ -355,7 +355,7 @@ textarea.form-control {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 13px;
+  font-size: 14px;
   color: #1e40af;
   box-shadow: var(--shadow-sm);
 }
@@ -390,7 +390,7 @@ textarea.form-control {
   box-shadow: var(--shadow-xl);
   border-left: 4px solid var(--primary-color);
   animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  font-size: 13.5px;
+  font-size: 14.5px;
 }
 
 .toast.toast-success { border-left-color: var(--success-color); }
@@ -461,7 +461,7 @@ textarea.form-control {
 }
 
 .modal-title {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 700;
   color: var(--primary-dark);
 }
