@@ -11,6 +11,7 @@ urlpatterns = [
     path('van-ban-di/kiem-tra/', views.van_ban_di_kiem_tra, name='van_ban_di_kiem_tra'),
     path('van-ban-di/phe-duyet/', views.van_ban_di_phe_duyet, name='van_ban_di_phe_duyet'),
     path('van-ban-di/ban-hanh/', views.van_ban_di_ban_hanh, name='van_ban_di_ban_hanh'),
+    path('van-ban-di/chung-thuc-chu-ky-so/', views.van_ban_di_chung_thuc_chu_ky_so, name='van_ban_di_chung_thuc_chu_ky_so'),
 
     # Văn bản đến
     path('van-ban-den/', views.van_ban_den_danh_sach, name='van_ban_den_danh_sach'),
@@ -20,6 +21,8 @@ urlpatterns = [
 
     # API
     path('api/van-ban-di', views.api_van_ban_di_list, name='api_van_ban_di_list'),
+    path('api/van-ban-di/chung-thuc-chu-ky-so', views.api_chung_thuc_chu_ky_so, name='api_chung_thuc_chu_ky_so'),
     path('api/van-ban-di/<int:van_ban_id>/ban-hanh', views.api_van_ban_di_ban_hanh, name='api_van_ban_di_ban_hanh'),
+    path('api/van-ban-di/<int:van_ban_id>/ky-so', views.api_van_ban_di_ky_so, name='api_van_ban_di_ky_so'),
     path('api/van-ban-den', views.api_van_ban_den_list, name='api_van_ban_den_list'),
 ]

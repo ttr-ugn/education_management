@@ -43,7 +43,8 @@
           items: [
             { label: 'Tiếp nhận dự thảo từ Chuyên viên', href: `${root}pages/van-ban-di/kiem-tra.html`, icon: ICONS.checkDraft, id: 'nav-vb-kiemtra' },
             { label: 'Sổ theo dõi Văn bản đi', href: `${root}pages/van-ban-di/danh-sach.html`, icon: ICONS.docOut, id: 'nav-vb-di' },
-            { label: 'Cấp số & Ban hành', href: `${root}pages/van-ban-di/ban-hanh.html`, icon: ICONS.publish, id: 'nav-vb-banhanh' }
+            { label: 'Cấp số & Ban hành', href: `${root}pages/van-ban-di/ban-hanh.html`, icon: ICONS.publish, id: 'nav-vb-banhanh' },
+            { label: 'Dịch vụ chứng thực chữ ký số', href: `${root}pages/van-ban-di/chung-thuc-chu-ky-so.html`, icon: ICONS.signDoc, id: 'nav-vb-chungthuc' }
           ]
         },
         {
@@ -78,7 +79,8 @@
           title: 'Ký duyệt văn bản',
           items: [
             { label: 'Ký số & Duyệt văn bản', href: `${root}pages/van-ban-di/phe-duyet.html`, icon: ICONS.signDoc, id: 'nav-vb-phe-duyet' },
-            { label: 'Sổ theo dõi Văn bản đi', href: `${root}pages/van-ban-di/danh-sach.html`, icon: ICONS.docOut, id: 'nav-vb-di' }
+            { label: 'Sổ theo dõi Văn bản đi', href: `${root}pages/van-ban-di/danh-sach.html`, icon: ICONS.docOut, id: 'nav-vb-di' },
+            { label: 'Dịch vụ chứng thực chữ ký số', href: `${root}pages/van-ban-di/chung-thuc-chu-ky-so.html`, icon: ICONS.signDoc, id: 'nav-vb-chungthuc' }
           ]
         },
         {
@@ -104,7 +106,8 @@
           title: 'Quản lý văn bản nội bộ',
           items: [
             { label: 'Soạn thảo dự thảo mới', href: `${root}pages/van-ban-di/soan-thao.html`, icon: ICONS.checkDraft, id: 'nav-vb-soan' },
-            { label: 'Văn bản của tôi', href: `${root}pages/van-ban-di/danh-sach.html`, icon: ICONS.folder, id: 'nav-vb-di' }
+            { label: 'Văn bản của tôi', href: `${root}pages/van-ban-di/danh-sach.html`, icon: ICONS.folder, id: 'nav-vb-di' },
+            { label: 'Dịch vụ chứng thực chữ ký số', href: `${root}pages/van-ban-di/chung-thuc-chu-ky-so.html`, icon: ICONS.signDoc, id: 'nav-vb-chungthuc' }
           ]
         },
         {
@@ -162,7 +165,10 @@
         const isBanHanh = currentPath.includes('ban-hanh');
         const isPheDuyet = currentPath.includes('phe-duyet');
         const isSoanThao = currentPath.includes('soan-thao');
-        if (role === 'VAN_THU') {
+        const isChungThuc = currentPath.includes('chung-thuc');
+        if (isChungThuc) {
+          activeItemId = 'nav-vb-chungthuc';
+        } else if (role === 'VAN_THU') {
           if (isKiemTra) activeItemId = 'nav-vb-kiemtra';
           else if (isBanHanh) activeItemId = 'nav-vb-banhanh';
           else activeItemId = 'nav-vb-di';

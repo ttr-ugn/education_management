@@ -1,0 +1,270 @@
+{% extends "base.html" %}
+
+{% block title %}Dịch vụ Chứng thực Chữ ký số - Quản lý văn bản Sở GD&ĐT Đà Nẵng{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Dịch vụ Chứng thực Chữ ký số & Thẩm định Văn bản điện tử</h1>
+    <p class="page-subtitle">Hạ tầng chứng thực số Ban Cơ yếu Chính phủ (VGCA) - Đáp ứng Nghị định 30/2020/NĐ-CP & Luật Giao dịch điện tử</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="danh-sach.html" class="btn btn-secondary">Sổ theo dõi văn bản đi</a>
+  </div>
+</div>
+
+<!-- Khối 1: Thống kê & Trạng thái Hạ tầng Chữ ký số -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 24px;">
+  <!-- Thẻ CA Cơ quan -->
+  <div class="card" style="border-top: 4px solid #004b91; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+    <div class="card-body p-3">
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <div>
+          <span style="font-size: 11.5px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Chứng thư số Cơ quan</span>
+          <h4 style="font-size: 15px; font-weight: 700; color: #1e293b; margin: 2px 0 0 0;">Sở Giáo dục và Đào tạo TP. Đà Nẵng</h4>
+        </div>
+        <span class="badge badge-success" style="font-size: 11px; padding: 4px 8px;">Đang hiệu lực</span>
+      </div>
+      <div style="font-size: 12.5px; color: #475569; display: flex; flex-direction: column; gap: 4px;">
+        <div><b>Đơn vị cấp CA:</b> Ban Cơ yếu Chính phủ (VGCA)</div>
+        <div><b>Mã định danh:</b> 000.00.06.G15</div>
+        <div><b>Thuật toán:</b> SHA-256 with RSA 2048-bit</div>
+        <div><b>Thời hạn:</b> 01/01/2024 - 31/12/2028</div>
+        <div style="font-family: monospace; font-size: 11px; color: #0284c7; background: #f0f9ff; padding: 3px 6px; border-radius: 4px; word-break: break-all;">
+          Serial: 7F:4A:9C:12:8E:B0:56:D3:A1:2F:89:01
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Thẻ CA Ban Giám đốc -->
+  <div class="card" style="border-top: 4px solid #0284c7; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+    <div class="card-body p-3">
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <div>
+          <span style="font-size: 11.5px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Chứng thư số Lãnh đạo ký</span>
+          <h4 style="font-size: 15px; font-weight: 700; color: #1e293b; margin: 2px 0 0 0;">Lê Thị Bích Thuận</h4>
+        </div>
+        <span class="badge badge-success" style="font-size: 11px; padding: 4px 8px;">Sẵn sàng ký</span>
+      </div>
+      <div style="font-size: 12.5px; color: #475569; display: flex; flex-direction: column; gap: 4px;">
+        <div><b>Chức vụ:</b> Giám đốc Sở GD&ĐT TP. Đà Nẵng</div>
+        <div><b>Thiết bị bảo mật:</b> USB Token PKI / HSM FIPS 140-2 L3</div>
+        <div><b>Đơn vị quản lý:</b> Văn phòng Sở Giáo dục và Đào tạo</div>
+        <div><b>Thời hạn:</b> 15/03/2024 - 15/03/2029</div>
+        <div style="font-family: monospace; font-size: 11px; color: #0284c7; background: #f0f9ff; padding: 3px 6px; border-radius: 4px; word-break: break-all;">
+          Serial: A8:52:1D:90:3E:44:B1:0C:67:F5:12:9A
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Thẻ Thống kê chứng thực -->
+  <div class="card" style="border-top: 4px solid #10b981; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+    <div class="card-body p-3">
+      <span style="font-size: 11.5px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Chỉ số An toàn & Toàn vẹn</span>
+      <div class="d-flex align-items-baseline gap-2 mt-1">
+        <span style="font-size: 28px; font-weight: 800; color: #059669;" id="statTotalSigned">--</span>
+        <span style="font-size: 13px; color: #64748b;">văn bản đã chứng thực</span>
+      </div>
+      <div style="font-size: 12.5px; color: #475569; margin-top: 8px; display: flex; flex-direction: column; gap: 4px;">
+        <div><b>Tỷ lệ toàn vẹn:</b> <span class="badge badge-success" style="font-size: 11px;">100% Không chỉnh sửa</span></div>
+        <div><b>Máy chủ Dấu thời gian (TSA):</b> Đồng bộ chuẩn UTC+7</div>
+        <div><b>Trạng thái kết nối VGCA:</b> <span style="color: #059669; font-weight: 600;">Trực tuyến 24/7</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Khối 2: Công cụ Thẩm định & Kiểm tra Tính toàn vẹn Chữ ký số -->
+<div class="card mb-4" style="border: 1px solid #bfdbfe;">
+  <div class="card-header" style="background: linear-gradient(135deg, #f0fdf4 0%, #eff6ff 100%); border-bottom: 1px solid #bfdbfe;">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <div>
+        <h2 class="card-title" style="color: #1e3a8a; font-size: 16px; margin: 0;">Trung tâm Thẩm định & Đối chiếu Tính toàn vẹn Chữ ký số</h2>
+        <p style="margin: 2px 0 0 0; font-size: 12.5px; color: #475569;">Kiểm tra chữ ký số có hợp lệ, tệp có bị sửa đổi sau khi ban hành và đối chiếu mã băm SHA-256</p>
+      </div>
+      <button class="btn btn-outline-primary btn-sm" onclick="openCertDetailModal()" style="font-size: 12px;">Xem chi tiết chứng thư CA</button>
+    </div>
+  </div>
+
+  <div class="card-body p-4">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+      <!-- Cách 1: Chọn từ văn bản nội bộ -->
+      <div style="background: #f8fafc; padding: 18px; border-radius: 8px; border: 1px solid #e2e8f0;">
+        <h3 style="font-size: 14px; font-weight: 700; color: #1e293b; margin-top: 0; margin-bottom: 8px;">
+          Phương thức 1: Chọn văn bản đi trong hệ thống
+        </h3>
+        <p style="font-size: 12.5px; color: #64748b; margin-bottom: 12px;">
+          Chọn nhanh văn bản đã ký hoặc đã ban hành để đối chiếu chữ ký số và mã băm tự động.
+        </p>
+        <div class="mb-3">
+          <label style="display: block; font-size: 12.5px; font-weight: 600; color: #334155; margin-bottom: 6px;">
+            Danh sách văn bản đã ký số:
+          </label>
+          <select id="selectInternalDoc" class="form-select" style="font-size: 13px; font-weight: 500;">
+            <option value="">-- Đang nạp danh sách văn bản... --</option>
+          </select>
+        </div>
+        <button type="button" class="btn btn-primary btn-sm" id="btnVerifyInternal" style="font-weight: 600;">
+          Thẩm định văn bản đã chọn
+        </button>
+      </div>
+
+      <!-- Cách 2: Tải lên tệp PDF để thẩm định -->
+      <div style="background: #f8fafc; padding: 18px; border-radius: 8px; border: 1px solid #e2e8f0;">
+        <h3 style="font-size: 14px; font-weight: 700; color: #1e293b; margin-top: 0; margin-bottom: 8px;">
+          Phương thức 2: Tải lên tệp văn bản từ máy tính
+        </h3>
+        <p style="font-size: 12.5px; color: #64748b; margin-bottom: 12px;">
+          Hỗ trợ tệp PDF, DOCX, scan văn bản. Hệ thống tính toán mã băm SHA-256 tức thì.
+        </p>
+        <div id="dropZone" style="border: 2px dashed #0284c7; background: #ffffff; padding: 16px; border-radius: 8px; text-align: center; cursor: pointer; transition: all 0.2s ease;">
+          <input type="file" id="uploadFileCert" style="display: none;" accept=".pdf,.docx,.doc,.xlsx,.txt">
+          <div style="font-size: 13px; font-weight: 600; color: #004b91;" id="uploadLabel">
+            Kéo thả tệp vào đây hoặc bấm để chọn tệp
+          </div>
+          <div style="font-size: 11.5px; color: #64748b; margin-top: 4px;" id="uploadSublabel">
+            Hỗ trợ tối đa 25MB (Chuẩn PDF/A theo quy định văn thư)
+          </div>
+        </div>
+        <div class="mt-3">
+          <button type="button" class="btn btn-success btn-sm" id="btnVerifyUpload" style="font-weight: 600;">
+            Kiểm tra tính toàn vẹn tệp tải lên
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Kết quả thẩm định (Hiện ra khi bấm thẩm định) -->
+    <div id="verificationResultPanel" style="display: none; margin-top: 24px; padding: 20px; border-radius: 8px; background: #f0fdf4; border: 1.5px solid #86efac;">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <div class="d-flex align-items-center gap-2">
+          <span style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: #16a34a;"></span>
+          <h3 style="margin: 0; font-size: 16px; font-weight: 700; color: #15803d;" id="resTitle">
+            KẾT QUẢ THẨM ĐỊNH: CHỮ KÝ SỐ HỢP LỆ & TÀI LIỆU TOÀN VẸN
+          </h3>
+        </div>
+        <span class="badge badge-success" style="font-size: 12px; padding: 5px 10px;" id="resBadge">HỢP PHÁP</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 16px; font-size: 13px; color: #1e293b;">
+        <div style="background: #ffffff; padding: 14px; border-radius: 6px; border: 1px solid #dcfce7; display: flex; flex-direction: column; gap: 6px;">
+          <div><b>Tệp tài liệu thẩm định:</b> <span id="resFileName" style="color: #004b91; font-weight: 600;">--</span> (<span id="resFileSize">--</span>)</div>
+          <div><b>Người ký số:</b> <span id="resSigner" style="font-weight: 700;">--</span> - <span id="resTitleSigner" style="color: #475569;">--</span></div>
+          <div><b>Cơ quan phát hành:</b> <span id="resOrg">Sở Giáo dục và Đào tạo Thành phố Đà Nẵng</span></div>
+          <div><b>Nhà cung cấp chứng thực:</b> <span id="resCA">Ban Cơ yếu Chính phủ (VGCA)</span></div>
+          <div><b>Thời gian ký số & TSA:</b> <span id="resTimestamp" style="color: #004b91; font-weight: 600;">--</span></div>
+          <div><b>Quy chuẩn pháp lý:</b> <span style="color: #16a34a;">Nghị định 30/2020/NĐ-CP & Luật Giao dịch điện tử</span></div>
+        </div>
+
+        <div style="background: #ffffff; padding: 14px; border-radius: 6px; border: 1px solid #dcfce7; display: flex; flex-direction: column; gap: 8px;">
+          <div>
+            <b style="font-size: 12px; color: #475569; text-transform: uppercase;">Mã băm SHA-256 Digest:</b>
+            <div id="resHash" style="font-family: monospace; font-size: 11px; word-break: break-all; background: #f8fafc; padding: 8px; border-radius: 4px; border: 1px solid #e2e8f0; margin-top: 4px; color: #0f172a;">
+              --
+            </div>
+          </div>
+          <div>
+            <b style="font-size: 12px; color: #475569;">Tính toàn vẹn (Integrity):</b>
+            <div style="color: #15803d; font-weight: 700; font-size: 13px; margin-top: 2px;">
+              Khớp 100% với chữ ký điện tử gốc
+            </div>
+          </div>
+        </div>
+      </div>
+      <p style="font-size: 12px; color: #166534; margin: 12px 0 0 0; line-height: 1.4;" id="resMessage">
+        Văn bản điện tử đảm bảo tính toàn vẹn tuyệt đối, không có dấu hiệu bị can thiệp chỉnh sửa sau thời điểm ký số. Chữ ký số có giá trị pháp lý tương đương chữ ký tay và con dấu cơ quan.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- Khối 3: Sổ theo dõi văn bản đã ký số & chứng thực -->
+<div class="card">
+  <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <div>
+      <h2 class="card-title">Sổ theo dõi Văn bản đã Ký số & Chứng thực điện tử</h2>
+      <p style="margin: 0; font-size: 12.5px; color: #64748b;">Danh sách các văn bản đi của cơ quan đã được gắn chứng thư số mật mã và lưu vết SHA-256</p>
+    </div>
+    <div class="d-flex gap-2">
+      <input type="text" id="filterInput" class="form-control form-control-sm" placeholder="Tìm số ký hiệu, trích yếu..." style="width: 250px;">
+      <button class="btn btn-secondary btn-sm" id="btnReloadList">Làm mới</button>
+    </div>
+  </div>
+
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0;">
+            <th style="padding: 12px 16px; font-size: 12px; font-weight: 700; color: #475569; width: 140px;">SỐ / KÝ HIỆU</th>
+            <th style="padding: 12px 16px; font-size: 12px; font-weight: 700; color: #475569; min-width: 280px;">TRÍCH YẾU NỘI DUNG VĂN BẢN</th>
+            <th style="padding: 12px 16px; font-size: 12px; font-weight: 700; color: #475569; width: 170px;">NGƯỜI KÝ DUYỆT</th>
+            <th style="padding: 12px 16px; font-size: 12px; font-weight: 700; color: #475569; width: 150px;">THỜI GIAN KÝ</th>
+            <th style="padding: 12px 16px; font-size: 12px; font-weight: 700; color: #475569; width: 220px;">MÃ BĂM SHA-256</th>
+            <th style="padding: 12px 16px; font-size: 12px; font-weight: 700; color: #475569; text-align: center; width: 140px;">TRẠNG THÁI</th>
+            <th style="padding: 12px 16px; font-size: 12px; font-weight: 700; color: #475569; text-align: center; width: 120px;">THAO TÁC</th>
+          </tr>
+        </thead>
+        <tbody id="signedDocsTableBody">
+          <tr><td colspan="7" class="text-center p-4 text-muted">Đang nạp dữ liệu chứng thực...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block modals %}
+<!-- Modal Xem Chi tiết Chứng thư số X.509 -->
+<div id="certDetailModal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 9999; align-items: center; justify-content: center; padding: 20px;">
+  <div style="background: #ffffff; width: 95%; max-width: 640px; border-radius: 12px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3); overflow: hidden; display: flex; flex-direction: column;">
+    <div style="background: #003366; color: #ffffff; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between;">
+      <h3 style="margin: 0; font-size: 16px; font-weight: 600;">Thông tin Chứng thư số X.509 (VGCA)</h3>
+      <button type="button" class="btn btn-sm btn-light" onclick="closeCertDetailModal()" style="font-weight: bold;">&times;</button>
+    </div>
+    <div style="padding: 20px; display: flex; flex-direction: column; gap: 14px; max-height: 75vh; overflow-y: auto; font-size: 13px;">
+      <div style="background: #f8fafc; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
+        <b style="color: #004b91;">1. Thông tin Chủ thể (Subject DN):</b>
+        <div style="margin-top: 6px; line-height: 1.5; color: #334155;">
+          <b>CN:</b> Sở Giáo dục và Đào tạo Thành phố Đà Nẵng<br>
+          <b>O:</b> Sở Giáo dục và Đào tạo TP. Đà Nẵng<br>
+          <b>L:</b> Quận Hải Châu, Thành phố Đà Nẵng<br>
+          <b>C:</b> VN (Việt Nam)<br>
+          <b>Mã định danh cơ quan:</b> 000.00.06.G15
+        </div>
+      </div>
+
+      <div style="background: #f8fafc; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
+        <b style="color: #004b91;">2. Đơn vị phát hành Chứng thư (Issuer DN):</b>
+        <div style="margin-top: 6px; line-height: 1.5; color: #334155;">
+          <b>CN:</b> Vietnam Government Root CA (VGCA)<br>
+          <b>O:</b> Ban Cơ yếu Chính phủ<br>
+          <b>OU:</b> Cục Chứng thực số và Bảo mật thông tin<br>
+          <b>C:</b> VN
+        </div>
+      </div>
+
+      <div style="background: #f8fafc; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
+        <b style="color: #004b91;">3. Thuộc tính kỹ thuật & Mật mã:</b>
+        <div style="margin-top: 6px; line-height: 1.5; color: #334155;">
+          <b>Số Serial:</b> 7F:4A:9C:12:8E:B0:56:D3:A1:2F:89:01<br>
+          <b>Thuật toán chữ ký:</b> SHA256withRSA (OID: 1.2.840.113549.1.1.11)<br>
+          <b>Độ dài khóa công khai:</b> RSA 2048-bit<br>
+          <b>Hiệu lực từ:</b> 01/01/2024 00:00:00 GMT+7<br>
+          <b>Hiệu lực đến:</b> 31/12/2028 23:59:59 GMT+7<br>
+          <b>Mục đích sử dụng:</b> Digital Signature, Non-Repudiation, Document Signing
+        </div>
+      </div>
+    </div>
+    <div style="padding: 12px 20px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end;">
+      <button type="button" class="btn btn-secondary btn-sm" onclick="closeCertDetailModal()">Đóng cửa sổ</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/van_ban_chung_thuc.js"></script>
+{% endblock %}

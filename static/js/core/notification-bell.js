@@ -296,31 +296,10 @@
       }
     }
 
-    // Tự động kiểm tra nhắc nhở đến hạn (Auto Reminder Checker)
+    // Tự động kiểm tra đồng bộ trạng thái chuông
     async function checkAutoReminders() {
-      if (!window.thongBaoService) return;
-      try {
-        const dueList = await window.thongBaoService.getDueReminders();
-        let hasNewDue = false;
-
-        dueList.forEach(item => {
-          if (!alertedIds.has(item.id)) {
-            alertedIds.add(item.id);
-            hasNewDue = true;
-            if (window.Toast) {
-              window.Toast.warning(`[NHẮC NHỞ ĐẾN HẠN] ${item.tieu_de}\nNội dung: ${item.noi_dung.substring(0, 80)}...`);
-            }
-          }
-        });
-
-        if (hasNewDue) {
-          playAlertBeep();
-        }
-
-        await updateBellStats();
-      } catch (e) {
-        // im lặng
-      }
+      // Chỉ cập nhật số lượng thông báo trên biểu tượng chuông, không hiển thị toast cảnh báo liên tục
+      await updateBellStats();
     }
 
     // Nạp dữ liệu lần đầu

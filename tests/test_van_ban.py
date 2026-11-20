@@ -137,3 +137,65 @@ class VanBanWorkflowTestCase(TestCase):
         doc.refresh_from_db()
         self.assertEqual(doc.trang_thai, TrangThaiVanBanDen.DANG_XU_LY)
         self.assertEqual(doc.nguoi_chu_tri, self.chuyen_vien)
+
+    def test_chung_thuc_chu_ky_so_page_and_api(self):
+        """Kiểm tra trang và API Dịch vụ chứng thực chữ ký số."""
+        # 1. Kiểm tra tải giao diện chứng thực
+        response = self.client.get('/pages/van-ban-di/chung-thuc-chu-ky-so.html')
+        self.assertEqual(response.status_code, 200)
+
+        # 2. Tạo một văn bản đã ký số
+        doc = VanBanDi.objects.create(
+            trich_yeu="Kế hoạch tuyển sinh đầu cấp năm học 2026-2027",
+            loai_van_ban="Kế hoạch",
+            nguoi_soan=self.chuyen_vien,
+            lanh_dao_ky=self.lanh_dao,
+            lanh_dao_ky_ten="Mai Tấn Linh",
+            trang_thai="DA_KY_CHO_BAN_HANH"
+        )
+
+        # 3. Kiểm tra API GET danh sách văn bản và CA
+        res_get = self.client.get('/api/van-ban-di/chung-thuc-chu-ky-so')
+        self.assertEqual(res_get.status_code, 200)
+        data_get = res_get.json()
+        self.assertTrue(data_get['thanh_cong'])
+        self.assertIn('chung_thu_ca', data_get)
+        self.assertIn('danh_sach_van_ban', data_get)
+        self.assertGreaterEqual(len(data_get['danh_sach_van_ban']), 1)
+
+        # 4. Kiểm tra API POST thẩm định theo ID văn bản
+        res_post_id = self.client.post('/api/van-ban-di/chung-thuc-chu-ky-so', {'van_ban_id': doc.van_ban_id})
+        self.assertEqual(res_post_id.status_code, 200)
+        data_post_id = res_post_id.json()
+        self.assertTrue(data_post_id['thanh_cong'])
+        self.assertTrue(data_post_id['hop_le'])
+        self.assertEqual(data_post_id['ket_qua']['trang_thai'], 'TOAN_VEN_HOP_LE')
+        self.assertIsNotNone(data_post_id['ket_qua']['ma_bam_sha256'])
+
+        # 5. Kiểm tra API POST thẩm định với tệp tải lên
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        test_file = SimpleUploadedFile("quyet_dinh_signed.pdf", b"%PDF-1.4 Mock signed content with VGCA certificate", content_type="application/pdf")
+        res_post_file = self.client.post('/api/van-ban-di/chung-thuc-chu-ky-so', {'file': test_file})
+        self.assertEqual(res_post_file.status_code, 200)
+        data_post_file = res_post_file.json()
+        self.assertTrue(data_post_file['thanh_cong'])
+        self.assertTrue(data_post_file['hop_le'])
+        self.assertIn('ma_bam_sha256', data_post_file['ket_qua'])
+
+    def test_api_ky_so_phe_duyet(self):
+        """Kiểm tra API Ký số văn bản của Lãnh đạo."""
+        doc = VanBanDi.objects.create(
+            trich_yeu="Quyết định khen thưởng tập thể cán bộ giáo viên",
+            loai_van_ban="Quyết định",
+            nguoi_soan=self.chuyen_vien,
+            trang_thai="CHO_LANH_DAO_KY"
+        )
+        res = self.client.post(f'/api/van-ban-di/{doc.van_ban_id}/ky-so')
+        self.assertEqual(res.status_code, 200)
+        data = res.json()
+        self.assertTrue(data['thanh_cong'])
+        doc.refresh_from_db()
+        self.assertEqual(doc.trang_thai, 'DA_KY_CHO_BAN_HANH')
+        self.assertIsNotNone(doc.thoi_gian_ky)
+        self.assertIsNotNone(doc.lanh_dao_ky_ten)
+

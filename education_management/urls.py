@@ -54,6 +54,7 @@ urlpatterns = [
     path('pages/van-ban-di/kiem-tra.html', vb_views.van_ban_di_kiem_tra),
     path('pages/van-ban-di/phe-duyet.html', vb_views.van_ban_di_phe_duyet),
     path('pages/van-ban-di/ban-hanh.html', vb_views.van_ban_di_ban_hanh),
+    path('pages/van-ban-di/chung-thuc-chu-ky-so.html', vb_views.van_ban_di_chung_thuc_chu_ky_so),
 
     # Phân hệ Công việc
     path('pages/cong-viec/danh-sach.html', cv_views.danh_sach_cong_viec),
@@ -88,9 +89,14 @@ urlpatterns = [
     # Văn bản đi
     path('api/van-ban-di', vb_views.api_van_ban_di_list, name='api_van_ban_di'),
     path('api/van-ban-di/', vb_views.api_van_ban_di_list, name='api_van_ban_di_slash'),
+    path('api/van-ban-di/chung-thuc-chu-ky-so', vb_views.api_chung_thuc_chu_ky_so, name='api_chung_thuc_chu_ky_so'),
     path('api/van-ban-di/<int:van_ban_id>', vb_views.api_van_ban_di_detail, name='api_van_ban_di_detail'),
     path('api/van-ban-di/<int:van_ban_id>/trang-thai', vb_views.api_van_ban_di_trang_thai, name='api_van_ban_di_trang_thai'),
     path('api/van-ban-di/<int:van_ban_id>/ban-hanh', vb_views.api_van_ban_di_ban_hanh, name='api_van_ban_di_ban_hanh'),
+    path('api/van-ban-di/<int:van_ban_id>/ky-so', vb_views.api_van_ban_di_ky_so, name='api_van_ban_di_ky_so'),
+    path('api/van-ban-di/<int:van_ban_id>/trinh-lanh-dao', vb_views.api_van_ban_di_trinh_lanh_dao, name='api_van_ban_di_trinh_lanh_dao'),
+    path('api/van-ban-di/<int:van_ban_id>/van-thu-tra-lai', vb_views.api_van_ban_di_van_thu_tra_lai, name='api_van_ban_di_van_thu_tra_lai'),
+    path('api/van-ban-di/<int:van_ban_id>/tu-choi', vb_views.api_van_ban_di_tu_choi, name='api_van_ban_di_tu_choi'),
 
     # Văn bản đến
     path('api/van-ban-den', vb_views.api_van_ban_den_list, name='api_van_ban_den'),
