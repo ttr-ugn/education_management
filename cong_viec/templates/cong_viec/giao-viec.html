@@ -315,15 +315,6 @@
                   </div>
 
                   <div class="fields-grid" style="gap: 14px 16px;">
-                    <div class="form-group full-width">
-                      <label for="vb_goi_y_select" class="custom-form-label">
-                        <span>Chọn nhanh từ kho văn bản hệ thống (tùy chọn)</span>
-                      </label>
-                      <select id="vb_goi_y_select" class="custom-select">
-                        <option value="">-- Hoặc tự nhập thông tin &amp; tải tệp đính kèm bên dưới --</option>
-                      </select>
-                    </div>
-
                     <div class="form-group">
                       <label for="so_ky_hieu_vb" class="custom-form-label">
                         <span>Số / Ký hiệu văn bản</span>
@@ -352,18 +343,18 @@
                       <input type="file" id="tep_dinh_kem_file" accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.txt" hidden>
                       <div id="attachmentDropzone" class="attachment-dropzone" role="button" tabindex="0" aria-label="Chọn tệp văn bản đính kèm">
                         <div class="attachment-dropzone-info">
-                          
+                          <svg id="dropzoneIcon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2" style="flex-shrink: 0;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
                           <div style="min-width: 0;">
-                            <div style="font-size: 13px; font-weight: 600; color: #0f172a;">Kéo thả tệp văn bản vào đây hoặc nhấn để tải lên</div>
-                            <div style="font-size: 11.5px; color: #64748b; margin-top: 2px;">Hỗ trợ PDF, Word (.doc/.docx), Excel (.xls/.xlsx), Hình ảnh (.png/.jpg), TXT • Tối đa 15MB</div>
+                            <div id="dropzoneTitle" style="font-size: 13px; font-weight: 600; color: #0f172a;">Kéo thả tệp văn bản vào đây hoặc nhấn để tải lên</div>
+                            <div id="dropzoneSubtitle" style="font-size: 11.5px; color: #64748b; margin-top: 2px;">Hỗ trợ PDF, Word (.doc/.docx), Excel (.xls/.xlsx), Hình ảnh (.png/.jpg), TXT • Tối đa 15MB</div>
                           </div>
                         </div>
-                        <span class="attachment-browse-badge">Chọn tệp</span>
+                        <span id="dropzoneBrowseBadge" class="attachment-browse-badge">Chọn tệp</span>
                       </div>
 
                       <div id="selectedAttachmentBar" class="attachment-preview-card">
                         <div class="attachment-preview-meta">
-                          <span id="selectedFileIcon" style="display: none;"></span>
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2" style="flex-shrink: 0;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
                           <div style="min-width: 0;">
                             <div id="selectedFileName" style="font-size: 13px; font-weight: 600; color: #0369a1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></div>
                             <div id="selectedFileMeta" style="font-size: 11.5px; color: #64748b;"></div>
@@ -485,11 +476,12 @@
       const btnText = document.getElementById('btnText');
       const resetBtn = document.getElementById('resetBtn');
 
-      const docSuggestionSelect = document.getElementById('vb_goi_y_select');
       const fileInput = document.getElementById('tep_dinh_kem_file');
       const dropzone = document.getElementById('attachmentDropzone');
+      const dropzoneTitle = document.getElementById('dropzoneTitle');
+      const dropzoneSubtitle = document.getElementById('dropzoneSubtitle');
+      const dropzoneBrowseBadge = document.getElementById('dropzoneBrowseBadge');
       const attachmentBar = document.getElementById('selectedAttachmentBar');
-      const selectedFileIcon = document.getElementById('selectedFileIcon');
       const selectedFileName = document.getElementById('selectedFileName');
       const selectedFileMeta = document.getElementById('selectedFileMeta');
       const previewAttachmentBtn = document.getElementById('previewAttachmentBtn');
@@ -497,19 +489,8 @@
 
       const ALLOWED_EXTS = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'png', 'jpg', 'jpeg', 'txt'];
       const MAX_FILE_BYTES = 15 * 1024 * 1024;
-      let suggestedDocs = [];
       let selectedLocalFile = null;
       let selectedLocalUrl = null;
-      let selectedRepoDoc = null;
-
-      function getFileIcon(filename) {
-        const ext = (filename || '').split('.').pop().toLowerCase();
-        if (ext === 'pdf') return '';
-        if (ext === 'doc' || ext === 'docx') return '';
-        if (ext === 'xls' || ext === 'xlsx') return '';
-        if (['png', 'jpg', 'jpeg'].includes(ext)) return '';
-        return '';
-      }
 
       function formatBytes(bytes) {
         if (!bytes) return '0 KB';
@@ -523,11 +504,17 @@
           selectedLocalUrl = null;
         }
         selectedLocalFile = null;
-        selectedRepoDoc = null;
         fileInput.value = '';
         attachmentBar.style.display = 'none';
         selectedFileName.textContent = '';
         selectedFileMeta.textContent = '';
+
+        // Khôi phục giao diện dropzone ban đầu
+        dropzone.style.background = '#f8fafc';
+        dropzone.style.borderColor = '#cbd5e1';
+        if (dropzoneTitle) dropzoneTitle.textContent = 'Kéo thả tệp văn bản vào đây hoặc nhấn để tải lên';
+        if (dropzoneSubtitle) dropzoneSubtitle.textContent = 'Hỗ trợ PDF, Word (.doc/.docx), Excel (.xls/.xlsx), Hình ảnh (.png/.jpg), TXT • Tối đa 15MB';
+        if (dropzoneBrowseBadge) dropzoneBrowseBadge.textContent = 'Chọn tệp';
       }
 
       function setLocalAttachment(file) {
@@ -546,28 +533,19 @@
         clearAttachment();
         selectedLocalFile = file;
         selectedLocalUrl = URL.createObjectURL(file);
-        selectedFileIcon.textContent = getFileIcon(file.name);
+
+        // Hiển thị thanh tệp đã chọn
         selectedFileName.textContent = file.name;
-        selectedFileMeta.textContent = `Tải lên từ máy • ${formatBytes(file.size)}`;
+        selectedFileMeta.textContent = `Tải lên từ máy • Dung lượng: ${formatBytes(file.size)}`;
         previewAttachmentBtn.style.display = ['pdf', 'png', 'jpg', 'jpeg', 'txt'].includes(ext) ? 'inline-flex' : 'none';
         attachmentBar.style.display = 'flex';
-      }
 
-      function setRepoAttachment(doc) {
-        clearAttachment();
-        if (!doc || !doc.tep_dinh_kem) return;
-        selectedRepoDoc = {
-          tep_dinh_kem: doc.tep_dinh_kem,
-          ten_tep_dinh_kem: doc.ten_tep_dinh_kem || doc.so_ky_hieu || 'van_ban_luu_tru.pdf',
-          co_file_pdf: Boolean(doc.co_file_pdf)
-        };
-        selectedFileIcon.textContent = getFileIcon(selectedRepoDoc.ten_tep_dinh_kem);
-        selectedFileName.textContent = selectedRepoDoc.ten_tep_dinh_kem;
-        selectedFileMeta.textContent = doc.co_file_pdf
-          ? 'Từ kho văn bản Sở • PDF gốc'
-          : 'Từ kho văn bản Sở • Bản điện tử chuẩn A4';
-        previewAttachmentBtn.style.display = 'inline-flex';
-        attachmentBar.style.display = 'flex';
+        // Cập nhật giao diện dropzone báo nhận tệp thành công
+        dropzone.style.background = '#f0f9ff';
+        dropzone.style.borderColor = '#0284c7';
+        if (dropzoneTitle) dropzoneTitle.textContent = `Đã chọn: ${file.name}`;
+        if (dropzoneSubtitle) dropzoneSubtitle.textContent = `Sẵn sàng ban hành kèm theo nhiệm vụ (${formatBytes(file.size)})`;
+        if (dropzoneBrowseBadge) dropzoneBrowseBadge.textContent = 'Đổi tệp khác';
       }
 
       dropzone.addEventListener('click', () => fileInput.click());
@@ -595,48 +573,13 @@
         }
       });
       previewAttachmentBtn.addEventListener('click', () => {
-        const url = selectedLocalUrl || (selectedRepoDoc && selectedRepoDoc.tep_dinh_kem);
-        if (url) window.open(url, '_blank', 'noopener');
+        if (selectedLocalUrl) {
+          window.open(selectedLocalUrl, '_blank', 'noopener');
+        }
       });
       removeAttachmentBtn.addEventListener('click', () => {
         clearAttachment();
-        if (docSuggestionSelect) docSuggestionSelect.value = '';
       });
-
-      // Tải danh sách văn bản gợi ý trong hệ thống
-      try {
-        const docRes = await window.api.get('/api/cong-viec/van-ban-goi-y');
-        suggestedDocs = docRes.du_lieu || [];
-        if (suggestedDocs.length > 0 && docSuggestionSelect) {
-          docSuggestionSelect.innerHTML = '<option value="">-- Hoặc tự nhập thông tin &amp; tải tệp đính kèm bên dưới --</option>';
-          suggestedDocs.forEach((d, idx) => {
-            const badge = d.co_file_pdf ? '[PDF] ' : (d.tep_dinh_kem ? '[VBĐT] ' : '');
-            const option = document.createElement('option');
-            option.value = String(idx);
-            option.textContent = `${badge}${d.label || d.so_ky_hieu || ''}`;
-            docSuggestionSelect.appendChild(option);
-          });
-        }
-      } catch (e) {
-        suggestedDocs = [];
-      }
-
-      if (docSuggestionSelect) {
-        docSuggestionSelect.addEventListener('change', () => {
-          const val = docSuggestionSelect.value;
-          if (val === '') return;
-          const doc = suggestedDocs[parseInt(val, 10)];
-          if (!doc) return;
-          document.getElementById('so_ky_hieu_vb').value = doc.so_ky_hieu || '';
-          document.getElementById('ngay_van_ban').value = doc.ngay_van_ban || '';
-          document.getElementById('trich_yeu_vb').value = doc.trich_yeu || '';
-          if (doc.tep_dinh_kem) {
-            setRepoAttachment(doc);
-          } else {
-            clearAttachment();
-          }
-        });
-      }
 
       // Tải danh sách chuyên viên từ backend
       try {
@@ -723,16 +666,24 @@
               }
             });
             payload.append('tep_dinh_kem', selectedLocalFile);
+            payload.append('ten_tep_dinh_kem', selectedLocalFile.name);
           } else {
             payload = {
               ...baseFields,
               nguoi_xu_ly_id: baseFields.nguoi_xu_ly_id || null,
-              tep_dinh_kem: selectedRepoDoc ? selectedRepoDoc.tep_dinh_kem : '',
-              ten_tep_dinh_kem: selectedRepoDoc ? selectedRepoDoc.ten_tep_dinh_kem : ''
+              tep_dinh_kem: '',
+              ten_tep_dinh_kem: ''
             };
           }
 
-          await window.congViecService.create(payload);
+          const res = await window.congViecService.create(payload);
+
+          // Cập nhật thống kê chuông thông báo ngay lập tức
+          if (window.NotificationBell && typeof window.NotificationBell.init === 'function') {
+            try {
+              await window.NotificationBell.init();
+            } catch (bellErr) {}
+          }
 
           setTimeout(() => {
             window.location.replace('danh-sach.html');

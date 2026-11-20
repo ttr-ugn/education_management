@@ -56,7 +56,10 @@ def api_thong_bao_list(request):
 
 @csrf_exempt
 def api_thong_bao_dem_chua_doc(request):
-    """Đếm số thông báo chưa đọc phục vụ badge real-time mỗi 2 giây."""
+    """Đếm số thông báo chưa đọc và nhiệm vụ đến hạn phục vụ badge real-time mỗi 2 giây."""
+    from datetime import date, timedelta
+    from cong_viec.models import CongViec
+
     user_id = request.session.get('user_id')
     user = NguoiDung.objects.filter(pk=user_id).first() if user_id else None
 
@@ -66,20 +69,57 @@ def api_thong_bao_dem_chua_doc(request):
         tong_so = ThongBao.objects.count()
         chua_doc = tong_so
 
+    today = date.today()
+    due_threshold = today + timedelta(days=2)
+    task_qs = CongViec.objects.filter(
+        trang_thai__in=['CHUA_THUC_HIEN', 'DANG_THUC_HIEN'],
+        han_hoan_thanh__lte=due_threshold
+    )
+    if user and user.vai_tro == 'CHUYEN_VIEN':
+        task_qs = task_qs.filter(nguoi_xu_ly=user)
+    den_han = task_qs.count()
+
     return JsonResponse({
         'thanh_cong': True,
         'chua_doc': chua_doc,
-        'den_han': 0
+        'den_han': den_han
     })
 
 
 @csrf_exempt
 def api_thong_bao_kiem_tra_den_han(request):
-    """Kiểm tra việc đến hạn."""
+    """Kiểm tra nhiệm vụ đến hạn phục vụ cảnh báo chuông và tab Đến hạn."""
+    from datetime import date, timedelta
+    from cong_viec.models import CongViec
+
+    user_id = request.session.get('user_id')
+    user = NguoiDung.objects.filter(pk=user_id).first() if user_id else None
+
+    today = date.today()
+    due_threshold = today + timedelta(days=2)
+    task_qs = CongViec.objects.filter(
+        trang_thai__in=['CHUA_THUC_HIEN', 'DANG_THUC_HIEN'],
+        han_hoan_thanh__lte=due_threshold
+    ).order_by('han_hoan_thanh')
+    if user and user.vai_tro == 'CHUYEN_VIEN':
+        task_qs = task_qs.filter(nguoi_xu_ly=user)
+
+    due_list = []
+    for cv in task_qs[:10]:
+        due_list.append({
+            'id': f"cv_{cv.cong_viec_id}",
+            'tieu_de': f"Nhiệm vụ: {cv.ten_cong_viec}",
+            'noi_dung': f"Người thực hiện: {cv.nguoi_xu_ly.ho_va_ten if cv.nguoi_xu_ly else 'Cán bộ'} - Hạn chót: {cv.han_hoan_thanh.strftime('%d/%m/%Y')}",
+            'ngay_hen_gio': cv.han_hoan_thanh.strftime('%d/%m/%Y'),
+            'loai': 'Nhắc nhở',
+            'da_den_han': cv.han_hoan_thanh <= today,
+            'lien_ket': f"/pages/cong-viec/xu-ly.html?id={cv.cong_viec_id}",
+        })
+
     return JsonResponse({
         'thanh_cong': True,
-        'nhac_nho_den_han': [],
-        'so_luong': 0
+        'nhac_nho_den_han': due_list,
+        'so_luong': len(due_list)
     })
 
 

@@ -118,6 +118,49 @@ def api_cong_viec_list(request):
             tep_dinh_kem=tep_dinh_kem or '',
             ten_tep_dinh_kem=ten_tep_dinh_kem or '',
         )
+
+        # Ghi nhật ký khởi tạo công việc
+        try:
+            from .models import NhatKyCongViec
+            attach_note = f" (Đính kèm: {ten_tep_dinh_kem})" if ten_tep_dinh_kem else ""
+            NhatKyCongViec.objects.create(
+                cong_viec=cv,
+                nguoi_cap_nhat=user,
+                tien_do_cu=0,
+                tien_do_moi=0,
+                noi_dung_ghi_chu=f"Giao nhiệm vụ mới cho đồng chí {chuyen_vien.ho_va_ten} (Hạn: {han_hoan_thanh.strftime('%d/%m/%Y')}){attach_note}"
+            )
+        except Exception:
+            pass
+
+        # Phát sinh thông báo điều hành tức thì
+        try:
+            from thong_bao.models import ThongBao
+            deadline_str = han_hoan_thanh.strftime('%d/%m/%Y') if han_hoan_thanh else ''
+            attach_str = f" (Đính kèm: {ten_tep_dinh_kem})" if ten_tep_dinh_kem else ""
+            if chuyen_vien:
+                ThongBao.objects.create(
+                    tieu_de=f"Giao nhiệm vụ: {cv.ten_cong_viec}",
+                    noi_dung=f"Đồng chí đã được phân công thực hiện nhiệm vụ: {cv.ten_cong_viec}. Hạn hoàn thành: {deadline_str}. Phòng ban: {cv.phong_ban}.{attach_str}",
+                    loai='Nhiệm vụ',
+                    muc_do='Quan trọng' if cv.do_uu_tien in ('CAO', 'KHAN_CAP') else 'Bình thường',
+                    nguoi_gui=user,
+                    nguoi_nhan=chuyen_vien,
+                    lien_ket=f"/pages/cong-viec/xu-ly.html?id={cv.cong_viec_id}",
+                )
+            if user and chuyen_vien and user.pk != chuyen_vien.pk:
+                ThongBao.objects.create(
+                    tieu_de=f"Đã giao nhiệm vụ: {cv.ten_cong_viec}",
+                    noi_dung=f"Đã phân công nhiệm vụ cho đồng chí {chuyen_vien.ho_va_ten}. Hạn xử lý: {deadline_str}.{attach_str}",
+                    loai='Nhiệm vụ',
+                    muc_do='Bình thường',
+                    nguoi_gui=user,
+                    nguoi_nhan=user,
+                    lien_ket=f"/pages/cong-viec/danh-sach.html",
+                )
+        except Exception:
+            pass
+
         return JsonResponse({
             'thanh_cong': True,
             'thong_bao': 'Giao nhiệm vụ thành công!',
@@ -330,10 +373,13 @@ def api_cong_viec_tai_dinh_kem(request, cong_viec_id):
         return JsonResponse({'thanh_cong': False, 'thong_bao': 'Không tìm thấy tệp văn bản đính kèm trên máy chủ.'}, status=404)
 
     content_type = mimetypes.guess_type(disk_path.name)[0] or 'application/octet-stream'
-    if preview:
+    ext = disk_path.suffix.lower()
+    download_name = cv.ten_tep_dinh_kem or disk_path.name
+
+    can_preview_inline = ext in ('.pdf', '.png', '.jpg', '.jpeg', '.gif', '.txt', '.svg')
+    if preview and can_preview_inline:
         return FileResponse(open(disk_path, 'rb'), as_attachment=False, content_type=content_type)
 
-    download_name = cv.ten_tep_dinh_kem or disk_path.name
     return FileResponse(open(disk_path, 'rb'), as_attachment=True, filename=download_name, content_type=content_type)
 
 

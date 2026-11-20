@@ -263,6 +263,34 @@ class TaskDispatchService:
             noi_dung_ghi_chu=f"Giao nhiệm vụ mới cho đồng chí {assignee.ho_va_ten} (Hạn: {han_hoan_thanh.strftime('%d/%m/%Y')}){attach_note}"
         )
 
+        # Phát sinh thông báo tức thì cho chuyên viên thụ lý và người giao việc
+        try:
+            from thong_bao.models import ThongBao
+            deadline_str = han_hoan_thanh.strftime('%d/%m/%Y') if han_hoan_thanh else ''
+            attach_str = f" (Đính kèm: {ten_tep_dinh_kem})" if ten_tep_dinh_kem else ""
+            if assignee:
+                ThongBao.objects.create(
+                    tieu_de=f"Giao nhiệm vụ: {task.ten_cong_viec}",
+                    noi_dung=f"Đồng chí đã được phân công thực hiện nhiệm vụ: {task.ten_cong_viec}. Hạn hoàn thành: {deadline_str}. Phòng ban: {task.phong_ban}.{attach_str}",
+                    loai='Nhiệm vụ',
+                    muc_do='Quan trọng' if do_uu_tien in ('CAO', 'KHAN_CAP') else 'Bình thường',
+                    nguoi_gui=creator,
+                    nguoi_nhan=assignee,
+                    lien_ket=f"/pages/cong-viec/xu-ly.html?id={task.cong_viec_id}",
+                )
+            if creator and assignee and creator.pk != assignee.pk:
+                ThongBao.objects.create(
+                    tieu_de=f"Đã giao nhiệm vụ: {task.ten_cong_viec}",
+                    noi_dung=f"Đã phân công nhiệm vụ cho đồng chí {assignee.ho_va_ten}. Hạn xử lý: {deadline_str}.{attach_str}",
+                    loai='Nhiệm vụ',
+                    muc_do='Bình thường',
+                    nguoi_gui=creator,
+                    nguoi_nhan=creator,
+                    lien_ket=f"/pages/cong-viec/danh-sach.html",
+                )
+        except Exception:
+            pass
+
         return task
 
     @classmethod
