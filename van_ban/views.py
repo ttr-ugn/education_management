@@ -91,6 +91,33 @@ def api_van_ban_di_list(request):
             nguoi_soan=user,
             trang_thai='CHO_VAN_THU_KIEM_TRA'
         )
+
+        # Phát sinh thông báo dự thảo mới cho Văn thư & toàn cơ quan
+        try:
+            from thong_bao.models import ThongBao
+            ThongBao.objects.create(
+                tieu_de=f"Dự thảo văn bản mới: {vb.trich_yeu[:60]}",
+                noi_dung=f"Đồng chí {user.ho_va_ten if user else 'Chuyên viên'} ({vb.don_vi_soan_thao}) đã nộp dự thảo văn bản: '{vb.trich_yeu}'. Chờ Văn thư kiểm tra thể thức.",
+                loai='Văn bản đi',
+                muc_do='Bình thường',
+                nguoi_gui=user,
+                nguoi_nhan=None,
+                lien_ket=f"/pages/van-ban-di/kiem-tra.html?id={vb.van_ban_id}",
+            )
+            van_thus = NguoiDung.objects.filter(vai_tro='VAN_THU', trang_thai='HOAT_DONG')
+            for vt in van_thus:
+                ThongBao.objects.create(
+                    tieu_de=f"Dự thảo mới chờ kiểm tra: {vb.trich_yeu[:60]}",
+                    noi_dung=f"Có dự thảo văn bản mới từ phòng {vb.don_vi_soan_thao} do đồng chí {user.ho_va_ten if user else 'Chuyên viên'} trình kiểm tra thể thức.",
+                    loai='Văn bản đi',
+                    muc_do='Quan trọng',
+                    nguoi_gui=user,
+                    nguoi_nhan=vt,
+                    lien_ket=f"/pages/van-ban-di/kiem-tra.html?id={vb.van_ban_id}",
+                )
+        except Exception:
+            pass
+
         return JsonResponse({'thanh_cong': True, 'thong_bao': 'Tạo dự thảo văn bản đi thành công!', 'van_ban_id': vb.van_ban_id})
 
     return JsonResponse({'thanh_cong': False, 'thong_bao': 'Phương thức không hỗ trợ'}, status=405)
@@ -167,6 +194,36 @@ def api_van_ban_di_ban_hanh(request, van_ban_id):
         vb.trang_thai = 'DA_BAN_HANH'
         vb.ngay_ban_hanh = timezone.now()
         vb.save()
+
+        # Phát sinh thông báo ban hành văn bản chính thức
+        try:
+            from thong_bao.models import ThongBao
+            user_id = request.session.get('user_id')
+            user = NguoiDung.objects.filter(pk=user_id).first() if user_id else NguoiDung.objects.filter(vai_tro='VAN_THU').first()
+
+            # 1. Phát sóng toàn cơ quan (nguoi_nhan=None)
+            ThongBao.objects.create(
+                tieu_de=f"Ban hành văn bản đi: Số {vb.so_ky_hieu}",
+                noi_dung=f"Sở GD&ĐT chính thức ban hành văn bản số {vb.so_ky_hieu}: '{vb.trich_yeu}'.",
+                loai='Văn bản đi',
+                muc_do='Bình thường',
+                nguoi_gui=user,
+                nguoi_nhan=None,
+                lien_ket=f"/pages/van-ban-di/danh-sach.html",
+            )
+            # 2. Thông báo cho người soạn
+            if vb.nguoi_soan:
+                ThongBao.objects.create(
+                    tieu_de=f"Văn bản đã ban hành: Số {vb.so_ky_hieu}",
+                    noi_dung=f"Dự thảo của đồng chí đã được cấp số {vb.so_ky_hieu} và ban hành chính thức.",
+                    loai='Văn bản đi',
+                    muc_do='Bình thường',
+                    nguoi_gui=user,
+                    nguoi_nhan=vb.nguoi_soan,
+                    lien_ket=f"/pages/van-ban-di/danh-sach.html",
+                )
+        except Exception as e:
+            print("Error creating ban hanh notification:", e)
 
         # Nếu có chọn hồ sơ thì liên kết
         ho_so_id = data.get('ho_so_id')
@@ -476,6 +533,48 @@ def api_van_ban_di_ky_so(request, van_ban_id):
         noi_dung="Ký số phê duyệt văn bản điện tử bằng chứng thư VGCA"
     )
 
+    # Phát sinh thông báo sau khi ký số
+    try:
+        from thong_bao.models import ThongBao
+        # 1. Thông báo cho người ký (Lãnh đạo)
+        if user:
+            ThongBao.objects.create(
+                tieu_de=f"Đã ký số phê duyệt: {vb.trich_yeu[:60]}",
+                noi_dung=f"Đồng chí đã ký số điện tử phê duyệt dự thảo văn bản: '{vb.trich_yeu}'. Chuyển Văn thư cấp số và ban hành.",
+                loai='Văn bản đi',
+                muc_do='Bình thường',
+                nguoi_gui=user,
+                nguoi_nhan=user,
+                lien_ket=f"/pages/van-ban-di/danh-sach.html",
+            )
+        # 2. Thông báo cho tất cả Văn thư cấp số & ban hành
+        van_thus = NguoiDung.objects.filter(vai_tro='VAN_THU', trang_thai='HOAT_DONG')
+        for vt in van_thus:
+            if user and vt.pk == user.pk:
+                continue
+            ThongBao.objects.create(
+                tieu_de=f"Văn bản chờ cấp số & ban hành: {vb.trich_yeu[:60]}",
+                noi_dung=f"Lãnh đạo Sở ({vb.lanh_dao_ky_ten}) đã ký số phê duyệt dự thảo '{vb.trich_yeu}'. Vui lòng cấp số và phát hành văn bản chính thức.",
+                loai='Văn bản đi',
+                muc_do='Quan trọng',
+                nguoi_gui=user,
+                nguoi_nhan=vt,
+                lien_ket=f"/pages/van-ban-di/ban-hanh.html?id={vb.van_ban_id}",
+            )
+        # 3. Thông báo cho người soạn
+        if vb.nguoi_soan and (not user or vb.nguoi_soan.pk != user.pk):
+            ThongBao.objects.create(
+                tieu_de=f"Dự thảo đã được ký số: {vb.trich_yeu[:60]}",
+                noi_dung=f"Dự thảo của đồng chí ('{vb.trich_yeu}') đã được Lãnh đạo ({vb.lanh_dao_ky_ten}) ký số phê duyệt thành công.",
+                loai='Văn bản đi',
+                muc_do='Bình thường',
+                nguoi_gui=user,
+                nguoi_nhan=vb.nguoi_soan,
+                lien_ket=f"/pages/van-ban-di/danh-sach.html?id={vb.van_ban_id}",
+            )
+    except Exception as e:
+        print("Error creating sign notification:", e)
+
     return JsonResponse({
         'thanh_cong': True,
         'thong_bao': f'Đã ký số phê duyệt thành công văn bản #{vb.van_ban_id}',
@@ -492,10 +591,80 @@ def api_van_ban_di_trinh_lanh_dao(request, van_ban_id):
     except VanBanDi.DoesNotExist:
         return JsonResponse({'thanh_cong': False, 'thong_bao': 'Không tìm thấy văn bản.'}, status=404)
 
+    user_id = request.session.get('user_id')
+    user = NguoiDung.objects.filter(pk=user_id).first() if user_id else NguoiDung.objects.filter(vai_tro='VAN_THU').first()
+
+    ghi_chu = ''
+    try:
+        data = json.loads(request.body.decode('utf-8')) if request.body else {}
+        ghi_chu = data.get('ghi_chu', '')
+    except Exception:
+        ghi_chu = request.POST.get('ghi_chu', '')
+
     from django.utils import timezone
     vb.trang_thai = 'CHO_LANH_DAO_KY'
     vb.ngay_trinh_lanh_dao = timezone.now()
+    if ghi_chu:
+        vb.y_kien_van_thu = ghi_chu
     vb.save()
+
+    try:
+        LichSuXuLyVanBan.objects.create(
+            van_ban=vb,
+            nguoi_thuc_hien=user or vb.nguoi_soan,
+            hanh_dong="Văn thư chuyển trình Lãnh đạo ký duyệt",
+            trang_thai_truoc='CHO_VAN_THU_KIEM_TRA',
+            trang_thai_sau='CHO_LANH_DAO_KY',
+            noi_dung=ghi_chu or "Văn thư đã kiểm tra thể thức văn bản đạt yêu cầu, chuyển trình Lãnh đạo ký số."
+        )
+    except Exception:
+        pass
+
+    # Phát sinh thông báo điều hành tức thì
+    try:
+        from thong_bao.models import ThongBao
+        note_str = f" (Ý kiến: {ghi_chu})" if ghi_chu else ""
+        sender_name = user.ho_va_ten if user else "Văn thư"
+
+        # 1. Thông báo riêng cho toàn bộ Lãnh đạo Sở
+        lanh_daos = NguoiDung.objects.filter(vai_tro='LANH_DAO', trang_thai='HOAT_DONG')
+        for ld in lanh_daos:
+            ThongBao.objects.create(
+                tieu_de=f"Dự thảo chờ ký duyệt: {vb.trich_yeu[:60]}",
+                noi_dung=f"Dự thảo văn bản từ phòng {vb.don_vi_soan_thao} ('{vb.trich_yeu}') đã được Văn thư ({sender_name}) kiểm tra thể thức và trình Lãnh đạo ký số phê duyệt.{note_str}",
+                loai='Văn bản đi',
+                muc_do='Quan trọng',
+                nguoi_gui=user,
+                nguoi_nhan=ld,
+                lien_ket=f"/pages/van-ban-di/phe-duyet.html?id={vb.van_ban_id}",
+            )
+
+        # 2. Thông báo cho người soạn thảo (Chuyên viên)
+        if vb.nguoi_soan:
+            ThongBao.objects.create(
+                tieu_de=f"Dự thảo đã được trình Lãnh đạo: {vb.trich_yeu[:60]}",
+                noi_dung=f"Dự thảo '{vb.trich_yeu}' của đồng chí đã được Văn thư kiểm tra đạt yêu cầu và chuyển trình Lãnh đạo Sở ký duyệt.",
+                loai='Văn bản đi',
+                muc_do='Bình thường',
+                nguoi_gui=user,
+                nguoi_nhan=vb.nguoi_soan,
+                lien_ket=f"/pages/van-ban-di/danh-sach.html?id={vb.van_ban_id}",
+            )
+
+        # 3. Thông báo cho người thực hiện thao tác (Văn thư) để ngay lập tức hiển thị số trên chuông
+        if user:
+            ThongBao.objects.create(
+                tieu_de=f"Đã chuyển trình Lãnh đạo ký: {vb.trich_yeu[:60]}",
+                noi_dung=f"Đồng chí đã kiểm tra thể thức và chuyển trình dự thảo '{vb.trich_yeu}' lên Lãnh đạo Sở phê duyệt.{note_str}",
+                loai='Văn bản đi',
+                muc_do='Bình thường',
+                nguoi_gui=user,
+                nguoi_nhan=user,
+                lien_ket=f"/pages/van-ban-di/kiem-tra.html",
+            )
+    except Exception as e:
+        print("Error creating trinh lanh dao notification:", e)
+
     return JsonResponse({'thanh_cong': True, 'thong_bao': 'Đã chuyển trình Lãnh đạo ký duyệt.'})
 
 
@@ -514,6 +683,34 @@ def api_van_ban_di_van_thu_tra_lai(request, van_ban_id):
     vb.trang_thai = 'VAN_THU_TRA_LAI'
     vb.y_kien_van_thu = data.get('ly_do', '')
     vb.save()
+
+    try:
+        from thong_bao.models import ThongBao
+        user_id = request.session.get('user_id')
+        user = NguoiDung.objects.filter(pk=user_id).first() if user_id else None
+        if vb.nguoi_soan:
+            ThongBao.objects.create(
+                tieu_de=f"Văn thư trả lại dự thảo: {vb.trich_yeu[:60]}",
+                noi_dung=f"Dự thảo văn bản '{vb.trich_yeu}' đã bị Văn thư trả lại yêu cầu chỉnh sửa. Lý do: {vb.y_kien_van_thu or 'Chưa đạt yêu cầu thể thức'}.",
+                loai='Văn bản đi',
+                muc_do='Quan trọng',
+                nguoi_gui=user,
+                nguoi_nhan=vb.nguoi_soan,
+                lien_ket=f"/pages/van-ban-di/soan-thao.html?id={vb.van_ban_id}",
+            )
+        if user:
+            ThongBao.objects.create(
+                tieu_de=f"Đã trả lại dự thảo: {vb.trich_yeu[:60]}",
+                noi_dung=f"Đồng chí đã trả lại dự thảo '{vb.trich_yeu}' cho Chuyên viên yêu cầu chỉnh sửa.",
+                loai='Văn bản đi',
+                muc_do='Bình thường',
+                nguoi_gui=user,
+                nguoi_nhan=user,
+                lien_ket=f"/pages/van-ban-di/kiem-tra.html",
+            )
+    except Exception:
+        pass
+
     return JsonResponse({'thanh_cong': True, 'thong_bao': 'Đã trả lại dự thảo.'})
 
 
@@ -532,5 +729,44 @@ def api_van_ban_di_tu_choi(request, van_ban_id):
     vb.trang_thai = 'LANH_DAO_TRA_LAI'
     vb.y_kien_lanh_dao = data.get('ly_do', '')
     vb.save()
+
+    try:
+        from thong_bao.models import ThongBao
+        user_id = request.session.get('user_id')
+        user = NguoiDung.objects.filter(pk=user_id).first() if user_id else None
+        if vb.nguoi_soan:
+            ThongBao.objects.create(
+                tieu_de=f"Lãnh đạo trả lại dự thảo: {vb.trich_yeu[:60]}",
+                noi_dung=f"Lãnh đạo Sở đã trả lại dự thảo '{vb.trich_yeu}'. Ý kiến chỉ đạo: {vb.y_kien_lanh_dao or 'Cần hoàn thiện lại nội dung'}.",
+                loai='Văn bản đi',
+                muc_do='Quan trọng',
+                nguoi_gui=user,
+                nguoi_nhan=vb.nguoi_soan,
+                lien_ket=f"/pages/van-ban-di/soan-thao.html?id={vb.van_ban_id}",
+            )
+        van_thus = NguoiDung.objects.filter(vai_tro='VAN_THU', trang_thai='HOAT_DONG')
+        for vt in van_thus:
+            ThongBao.objects.create(
+                tieu_de=f"Lãnh đạo trả lại dự thảo: {vb.trich_yeu[:60]}",
+                noi_dung=f"Lãnh đạo Sở đã trả lại dự thảo '{vb.trich_yeu}' của phòng {vb.don_vi_soan_thao}. Lý do: {vb.y_kien_lanh_dao or 'Cần chỉnh sửa lại'}.",
+                loai='Văn bản đi',
+                muc_do='Quan trọng',
+                nguoi_gui=user,
+                nguoi_nhan=vt,
+                lien_ket=f"/pages/van-ban-di/kiem-tra.html",
+            )
+        if user:
+            ThongBao.objects.create(
+                tieu_de=f"Đã trả lại dự thảo: {vb.trich_yeu[:60]}",
+                noi_dung=f"Đồng chí đã trả lại dự thảo '{vb.trich_yeu}' yêu cầu hoàn thiện lại.",
+                loai='Văn bản đi',
+                muc_do='Bình thường',
+                nguoi_gui=user,
+                nguoi_nhan=user,
+                lien_ket=f"/pages/van-ban-di/phe-duyet.html",
+            )
+    except Exception:
+        pass
+
     return JsonResponse({'thanh_cong': True, 'thong_bao': 'Đã trả lại dự thảo cho chuyên viên.'})
 

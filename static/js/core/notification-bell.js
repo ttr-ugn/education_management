@@ -48,7 +48,10 @@
     if (!bellBtn) return;
 
     // Ngăn chặn tạo lại nếu đã khởi tạo
-    if (bellBtn.dataset.bellInitialized === 'true') return;
+    if (bellBtn.dataset.bellInitialized === 'true') {
+      await updateBellStats();
+      return;
+    }
     bellBtn.dataset.bellInitialized = 'true';
 
     // Bọc trong topbar-bell-wrapper
@@ -322,6 +325,7 @@
   }
 
   window.NotificationBell = {
-    init: initNotificationBell
+    init: initNotificationBell,
+    update: updateBellStats
   };
 })(window);

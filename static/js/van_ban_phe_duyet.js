@@ -59,6 +59,9 @@ let currentFilterStatus = 'CHO_LANH_DAO_KY';
       try {
         const res = await window.api.post(`/api/van-ban-di/${docId}/ky-so`, { page: 1, x: 60, y: 70 });
         window.Toast.success(res.thong_bao || 'Đã ký số điện tử thành công! Dự thảo đã chuyển về Văn thư để cấp số và ban hành.');
+        if (window.NotificationBell && typeof window.NotificationBell.update === 'function') {
+          try { await window.NotificationBell.update(); } catch (_) {}
+        }
         closePreviewModal();
         fetchData();
       } catch (err) {
@@ -72,6 +75,9 @@ let currentFilterStatus = 'CHO_LANH_DAO_KY';
         try {
           await window.api.post(`/api/van-ban-di/${docId}/tu-choi`, { ly_do: reason.trim() });
           window.Toast.info('Đã trả lại dự thảo kèm ý kiến chỉ đạo cho Chuyên viên và Văn thư.');
+          if (window.NotificationBell && typeof window.NotificationBell.update === 'function') {
+            try { await window.NotificationBell.update(); } catch (_) {}
+          }
           closePreviewModal();
           fetchData();
         } catch (err) {

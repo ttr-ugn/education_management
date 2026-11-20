@@ -151,6 +151,9 @@ function openPreviewModal(docId, fileType, fileName, trichYeu, soKyHieu) {
             if (note !== null) {
               await window.api.post(`/api/van-ban-di/${doc.id}/trinh-lanh-dao`, { ghi_chu: note });
               window.Toast.success('Đã chuyển trình Lãnh đạo ký số thành công!');
+              if (window.NotificationBell && typeof window.NotificationBell.update === 'function') {
+                try { await window.NotificationBell.update(); } catch (_) {}
+              }
               loadDetail();
             }
           };
@@ -160,6 +163,9 @@ function openPreviewModal(docId, fileType, fileName, trichYeu, soKyHieu) {
             if (reason && reason.trim()) {
               await window.api.post(`/api/van-ban-di/${doc.id}/van-thu-tra-lai`, { ly_do: reason.trim() });
               window.Toast.info('Đã trả lại văn bản cho Chuyên viên!');
+              if (window.NotificationBell && typeof window.NotificationBell.update === 'function') {
+                try { await window.NotificationBell.update(); } catch (_) {}
+              }
               loadDetail();
             }
           };
@@ -186,6 +192,9 @@ function openPreviewModal(docId, fileType, fileName, trichYeu, soKyHieu) {
                 y: 75.0
               });
               window.Toast.success('Đã ký số điện tử thành công! Chuyển văn bản về Văn thư để cấp số ban hành.');
+              if (window.NotificationBell && typeof window.NotificationBell.update === 'function') {
+                try { await window.NotificationBell.update(); } catch (_) {}
+              }
               loadDetail();
             }
           };
@@ -195,6 +204,9 @@ function openPreviewModal(docId, fileType, fileName, trichYeu, soKyHieu) {
             if (reason && reason.trim()) {
               await window.api.post(`/api/van-ban-di/${doc.id}/tu-choi`, { ly_do: reason.trim() });
               window.Toast.info('Đã hoàn trả yêu cầu chỉnh sửa!');
+              if (window.NotificationBell && typeof window.NotificationBell.update === 'function') {
+                try { await window.NotificationBell.update(); } catch (_) {}
+              }
               loadDetail();
             }
           };
@@ -217,6 +229,9 @@ function openPreviewModal(docId, fileType, fileName, trichYeu, soKyHieu) {
                 ngay_ban_hanh: new Date().toISOString().split('T')[0]
               });
               window.Toast.success(`Đã ban hành văn bản chính thức với số: ${num}!`);
+              if (window.NotificationBell && typeof window.NotificationBell.update === 'function') {
+                try { await window.NotificationBell.update(); } catch (_) {}
+              }
               loadDetail();
             }
           };

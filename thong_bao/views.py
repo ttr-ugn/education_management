@@ -22,7 +22,7 @@ def api_thong_bao_list(request):
     """Danh sách thông báo hoặc tạo mới thông báo."""
     if request.method == 'GET':
         user_id = request.session.get('user_id')
-        user = NguoiDung.objects.filter(pk=user_id).first() if user_id else None
+        user = NguoiDung.objects.filter(pk=user_id).first() if user_id else NguoiDung.objects.filter(vai_tro='VAN_THU').first()
 
         if user:
             data = NotificationReadService.get_user_notifications(user, limit=50)
@@ -66,8 +66,11 @@ def api_thong_bao_dem_chua_doc(request):
     if user:
         chua_doc = NotificationReadService.get_unread_count(user)
     else:
-        tong_so = ThongBao.objects.count()
-        chua_doc = tong_so
+        default_user = NguoiDung.objects.filter(vai_tro='VAN_THU').first()
+        if default_user:
+            chua_doc = NotificationReadService.get_unread_count(default_user)
+        else:
+            chua_doc = 0
 
     today = date.today()
     due_threshold = today + timedelta(days=2)

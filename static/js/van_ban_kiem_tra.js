@@ -259,6 +259,9 @@ let currentFilterStatus = 'CHO_VAN_THU_KIEM_TRA';
               try {
                 await window.api.post(`/api/van-ban-di/${id}/trinh-lanh-dao`, { ghi_chu: note });
                 window.Toast.success('Đã chuyển trình dự thảo lên Lãnh đạo Sở phê duyệt và ký số thành công!');
+                if (window.NotificationBell && typeof window.NotificationBell.update === 'function') {
+                  try { await window.NotificationBell.update(); } catch (_) {}
+                }
                 fetchDrafts();
               } catch (err) {
                 window.Toast.error(err.message || 'Lỗi khi trình lãnh đạo');
@@ -275,6 +278,9 @@ let currentFilterStatus = 'CHO_VAN_THU_KIEM_TRA';
               try {
                 await window.api.post(`/api/van-ban-di/${id}/van-thu-tra-lai`, { ly_do: reason.trim() });
                 window.Toast.info('Đã trả lại dự thảo cho Chuyên viên kèm theo lý do!');
+                if (window.NotificationBell && typeof window.NotificationBell.update === 'function') {
+                  try { await window.NotificationBell.update(); } catch (_) {}
+                }
                 fetchDrafts();
               } catch (err) {
                 window.Toast.error(err.message || 'Lỗi khi trả lại văn bản');

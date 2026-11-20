@@ -138,28 +138,66 @@ def api_cong_viec_list(request):
             from thong_bao.models import ThongBao
             deadline_str = han_hoan_thanh.strftime('%d/%m/%Y') if han_hoan_thanh else ''
             attach_str = f" (Đính kèm: {ten_tep_dinh_kem})" if ten_tep_dinh_kem else ""
+            assignee_name = chuyen_vien.ho_va_ten if chuyen_vien else 'Cán bộ chuyên môn'
+            notified_user_ids = set()
+
+            # 1. Thông báo riêng cho cán bộ thụ lý (chuyen_vien)
             if chuyen_vien:
                 ThongBao.objects.create(
-                    tieu_de=f"Giao nhiệm vụ: {cv.ten_cong_viec}",
-                    noi_dung=f"Đồng chí đã được phân công thực hiện nhiệm vụ: {cv.ten_cong_viec}. Hạn hoàn thành: {deadline_str}. Phòng ban: {cv.phong_ban}.{attach_str}",
+                    tieu_de=f"Nhiệm vụ mới được giao: {cv.ten_cong_viec}",
+                    noi_dung=f"Đồng chí đã được phân công thực hiện nhiệm vụ: {cv.ten_cong_viec}. Hạn hoàn thành: {deadline_str}. Phòng ban: {cv.phong_ban}. Vui lòng tiếp nhận và cập nhật tiến độ.{attach_str}",
                     loai='Nhiệm vụ',
                     muc_do='Quan trọng' if cv.do_uu_tien in ('CAO', 'KHAN_CAP') else 'Bình thường',
                     nguoi_gui=user,
                     nguoi_nhan=chuyen_vien,
                     lien_ket=f"/pages/cong-viec/xu-ly.html?id={cv.cong_viec_id}",
                 )
-            if user and chuyen_vien and user.pk != chuyen_vien.pk:
+                notified_user_ids.add(chuyen_vien.pk)
+
+            # 2. Thông báo xác nhận cho người giao việc (user)
+            if user and user.pk not in notified_user_ids:
                 ThongBao.objects.create(
                     tieu_de=f"Đã giao nhiệm vụ: {cv.ten_cong_viec}",
-                    noi_dung=f"Đã phân công nhiệm vụ cho đồng chí {chuyen_vien.ho_va_ten}. Hạn xử lý: {deadline_str}.{attach_str}",
+                    noi_dung=f"Đã phân công nhiệm vụ cho đồng chí {assignee_name}. Hạn xử lý: {deadline_str}.{attach_str}",
                     loai='Nhiệm vụ',
                     muc_do='Bình thường',
                     nguoi_gui=user,
                     nguoi_nhan=user,
                     lien_ket=f"/pages/cong-viec/danh-sach.html",
                 )
-        except Exception:
-            pass
+                notified_user_ids.add(user.pk)
+
+            # 3. Thông báo cho Lãnh đạo Sở nắm bắt điều hành
+            for ld in NguoiDung.objects.filter(vai_tro='LANH_DAO', trang_thai='HOAT_DONG'):
+                if ld.pk in notified_user_ids:
+                    continue
+                ThongBao.objects.create(
+                    tieu_de=f"Giao nhiệm vụ: {cv.ten_cong_viec}",
+                    noi_dung=f"Văn phòng đã giao nhiệm vụ '{cv.ten_cong_viec}' cho đồng chí {assignee_name} ({cv.phong_ban}). Hạn xử lý: {deadline_str}.{attach_str}",
+                    loai='Nhiệm vụ',
+                    muc_do='Bình thường',
+                    nguoi_gui=user,
+                    nguoi_nhan=ld,
+                    lien_ket=f"/pages/cong-viec/danh-sach.html",
+                )
+                notified_user_ids.add(ld.pk)
+
+            # 4. Thông báo cho các Văn thư khác trong Sở
+            for vt in NguoiDung.objects.filter(vai_tro='VAN_THU', trang_thai='HOAT_DONG'):
+                if vt.pk in notified_user_ids:
+                    continue
+                ThongBao.objects.create(
+                    tieu_de=f"Giao nhiệm vụ mới: {cv.ten_cong_viec}",
+                    noi_dung=f"Đã giao nhiệm vụ '{cv.ten_cong_viec}' cho đồng chí {assignee_name}. Hạn xử lý: {deadline_str}.{attach_str}",
+                    loai='Nhiệm vụ',
+                    muc_do='Bình thường',
+                    nguoi_gui=user,
+                    nguoi_nhan=vt,
+                    lien_ket=f"/pages/cong-viec/danh-sach.html",
+                )
+                notified_user_ids.add(vt.pk)
+        except Exception as e:
+            print("Error creating task notification:", e)
 
         return JsonResponse({
             'thanh_cong': True,
