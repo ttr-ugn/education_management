@@ -176,6 +176,16 @@
       <p style="font-size: 12px; color: #166534; margin: 12px 0 0 0; line-height: 1.4;" id="resMessage">
         Văn bản điện tử đảm bảo tính toàn vẹn tuyệt đối, không có dấu hiệu bị can thiệp chỉnh sửa sau thời điểm ký số. Chữ ký số có giá trị pháp lý tương đương chữ ký tay và con dấu cơ quan.
       </p>
+
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mt-3 pt-3" style="border-top: 1px dashed #86efac;">
+        <span style="font-size: 12.5px; color: #166534; font-weight: 500;">
+          Xác thực điện tử hoàn tất. Đồng chí có thể xem trước toàn văn văn bản hoặc mở bản in đối chiếu.
+        </span>
+        <button type="button" class="btn btn-primary btn-sm" id="btnPreviewVerifiedDoc" style="font-weight: 600; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(2, 132, 199, 0.25);">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+          <span>Xem trước nội dung văn bản</span>
+        </button>
+      </div>
     </div>
   </div>
 </div>
@@ -260,6 +270,45 @@
     </div>
     <div style="padding: 12px 20px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end;">
       <button type="button" class="btn btn-secondary btn-sm" onclick="closeCertDetailModal()">Đóng cửa sổ</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Xem trước Toàn văn Văn bản & Chữ ký số -->
+<div id="docPreviewModal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px); z-index: 9999; align-items: center; justify-content: center; padding: 20px;">
+  <div style="background: #ffffff; width: 95%; max-width: 920px; height: 90vh; border-radius: 12px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35); overflow: hidden; display: flex; flex-direction: column;">
+    <div style="background: linear-gradient(135deg, #003366 0%, #004b91 100%); color: #ffffff; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        <div>
+          <h3 style="margin: 0; font-size: 15.5px; font-weight: 700;" id="docPreviewModalTitle">Xem trước văn bản điện tử</h3>
+          <p style="margin: 2px 0 0 0; font-size: 12px; opacity: 0.85;" id="docPreviewModalSubtitle">Nghị định 30/2020/NĐ-CP - Chữ ký số Ban Cơ yếu Chính phủ</p>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <button type="button" class="btn btn-sm btn-light" id="previewPrintBtn" title="In văn bản" style="font-size: 12px; font-weight: 600;">
+          In văn bản
+        </button>
+        <button type="button" class="btn btn-sm btn-outline-light" onclick="closeDocPreviewModal()" style="font-weight: bold; font-size: 16px; line-height: 1; padding: 4px 10px;">&times;</button>
+      </div>
+    </div>
+
+    <div style="flex-grow: 1; position: relative; background: #f8fafc; overflow: hidden;">
+      <div id="previewLoading" style="position: absolute; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(255,255,255,0.85); z-index: 10;">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+          <div style="width: 32px; height: 32px; border: 3px solid #e2e8f0; border-top-color: #0284c7; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+          <span style="font-size: 13px; color: #475569; font-weight: 500;">Đang nạp toàn văn tài liệu điện tử...</span>
+        </div>
+      </div>
+      <iframe id="docPreviewIframe" style="width: 100%; height: 100%; border: none; background: #ffffff;"></iframe>
+    </div>
+
+    <div style="padding: 12px 20px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
+      <div style="font-size: 12px; color: #15803d; font-weight: 600; display: flex; align-items: center; gap: 6px;">
+        <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #16a34a;"></span>
+        <span>Xác thực toàn vẹn bởi Ban Cơ yếu Chính phủ (VGCA) - Đạt chuẩn Nghị định 30/2020/NĐ-CP</span>
+      </div>
+      <button type="button" class="btn btn-secondary btn-sm" onclick="closeDocPreviewModal()">Đóng cửa sổ</button>
     </div>
   </div>
 </div>

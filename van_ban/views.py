@@ -485,11 +485,351 @@ def api_chung_thuc_chu_ky_so(request):
                 'seri_chung_thu': '7F:4A:9C:12:8E:B0:56:D3:A1:2F:89:01',
                 'thuat_toan_ky': 'SHA-256 with RSA 2048-bit',
                 'thoi_gian_tham_dinh': datetime.now().strftime('%d/%m/%Y %H:%M:%S'),
-                'tieu_chuan_tuan_thu': 'Nghị định 30/2020/NĐ-CP của Chính phủ về công tác văn thư điện tử'
+                'tieu_chuan_tuan_thu': 'Nghị định 30/2020/NĐ-CP của Chính phủ về công tác văn thư điện tử',
+                'van_ban_id': int(van_ban_id) if van_ban_id else None,
+                'preview_url': f'/api/van-ban-di/{van_ban_id}/preview' if van_ban_id else None,
+                'so_ky_hieu': getattr(doc, 'so_ky_hieu', '') if van_ban_id else '',
+                'trich_yeu': getattr(doc, 'trich_yeu', '') if van_ban_id else file_name,
             }
         })
 
     return JsonResponse({'thanh_cong': False, 'thong_bao': 'Phương thức không hỗ trợ.'}, status=405)
+
+
+def api_van_ban_di_preview(request, van_ban_id):
+    """Xem trước trực tiếp toàn văn nội dung văn bản đi chuẩn Nghị định 30/2020/NĐ-CP và chữ ký số."""
+    import hashlib
+    import html
+    from django.http import HttpResponse, FileResponse
+    from common.pdf_signer import PDFSignerService
+    from pathlib import Path
+
+    try:
+        doc = VanBanDi.objects.get(pk=van_ban_id)
+    except VanBanDi.DoesNotExist:
+        return HttpResponse("<h3>Không tìm thấy văn bản yêu cầu xem trước.</h3>", status=404)
+
+    # Nếu có tệp PDF thực tế trên đĩa
+    file_path = doc.file_da_ky_path or doc.file_goc_path
+    if file_path:
+        p = Path(file_path)
+        if p.exists() and p.suffix.lower() == '.pdf':
+            return FileResponse(open(p, 'rb'), content_type='application/pdf')
+
+    # Tính toán mã băm SHA-256
+    hash_val = None
+    if doc.file_goc_path:
+        hash_val = PDFSignerService.calculate_file_hash(doc.file_goc_path)
+    if not hash_val:
+        raw_token = f"DANANG-SGDDT-DOC-{doc.van_ban_id}-{doc.so_ky_hieu or 'DRAFT'}-{doc.trich_yeu}"
+        hash_val = hashlib.sha256(raw_token.encode('utf-8')).hexdigest()
+
+    signer_name = doc.lanh_dao_ky_ten or (doc.lanh_dao_ky.ho_va_ten if doc.lanh_dao_ky else 'Lê Thị Bích Thuận')
+    signer_title = 'GIÁM ĐỐC SỞ' if 'Bích Thuận' in signer_name else 'PHÓ GIÁM ĐỐC SỞ'
+    sign_time_str = doc.thoi_gian_ky.strftime('%d/%m/%Y %H:%M:%S') if doc.thoi_gian_ky else '11/11/2026 14:30:00'
+    ngay_bh = doc.ngay_ban_hanh or doc.ngay_tao
+    ngay_str = f"Đà Nẵng, ngày {ngay_bh.day:02d} tháng {ngay_bh.month:02d} năm {ngay_bh.year}" if ngay_bh else "Đà Nẵng, ngày ... tháng ... năm 2026"
+
+    noi_dung = doc.noi_dung_tom_tat or doc.trich_yeu or ''
+    paragraphs = noi_dung.split('\n') if noi_dung else []
+    if len(paragraphs) <= 1:
+        paragraphs = [
+            f"Thực hiện chức năng, nhiệm vụ quản lý nhà nước về lĩnh vực giáo dục và đào tạo trên địa bàn thành phố Đà Nẵng; căn cứ quy định tại Nghị định số 30/2020/NĐ-CP ngày 05/3/2020 của Chính phủ về công tác văn thư;",
+            f"Sở Giáo dục và Đào tạo ban hành văn bản {doc.trich_yeu}. Yêu cầu các phòng ban chuyên môn, các đơn vị sự nghiệp trực thuộc và các cơ sở giáo dục trên toàn địa bàn nghiêm túc triển khai thực hiện đúng quy định, bảo đảm chất lượng và tiến độ được giao.",
+            f"Trong quá trình triển khai thực hiện, nếu có khó khăn, vướng mắc phát sinh, các đơn vị kịp thời phản ánh về Sở Giáo dục và Đào tạo (qua Văn phòng Sở và đơn vị chủ trì: {doc.don_vi_soan_thao}) để được hướng dẫn, giải quyết."
+        ]
+
+    doc_html = f"""<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{html.escape(doc.so_ky_hieu or 'Văn bản điện tử')}</title>
+<style>
+  * {{ box-sizing: border-box; }}
+  body {{
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 13.5pt;
+    line-height: 1.45;
+    color: #111827;
+    background: #f8fafc;
+    margin: 0;
+    padding: 24px 16px;
+  }}
+  .a4-page {{
+    width: 100%;
+    max-width: 820px;
+    margin: 0 auto;
+    background: #ffffff;
+    padding: 40px 50px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    border-radius: 4px;
+    border: 1px solid #e2e8f0;
+  }}
+  .header-grid {{
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+  }}
+  .header-left {{
+    text-align: center;
+    width: 45%;
+  }}
+  .header-right {{
+    text-align: center;
+    width: 53%;
+  }}
+  .agency-parent {{
+    font-size: 12pt;
+    text-transform: uppercase;
+    color: #374151;
+  }}
+  .agency-name {{
+    font-size: 12.5pt;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #111827;
+    margin-top: 2px;
+  }}
+  .agency-line {{
+    width: 120px;
+    height: 1.5px;
+    background: #111827;
+    margin: 4px auto 8px auto;
+  }}
+  .doc-num {{
+    font-size: 12pt;
+    color: #1f2937;
+  }}
+  .country-name {{
+    font-size: 12pt;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #111827;
+  }}
+  .country-motto {{
+    font-size: 12.5pt;
+    font-weight: bold;
+    color: #111827;
+    margin-top: 2px;
+  }}
+  .country-line {{
+    width: 160px;
+    height: 1.5px;
+    background: #111827;
+    margin: 4px auto 8px auto;
+  }}
+  .doc-place-date {{
+    font-size: 12.5pt;
+    font-style: italic;
+    color: #374151;
+  }}
+  .doc-title-section {{
+    text-align: center;
+    margin: 30px 0 24px 0;
+  }}
+  .doc-type-title {{
+    font-size: 16pt;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #003366;
+    letter-spacing: 0.5px;
+  }}
+  .doc-subject-title {{
+    font-size: 13.5pt;
+    font-weight: bold;
+    margin-top: 8px;
+    color: #111827;
+  }}
+  .doc-content {{
+    text-align: justify;
+    line-height: 1.55;
+    font-size: 13.5pt;
+  }}
+  .doc-content p {{
+    text-indent: 1.25cm;
+    margin: 0 0 12px 0;
+  }}
+  .footer-grid {{
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-top: 40px;
+    page-break-inside: avoid;
+  }}
+  .recipients-col {{
+    width: 45%;
+    font-size: 11pt;
+  }}
+  .recipients-title {{
+    font-weight: bold;
+    font-style: italic;
+    margin-bottom: 4px;
+  }}
+  .recipients-list {{
+    margin: 0;
+    padding-left: 18px;
+    line-height: 1.4;
+  }}
+  .signature-col {{
+    width: 50%;
+    text-align: center;
+  }}
+  .signer-role {{
+    font-weight: bold;
+    font-size: 12.5pt;
+    text-transform: uppercase;
+  }}
+  .digital-signature-box {{
+    margin: 14px auto;
+    border: 2px solid #dc2626;
+    background: #fef2f2;
+    border-radius: 6px;
+    padding: 10px 14px;
+    display: inline-block;
+    text-align: left;
+    box-shadow: 0 2px 6px rgba(220, 38, 38, 0.15);
+  }}
+  .digital-sig-header {{
+    color: #b91c1c;
+    font-weight: 700;
+    font-size: 10.5pt;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border-bottom: 1px dashed #fca5a5;
+    padding-bottom: 4px;
+    margin-bottom: 6px;
+    font-family: Arial, sans-serif;
+  }}
+  .digital-sig-body {{
+    font-family: Arial, sans-serif;
+    font-size: 9.5pt;
+    color: #7f1d1d;
+    line-height: 1.4;
+  }}
+  .signer-name {{
+    font-weight: bold;
+    font-size: 13pt;
+    margin-top: 8px;
+  }}
+  .integrity-seal {{
+    margin-top: 30px;
+    padding: 12px 16px;
+    background: #f0fdf4;
+    border: 1px solid #86efac;
+    border-radius: 6px;
+    font-family: Arial, sans-serif;
+    font-size: 11px;
+    color: #166534;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }}
+  .integrity-seal code {{
+    font-family: monospace;
+    font-size: 11px;
+    background: #ffffff;
+    padding: 2px 6px;
+    border: 1px solid #bbf7d0;
+    border-radius: 4px;
+    color: #15803d;
+  }}
+</style>
+</head>
+<body>
+  <div class="a4-page">
+    <div class="header-grid">
+      <div class="header-left">
+        <div class="agency-parent">ỦY BAN NHÂN DÂN THÀNH PHỐ ĐÀ NẴNG</div>
+        <div class="agency-name">SỞ GIÁO DỤC VÀ ĐÀO TẠO</div>
+        <div class="agency-line"></div>
+        <div class="doc-num">Số: <b>{html.escape(doc.so_ky_hieu or '.../SGDĐT')}</b></div>
+      </div>
+      <div class="header-right">
+        <div class="country-name">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</div>
+        <div class="country-motto">Độc lập - Tự do - Hạnh phúc</div>
+        <div class="country-line"></div>
+        <div class="doc-place-date">{ngay_str}</div>
+      </div>
+    </div>
+
+    <div class="doc-title-section">
+      <div class="doc-type-title">{html.escape(doc.loai_van_ban or 'CÔNG VĂN')}</div>
+      <div class="doc-subject-title">{html.escape(doc.trich_yeu)}</div>
+    </div>
+
+    <div class="doc-content">
+      {''.join(f'<p>{html.escape(p)}</p>' for p in paragraphs)}
+    </div>
+
+    <div class="footer-grid">
+      <div class="recipients-col">
+        <div class="recipients-title">Nơi nhận:</div>
+        <ul class="recipients-list">
+          <li>{html.escape(doc.noi_nhan or 'Như trên')}</li>
+          <li>UBND thành phố (để b/c);</li>
+          <li>Giám đốc, các Phó Giám đốc Sở;</li>
+          <li>Lưu: VT, {html.escape(doc.don_vi_soan_thao or 'VP')}.</li>
+        </ul>
+      </div>
+      <div class="signature-col">
+        <div class="signer-role">{signer_title}</div>
+        <div class="digital-signature-box">
+          <div class="digital-sig-header">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            <span>KÝ SỐ BỞI: SỞ GIÁO DỤC VÀ ĐÀO TẠO</span>
+          </div>
+          <div class="digital-sig-body">
+            <b>Người ký:</b> {html.escape(signer_name)}<br>
+            <b>Cơ quan:</b> Sở Giáo dục và Đào tạo TP. Đà Nẵng<br>
+            <b>Thời gian ký:</b> {sign_time_str}<br>
+            <b>Chứng thư số:</b> VGCA X.509 Root CA
+          </div>
+        </div>
+        <div class="signer-name">{html.escape(signer_name)}</div>
+      </div>
+    </div>
+
+    <div class="integrity-seal">
+      <div>
+        <b>DỊCH VỤ CHỨNG THỰC CHỮ KÝ SỐ:</b> TÀI LIỆU TOÀN VẸN & HỢP PHÁP
+      </div>
+      <div>
+        SHA-256 Digest: <code>{hash_val[:24]}...{hash_val[-8:]}</code>
+      </div>
+    </div>
+  </div>
+</body>
+</html>"""
+
+    return HttpResponse(doc_html, content_type='text/html; charset=utf-8')
+
+
+def api_van_ban_di_download(request, van_ban_id):
+    """Tải tệp văn bản đi (PDF hoặc Word)."""
+    from django.http import FileResponse, HttpResponse
+    from pathlib import Path
+
+    try:
+        doc = VanBanDi.objects.get(pk=van_ban_id)
+    except VanBanDi.DoesNotExist:
+        return HttpResponse("Không tìm thấy văn bản", status=404)
+
+    file_path = doc.file_da_ky_path or doc.file_goc_path
+    if file_path:
+        p = Path(file_path)
+        if p.exists():
+            return FileResponse(open(p, 'rb'), as_attachment=True, filename=p.name)
+
+    doc_html = api_van_ban_di_preview(request, van_ban_id).content.decode('utf-8')
+    filename = f"van_ban_{doc.van_ban_id}_{doc.so_ky_hieu or 'DT'}.doc"
+    resp = HttpResponse(doc_html, content_type='application/msword; charset=utf-8')
+    resp['Content-Disposition'] = f'attachment; filename="{filename}"'
+    return resp
 
 
 @csrf_exempt

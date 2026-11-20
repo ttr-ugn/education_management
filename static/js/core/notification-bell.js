@@ -197,6 +197,38 @@
         return;
       }
 
+      function resolveNotificationLink(item) {
+        if (item.lien_ket && item.lien_ket !== '#' && !item.lien_ket.endsWith('thong-bao.html')) {
+          return item.lien_ket;
+        }
+        const text = ((item.tieu_de || '') + ' ' + (item.noi_dung || '')).toLowerCase();
+        if (text.includes('trình lãnh đạo') || text.includes('chờ ký duyệt') || text.includes('ký duyệt')) {
+          return '/pages/van-ban-di/phe-duyet.html';
+        }
+        if (text.includes('chữ ký số') || text.includes('smartca') || text.includes('chứng thực')) {
+          return '/pages/van-ban-di/chung-thuc-chu-ky-so.html';
+        }
+        if (text.includes('nhiệm vụ') || text.includes('giao việc') || text.includes('tiến độ')) {
+          return '/pages/cong-viec/danh-sach.html';
+        }
+        if (text.includes('văn bản đến')) {
+          return '/pages/van-ban-den/danh-sach.html';
+        }
+        if (text.includes('cấp số') || text.includes('ban hành')) {
+          return '/pages/van-ban-di/ban-hanh.html';
+        }
+        if (text.includes('dự thảo') || text.includes('văn bản đi')) {
+          return '/pages/van-ban-di/danh-sach.html';
+        }
+        if (text.includes('hồ sơ')) {
+          return '/pages/ho-so/danh-sach.html';
+        }
+        if (text.includes('thống kê') || text.includes('báo cáo')) {
+          return '/pages/thong-ke.html';
+        }
+        return '/pages/dashboard.html';
+      }
+
       listEl.innerHTML = displayItems.slice(0, 8).map(item => {
         let badgeHtml = '';
         if (item.da_den_han) {
@@ -211,9 +243,10 @@
 
         const isUnread = !item.da_doc;
         const itemClass = `notif-dropdown-item ${isUnread ? 'unread' : ''} ${item.da_den_han ? 'is-due' : ''}`;
+        const finalLink = resolveNotificationLink(item);
 
         return `
-          <div class="${itemClass}" data-id="${item.id}" data-link="${item.lien_ket || ''}" style="cursor: pointer;">
+          <div class="${itemClass}" data-id="${item.id}" data-link="${finalLink}" style="cursor: pointer;">
             <div class="notif-item-top">
               <div>
                 ${badgeHtml}

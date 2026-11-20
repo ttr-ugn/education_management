@@ -24,5 +24,7 @@ urlpatterns = [
     path('api/van-ban-di/chung-thuc-chu-ky-so', views.api_chung_thuc_chu_ky_so, name='api_chung_thuc_chu_ky_so'),
     path('api/van-ban-di/<int:van_ban_id>/ban-hanh', views.api_van_ban_di_ban_hanh, name='api_van_ban_di_ban_hanh'),
     path('api/van-ban-di/<int:van_ban_id>/ky-so', views.api_van_ban_di_ky_so, name='api_van_ban_di_ky_so'),
+    path('api/van-ban-di/<int:van_ban_id>/preview', views.api_van_ban_di_preview, name='api_van_ban_di_preview'),
+    path('api/van-ban-di/<int:van_ban_id>/download', views.api_van_ban_di_download, name='api_van_ban_di_download'),
     path('api/van-ban-den', views.api_van_ban_den_list, name='api_van_ban_den_list'),
 ]

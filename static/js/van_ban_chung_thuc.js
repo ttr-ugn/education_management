@@ -109,9 +109,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             <span class="badge badge-success" style="font-size: 11px; padding: 4px 8px;">TOÀN VẸN</span>
           </td>
           <td style="padding: 12px 16px; text-align: center;">
-            <button class="btn btn-primary btn-sm btn-action-verify" data-id="${d.id}" style="font-size: 11.5px; padding: 3px 8px; font-weight: 600;">
-              Thẩm định
-            </button>
+            <div style="display: flex; gap: 6px; justify-content: center; align-items: center;">
+              <button class="btn btn-outline-primary btn-sm btn-action-preview" data-id="${d.id}" data-title="${escapeHtml(d.trich_yeu)}" data-code="${escapeHtml(d.so_ky_hieu)}" style="font-size: 11.5px; padding: 3px 8px; font-weight: 600;">
+                Xem trước
+              </button>
+              <button class="btn btn-primary btn-sm btn-action-verify" data-id="${d.id}" style="font-size: 11.5px; padding: 3px 8px; font-weight: 600;">
+                Thẩm định
+              </button>
+            </div>
           </td>
         </tr>
       `;
@@ -125,6 +130,16 @@ document.addEventListener('DOMContentLoaded', async () => {
           selectInternalDoc.value = docId;
         }
         verifyInternal(docId);
+      });
+    });
+
+    // Gắn sự kiện cho các nút Xem trước trên bảng
+    document.querySelectorAll('.btn-action-preview').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const docId = e.currentTarget.getAttribute('data-id');
+        const code = e.currentTarget.getAttribute('data-code');
+        const title = e.currentTarget.getAttribute('data-title');
+        openDocPreviewModal(docId, `Văn bản ${code}`, title, code);
       });
     });
   }
@@ -250,9 +265,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
+  let lastVerificationResult = null;
+  const btnPreviewVerifiedDoc = document.getElementById('btnPreviewVerifiedDoc');
+
   // 7. Hiển thị khối kết quả thẩm định
   function showVerificationResult(k) {
     if (!resultPanel) return;
+
+    lastVerificationResult = k;
 
     if (resFileName) resFileName.textContent = k.ten_tep || 'van_ban.pdf';
     if (resFileSize) resFileSize.textContent = k.dung_luong || '---';
@@ -264,6 +284,30 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     resultPanel.style.display = 'block';
     resultPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  // Xử lý nút bấm Xem trước nội dung văn bản khi thẩm định
+  if (btnPreviewVerifiedDoc) {
+    btnPreviewVerifiedDoc.addEventListener('click', () => {
+      if (!lastVerificationResult) {
+        if (window.Toast) window.Toast.warning('Chưa có kết quả thẩm định để xem trước.');
+        return;
+      }
+
+      if (lastVerificationResult.van_ban_id) {
+        openDocPreviewModal(
+          lastVerificationResult.van_ban_id,
+          lastVerificationResult.ten_tep || 'Văn bản điện tử',
+          lastVerificationResult.trich_yeu || '',
+          lastVerificationResult.so_ky_hieu || ''
+        );
+      } else if (selectedFile) {
+        previewUploadedFile(selectedFile, lastVerificationResult);
+      } else {
+        if (window.Toast) window.Toast.info('Đang mở bản xem trước tài liệu thẩm định...');
+        openDocPreviewModal(1, 'Văn bản điện tử thẩm định', lastVerificationResult.trich_yeu || 'Văn bản đã chứng thực', '');
+      }
+    });
   }
 
   // 8. Tìm kiếm / lọc bảng
@@ -313,3 +357,76 @@ function closeCertDetailModal() {
   const modal = document.getElementById('certDetailModal');
   if (modal) modal.style.display = 'none';
 }
+
+// Modal Xem trước Toàn văn Văn bản & Dấu Chữ ký số
+function openDocPreviewModal(docId, fileName, trichYeu, soKyHieu) {
+  const modal = document.getElementById('docPreviewModal');
+  const titleEl = document.getElementById('docPreviewModalTitle');
+  const subEl = document.getElementById('docPreviewModalSubtitle');
+  const iframe = document.getElementById('docPreviewIframe');
+  const loading = document.getElementById('previewLoading');
+
+  if (titleEl) titleEl.textContent = (soKyHieu ? `[${soKyHieu}] ` : '') + (fileName || 'Xem trước văn bản');
+  if (subEl) subEl.textContent = trichYeu || 'Văn bản đã chứng thực chữ ký số điện tử';
+  if (loading) loading.style.display = 'flex';
+  if (iframe) {
+    iframe.onload = () => { if (loading) loading.style.display = 'none'; };
+    iframe.src = `/api/van-ban-di/${docId}/preview`;
+  }
+  if (modal) modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeDocPreviewModal() {
+  const modal = document.getElementById('docPreviewModal');
+  const iframe = document.getElementById('docPreviewIframe');
+  if (modal) modal.style.display = 'none';
+  if (iframe) iframe.src = '';
+  document.body.style.overflow = '';
+}
+
+function previewUploadedFile(file, result) {
+  const modal = document.getElementById('docPreviewModal');
+  const titleEl = document.getElementById('docPreviewModalTitle');
+  const subEl = document.getElementById('docPreviewModalSubtitle');
+  const iframe = document.getElementById('docPreviewIframe');
+  const loading = document.getElementById('previewLoading');
+
+  if (titleEl) titleEl.textContent = `Tệp thẩm định: ${file.name}`;
+  if (subEl) subEl.textContent = `Mã băm SHA-256: ${result.ma_bam_sha256 || '---'}`;
+  if (modal) modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+
+  if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
+    if (iframe) {
+      iframe.src = URL.createObjectURL(file);
+    }
+  } else {
+    // Non-PDF uploaded file: Render clean HTML view inside iframe
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const content = e.target.result;
+      const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{font-family:Arial,sans-serif;padding:30px;line-height:1.6;color:#1e293b;}.badge{display:inline-block;padding:6px 12px;background:#ecfdf5;color:#047857;border:1px solid #a7f3d0;border-radius:6px;font-weight:bold;margin-bottom:15px;}</style></head><body><div class="badge">CHỨNG THỰC TOÀN VẸN HỢP LỆ</div><h2>${file.name}</h2><p><b>Dung lượng:</b> ${(file.size/1024).toFixed(1)} KB | <b>SHA-256:</b> <code>${result.ma_bam_sha256}</code></p><hr><pre style="white-space:pre-wrap;background:#f8fafc;padding:15px;border-radius:6px;border:1px solid #e2e8f0;">${content}</pre></body></html>`;
+      if (iframe) {
+        iframe.srcdoc = html;
+      }
+    };
+    reader.readAsText(file);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const printBtn = document.getElementById('previewPrintBtn');
+  if (printBtn) {
+    printBtn.addEventListener('click', () => {
+      const iframe = document.getElementById('docPreviewIframe');
+      if (iframe && iframe.contentWindow) {
+        iframe.contentWindow.print();
+      }
+    });
+  }
+});
+
+window.openDocPreviewModal = openDocPreviewModal;
+window.closeDocPreviewModal = closeDocPreviewModal;
+window.previewUploadedFile = previewUploadedFile;

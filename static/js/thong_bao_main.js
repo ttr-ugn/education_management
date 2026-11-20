@@ -50,6 +50,38 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       window.loadNotificationsData = loadData;
 
+      function resolveNotificationLink(item) {
+        if (item.lien_ket && item.lien_ket !== '#' && !item.lien_ket.endsWith('thong-bao.html')) {
+          return item.lien_ket;
+        }
+        const text = ((item.tieu_de || '') + ' ' + (item.noi_dung || '')).toLowerCase();
+        if (text.includes('trình lãnh đạo') || text.includes('chờ ký duyệt') || text.includes('ký duyệt')) {
+          return '/pages/van-ban-di/phe-duyet.html';
+        }
+        if (text.includes('chữ ký số') || text.includes('smartca') || text.includes('chứng thực')) {
+          return '/pages/van-ban-di/chung-thuc-chu-ky-so.html';
+        }
+        if (text.includes('nhiệm vụ') || text.includes('giao việc') || text.includes('tiến độ')) {
+          return '/pages/cong-viec/danh-sach.html';
+        }
+        if (text.includes('văn bản đến')) {
+          return '/pages/van-ban-den/danh-sach.html';
+        }
+        if (text.includes('cấp số') || text.includes('ban hành')) {
+          return '/pages/van-ban-di/ban-hanh.html';
+        }
+        if (text.includes('dự thảo') || text.includes('văn bản đi')) {
+          return '/pages/van-ban-di/danh-sach.html';
+        }
+        if (text.includes('hồ sơ')) {
+          return '/pages/ho-so/danh-sach.html';
+        }
+        if (text.includes('thống kê') || text.includes('báo cáo')) {
+          return '/pages/thong-ke.html';
+        }
+        return '/pages/dashboard.html';
+      }
+
       function renderList() {
         let filtered = [...allNotifications];
         if (currentFilter === 'unread') {
@@ -82,6 +114,8 @@ document.addEventListener('DOMContentLoaded', async () => {
           if (item.da_den_han) borderColor = '#ef4444';
           else if (item.muc_do === 'Khẩn cấp') borderColor = '#ef4444';
 
+          const targetUrl = resolveNotificationLink(item);
+
           return `
             <div class="card notification-item mb-3" style="border-left: 4px solid ${borderColor};">
               <div class="card-body">
@@ -96,7 +130,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                   <small class="text-muted">${item.thoi_gian}</small>
                 </div>
                 <h3 style="font-size: 16px; font-weight: 700; color: #1e293b; margin-bottom: 8px;">
-                  ${item.tieu_de}
+                  <a href="${targetUrl}" class="notif-link-btn" data-id="${item.id}" style="color: #003366; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                    <span>${item.tieu_de}</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                  </a>
                 </h3>
                 <p style="font-size: 13.5px; color: #475569; line-height: 1.5; margin-bottom: 12px; white-space: pre-line;">
                   ${item.noi_dung}
@@ -107,8 +144,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                   </div>
                 ` : ''}
                 <div class="d-flex justify-content-between align-items-center text-muted" style="font-size: 12px; border-top: 1px solid var(--border-color); padding-top: 8px;">
-                  <span>Nguồn phát hành: <b>${item.nguoi_gui}</b></span>
+                  <span>Nguồn phát hành: <b>${item.nguoi_gui || item.nguoi_gui_ten || 'Hệ thống'}</b></span>
                   <div class="d-flex align-items-center gap-2">
+                    <a href="${targetUrl}" class="btn btn-primary btn-sm notif-link-btn" data-id="${item.id}" style="font-size: 12px; font-weight: 600; text-decoration: none;">
+                      Xem nội dung liên quan &rarr;
+                    </a>
                     ${!item.da_doc ? `
                       <button class="btn btn-outline-primary btn-sm btn-mark-read" data-id="${item.id}">
                         Đánh dấu đã đọc
@@ -123,6 +163,20 @@ document.addEventListener('DOMContentLoaded', async () => {
             </div>
           `;
         }).join('');
+
+        // Gán sự kiện click vào link dẫn đến nội dung được đề cập
+        container.querySelectorAll('.notif-link-btn').forEach(link => {
+          link.addEventListener('click', async (e) => {
+            const id = link.dataset.id;
+            try {
+              if (window.api && typeof window.api.post === 'function') {
+                await window.api.post(`/api/thong-bao/${id}/da-doc`);
+              } else if (window.thongBaoService) {
+                await window.thongBaoService.markAsRead(id);
+              }
+            } catch (_) {}
+          });
+        });
 
         // Gán sự kiện đánh dấu đã đọc
         container.querySelectorAll('.btn-mark-read').forEach(btn => {
