@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       } else if (user.vai_tro === 'LANH_DAO') {
 
-        subtextEl.textContent = 'Vai trò: Lãnh đạo Sở. Xem xét phê duyệt, ký số điện tử văn bản nội bộ, giao việc chỉ đạo điều hành và theo dõi báo cáo thống kê.';
+        subtextEl.textContent = 'Vai trò: Lãnh đạo Sở. Xem xét phê duyệt, ký số điện tử văn bản nội bộ, xem hồ sơ lưu trữ và theo dõi báo cáo thống kê.';
 
         statRoleLabel.textContent = 'Văn bản chờ duyệt';
 
@@ -118,27 +118,27 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         quickActionsEl.innerHTML = `
 
-          <a href="van-ban-di/phe-duyet.html" class="btn btn-warning">
+          <a href="van-ban-di/phe-duyet.html" class="btn btn-warning" id="btnLeaderApprove">
 
             Ký số & Phê duyệt VB
-
-          </a>
-
-          <a href="cong-viec/giao-viec.html" class="btn btn-outline-primary" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3);">
-
-            + Giao việc mới
-
-          </a>
-
-          <a href="cong-viec/danh-sach.html" class="btn btn-outline-primary" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3);">
-
-            Tiến độ công việc
 
           </a>
 
           <a href="van-ban-di/chung-thuc-chu-ky-so.html" class="btn btn-outline-primary" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3);">
 
             Chứng thực chữ ký số
+
+          </a>
+
+          <a href="van-ban-di/danh-sach.html" class="btn btn-outline-primary" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3);">
+
+            Sổ theo dõi văn bản
+
+          </a>
+
+          <a href="ho-so/danh-sach.html" class="btn btn-outline-primary" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3);">
+
+            Hồ sơ tài liệu
 
           </a>
 
@@ -199,6 +199,17 @@ document.addEventListener('DOMContentLoaded', async () => {
           const list = vbAll.du_lieu.slice(0, 5);
           const statEl = document.getElementById('statVBDen');
           if (statEl) statEl.textContent = vbAll.du_lieu.length;
+
+          // Cập nhật số liệu đặc thù theo vai trò
+          if (user.vai_tro === 'LANH_DAO') {
+            const pendingForLeader = vbAll.du_lieu.filter(d => d.trang_thai === 'CHO_LANH_DAO_KY' || d.trang_thai === 'CHO_LANH_DAO_DUYET');
+            if (statRoleSpec) statRoleSpec.textContent = pendingForLeader.length;
+            const btnApprove = document.getElementById('btnLeaderApprove');
+            if (btnApprove) btnApprove.textContent = `Ký số & Phê duyệt VB (${pendingForLeader.length})`;
+          } else if (user.vai_tro === 'CHUYEN_VIEN') {
+            const myDocs = vbAll.du_lieu.filter(d => (d.nguoi_soan_ten && d.nguoi_soan_ten === user.ho_va_ten) || d.nguoi_soan_id === user.nguoi_dung_id);
+            if (statRoleSpec) statRoleSpec.textContent = myDocs.length;
+          }
 
           const statusConfig = {
             'CHO_LANH_DAO_KY': {

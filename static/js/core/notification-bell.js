@@ -144,12 +144,16 @@
     if (btnQuickMarkAll) {
       btnQuickMarkAll.addEventListener('click', async (e) => {
         e.stopPropagation();
-        if (window.thongBaoService) {
-          await window.thongBaoService.markAllAsRead();
+        try {
+          if (window.api && typeof window.api.post === 'function') {
+            await window.api.post('/api/thong-bao/doc-tat-ca');
+          } else if (window.thongBaoService) {
+            await window.thongBaoService.markAllAsRead();
+          }
           if (window.Toast) window.Toast.success('Đã đánh dấu tất cả thông báo là đã đọc.');
           await updateBellStats();
           loadDropdownData();
-        }
+        } catch (_) {}
       });
     }
 
@@ -209,7 +213,7 @@
         const itemClass = `notif-dropdown-item ${isUnread ? 'unread' : ''} ${item.da_den_han ? 'is-due' : ''}`;
 
         return `
-          <div class="${itemClass}" data-id="${item.id}">
+          <div class="${itemClass}" data-id="${item.id}" data-link="${item.lien_ket || ''}" style="cursor: pointer;">
             <div class="notif-item-top">
               <div>
                 ${badgeHtml}
@@ -233,17 +237,25 @@
         el.addEventListener('click', async (e) => {
           e.stopPropagation();
           const id = el.dataset.id;
-          if (window.thongBaoService) {
-            await window.thongBaoService.markAsRead(id);
-            await updateBellStats();
-            // Nếu đang ở trang thong-bao.html thì reload trang, nếu không thì chuyển hướng
-            if (window.location.pathname.includes('thong-bao.html')) {
-              if (typeof window.loadNotificationsData === 'function') {
-                window.loadNotificationsData();
-              }
-            } else {
-              window.location.href = thongBaoUrl;
+          const targetLink = el.dataset.link;
+          try {
+            if (window.api && typeof window.api.post === 'function') {
+              await window.api.post(`/api/thong-bao/${id}/da-doc`);
+            } else if (window.thongBaoService) {
+              await window.thongBaoService.markAsRead(id);
             }
+          } catch (_) {}
+
+          await updateBellStats();
+
+          if (targetLink && targetLink !== '#' && !targetLink.startsWith('javascript:')) {
+            window.location.href = targetLink;
+          } else if (window.location.pathname.includes('thong-bao.html')) {
+            if (typeof window.loadNotificationsData === 'function') {
+              window.loadNotificationsData();
+            }
+          } else {
+            window.location.href = thongBaoUrl;
           }
         });
       });

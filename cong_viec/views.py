@@ -140,18 +140,7 @@ def api_cong_viec_list(request):
             attach_str = f" (Đính kèm: {ten_tep_dinh_kem})" if ten_tep_dinh_kem else ""
             assignee_name = chuyen_vien.ho_va_ten if chuyen_vien else 'Cán bộ chuyên môn'
 
-            # 1. Phát sóng thông báo chung toàn cơ quan (nguoi_nhan=None) -> Để toàn bộ Lãnh đạo, Văn thư và mọi Chuyên viên đều thấy trên chuông
-            ThongBao.objects.create(
-                tieu_de=f"Giao nhiệm vụ: {cv.ten_cong_viec}",
-                noi_dung=f"Phân công đồng chí {assignee_name} ({cv.phong_ban}) thực hiện nhiệm vụ: {cv.ten_cong_viec}. Hạn hoàn thành: {deadline_str}.{attach_str}",
-                loai='Nhiệm vụ',
-                muc_do='Quan trọng' if cv.do_uu_tien in ('CAO', 'KHAN_CAP') else 'Bình thường',
-                nguoi_gui=user,
-                nguoi_nhan=None,
-                lien_ket=f"/pages/cong-viec/xu-ly.html?id={cv.cong_viec_id}",
-            )
-
-            # 2. Thông báo riêng cho cán bộ thụ lý (chuyen_vien)
+            # 1. Thông báo riêng cho cán bộ thụ lý (chuyen_vien)
             if chuyen_vien:
                 ThongBao.objects.create(
                     tieu_de=f"Nhiệm vụ mới được giao: {cv.ten_cong_viec}",
@@ -161,6 +150,30 @@ def api_cong_viec_list(request):
                     nguoi_gui=user,
                     nguoi_nhan=chuyen_vien,
                     lien_ket=f"/pages/cong-viec/xu-ly.html?id={cv.cong_viec_id}",
+                )
+
+            # 2. Thông báo cho Lãnh đạo Sở nắm tiến độ
+            for ld in NguoiDung.objects.filter(vai_tro='LANH_DAO', trang_thai='HOAT_DONG'):
+                ThongBao.objects.create(
+                    tieu_de=f"Giao nhiệm vụ: {cv.ten_cong_viec}",
+                    noi_dung=f"Văn phòng đã giao nhiệm vụ '{cv.ten_cong_viec}' cho đồng chí {assignee_name} ({cv.phong_ban}). Hạn xử lý: {deadline_str}.{attach_str}",
+                    loai='Nhiệm vụ',
+                    muc_do='Bình thường',
+                    nguoi_gui=user,
+                    nguoi_nhan=ld,
+                    lien_ket=f"/pages/cong-viec/danh-sach.html?id={cv.cong_viec_id}",
+                )
+
+            # 3. Thông báo cho người giao việc (Văn thư)
+            if user:
+                ThongBao.objects.create(
+                    tieu_de=f"Đã giao nhiệm vụ: {cv.ten_cong_viec}",
+                    noi_dung=f"Đã phân công nhiệm vụ cho đồng chí {assignee_name}. Hạn xử lý: {deadline_str}.{attach_str}",
+                    loai='Nhiệm vụ',
+                    muc_do='Bình thường',
+                    nguoi_gui=user,
+                    nguoi_nhan=user,
+                    lien_ket=f"/pages/cong-viec/danh-sach.html?id={cv.cong_viec_id}",
                 )
         except Exception as e:
             print("Error creating task notification:", e)
