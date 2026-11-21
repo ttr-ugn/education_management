@@ -13,14 +13,25 @@ let currentFilterStatus = 'CHO_VAN_THU_KIEM_TRA';
       const iframe = document.getElementById('previewIframe');
       const loading = document.getElementById('previewLoading');
 
-      modalTitle.textContent = fileName || 'Xem trước văn bản';
-      modalSubtitle.textContent = (soKyHieu ? `[${soKyHieu}] ` : '') + (trichYeu || '');
-      downloadBtn.href = `/api/van-ban-di/${docId}/download?type=goc`;
-      downloadBtn.download = fileName || 'van_ban_goc';
+      if (modalTitle) modalTitle.textContent = (soKyHieu ? `[${soKyHieu}] ` : '') + (fileName || 'Xem trước văn bản');
+      if (modalSubtitle) modalSubtitle.textContent = trichYeu || '';
+      if (downloadBtn) {
+        downloadBtn.href = `/api/van-ban-di/${docId}/download?type=goc`;
+        downloadBtn.download = fileName || 'van_ban_goc';
+      }
 
-      loading.style.display = 'flex';
-      iframe.src = `/api/van-ban-di/${docId}/preview?type=goc`;
-      modal.style.display = 'flex';
+      if (loading) loading.style.display = 'flex';
+      if (iframe) {
+        iframe.onload = () => {
+          if (loading) loading.style.display = 'none';
+        };
+        iframe.src = `/api/van-ban-di/${docId}/preview`;
+      }
+      setTimeout(() => {
+        if (loading) loading.style.display = 'none';
+      }, 800);
+
+      if (modal) modal.style.display = 'flex';
       document.body.style.overflow = 'hidden';
     }
 
@@ -34,14 +45,25 @@ let currentFilterStatus = 'CHO_VAN_THU_KIEM_TRA';
     function closePreviewModal() {
       const modal = document.getElementById('previewModal');
       const iframe = document.getElementById('previewIframe');
+      const loading = document.getElementById('previewLoading');
       if (modal) modal.style.display = 'none';
       if (iframe) iframe.src = '';
+      if (loading) loading.style.display = 'none';
       document.body.style.overflow = '';
+    }
+
+    function printPreviewFrame() {
+      const iframe = document.getElementById('previewIframe');
+      if (iframe && iframe.contentWindow) {
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+      }
     }
 
     window.openPreviewModal = openPreviewModal;
     window.closePreviewModal = closePreviewModal;
     window.onPreviewLoaded = onPreviewLoaded;
+    window.printPreviewFrame = printPreviewFrame;
 
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
@@ -116,7 +138,7 @@ let currentFilterStatus = 'CHO_VAN_THU_KIEM_TRA';
 
           // 1. Mã dự thảo dạng pill Monospace
           const codeHtml = `
-            <div class="doc-code-pill" style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; background: #f0f7ff; border: 1px solid #bae6fd; border-radius: 6px; font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, Menlo, monospace; font-size: 12px; font-weight: 600; color: #0284c7; white-space: nowrap;">
+            <div class="doc-code-pill" onclick="openPreviewModal(${d.id}, '${(fileInfo.ten_tep || '').replace(/'/g, "\\'")}', '${cleanTrichYeu}', '${cleanSo}')" style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; background: #f0f7ff; border: 1px solid #bae6fd; border-radius: 6px; font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, Menlo, monospace; font-size: 12px; font-weight: 600; color: #0284c7; white-space: nowrap; cursor: pointer;" title="Nhấn để xem trước văn bản">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
               <span>${d.so_ky_hieu || 'Dự thảo'}</span>
             </div>

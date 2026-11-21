@@ -11,12 +11,23 @@ let currentHsId = 1;
       const downloadBtn = document.getElementById('previewDownloadBtn');
       const loader = document.getElementById('previewLoading');
 
-      title.textContent = soKyHieu || 'Xem trước văn bản';
-      subtitle.textContent = trichYeu || '';
-      downloadBtn.href = url;
-      loader.style.display = 'flex';
-      iframe.src = url;
-      modal.style.display = 'flex';
+      if (title) title.textContent = soKyHieu || 'Xem trước văn bản';
+      if (subtitle) subtitle.textContent = trichYeu || '';
+      if (downloadBtn) downloadBtn.href = url;
+
+      if (loader) loader.style.display = 'flex';
+      if (iframe) {
+        iframe.onload = () => {
+          if (loader) loader.style.display = 'none';
+        };
+        iframe.src = url;
+      }
+      setTimeout(() => {
+        if (loader) loader.style.display = 'none';
+      }, 800);
+
+      if (modal) modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
     }
 
     function onPreviewLoaded() {
@@ -27,8 +38,11 @@ let currentHsId = 1;
     function closePreviewModal() {
       const modal = document.getElementById('previewModal');
       const iframe = document.getElementById('previewIframe');
-      iframe.src = '';
-      modal.style.display = 'none';
+      const loader = document.getElementById('previewLoading');
+      if (iframe) iframe.src = '';
+      if (loader) loader.style.display = 'none';
+      if (modal) modal.style.display = 'none';
+      document.body.style.overflow = '';
     }
 
     function printPreviewFrame() {

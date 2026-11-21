@@ -530,6 +530,54 @@ def api_van_ban_di_preview(request, van_ban_id):
     ngay_bh = doc.ngay_ban_hanh or doc.ngay_tao
     ngay_str = f"Đà Nẵng, ngày {ngay_bh.day:02d} tháng {ngay_bh.month:02d} năm {ngay_bh.year}" if ngay_bh else "Đà Nẵng, ngày ... tháng ... năm 2026"
 
+    # Kiểm tra xem văn bản đã được Lãnh đạo ký duyệt hay chưa
+    # Chỉ các văn bản đã ký mới hiển thị con dấu chữ ký số của Lãnh đạo và dấu niêm phong bảo mật
+    da_ky = (
+        doc.trang_thai in ['DA_KY_CHO_BAN_HANH', 'DA_BAN_HANH', 'DA_DUYET'] or
+        (doc.thoi_gian_ky is not None and doc.trang_thai not in ['CHO_VAN_THU_KIEM_TRA', 'CHO_LANH_DAO_KY', 'VAN_THU_TRA_LAI', 'LANH_DAO_TRA_LAI'])
+    )
+
+    if da_ky:
+        signature_block_html = f"""
+        <div class="signer-role">{signer_title}</div>
+        <div class="digital-signature-box">
+          <div class="digital-sig-header">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            <span>KÝ SỐ BỞI: SỞ GIÁO DỤC VÀ ĐÀO TẠO</span>
+          </div>
+          <div class="digital-sig-body">
+            <b>Người ký:</b> {html.escape(signer_name)}<br>
+            <b>Cơ quan:</b> Sở Giáo dục và Đào tạo TP. Đà Nẵng<br>
+            <b>Thời gian ký:</b> {sign_time_str}<br>
+            <b>Chứng thư số:</b> VGCA X.509 Root CA
+          </div>
+        </div>
+        <div class="signer-name">{html.escape(signer_name)}</div>
+        """
+        integrity_seal_html = f"""
+        <div class="integrity-seal">
+          <div>
+            <b>DỊCH VỤ CHỨNG THỰC CHỮ KÝ SỐ:</b> TÀI LIỆU TOÀN VẸN & HỢP PHÁP
+          </div>
+          <div>
+            SHA-256 Digest: <code>{hash_val[:24]}...{hash_val[-8:]}</code>
+          </div>
+        </div>
+        """
+    else:
+        signature_block_html = f"""
+        <div class="signer-role">{signer_title}</div>
+        <div style="height: 70px; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-style: italic; font-size: 11pt; margin: 10px auto;">
+          (Dự thảo văn bản - Chưa ký duyệt)
+        </div>
+        <div class="signer-name">{html.escape(signer_name)}</div>
+        """
+        integrity_seal_html = f"""
+        <div style="margin-top: 30px; padding: 10px 14px; background: #fffbeb; border: 1px dashed #fde68a; border-radius: 6px; font-family: Arial, sans-serif; font-size: 11.5px; color: #b45309; display: flex; justify-content: space-between; align-items: center;">
+          <span><b>GHI CHÚ THỂ THỨC:</b> Bản xem trước dự thảo văn bản nội bộ. Văn bản chưa có hiệu lực pháp lý do chưa được Lãnh đạo ký số và cấp số ban hành.</span>
+          <span style="background: #fef3c7; padding: 2px 8px; border-radius: 4px; font-weight: 600;">DỰ THẢO</span>
+        </div>
+        """
     noi_dung = doc.noi_dung_tom_tat or doc.trich_yeu or ''
     paragraphs = noi_dung.split('\n') if noi_dung else []
     if len(paragraphs) <= 1:
@@ -777,31 +825,11 @@ def api_van_ban_di_preview(request, van_ban_id):
         </ul>
       </div>
       <div class="signature-col">
-        <div class="signer-role">{signer_title}</div>
-        <div class="digital-signature-box">
-          <div class="digital-sig-header">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-            <span>KÝ SỐ BỞI: SỞ GIÁO DỤC VÀ ĐÀO TẠO</span>
-          </div>
-          <div class="digital-sig-body">
-            <b>Người ký:</b> {html.escape(signer_name)}<br>
-            <b>Cơ quan:</b> Sở Giáo dục và Đào tạo TP. Đà Nẵng<br>
-            <b>Thời gian ký:</b> {sign_time_str}<br>
-            <b>Chứng thư số:</b> VGCA X.509 Root CA
-          </div>
-        </div>
-        <div class="signer-name">{html.escape(signer_name)}</div>
+        {signature_block_html}
       </div>
     </div>
 
-    <div class="integrity-seal">
-      <div>
-        <b>DỊCH VỤ CHỨNG THỰC CHỮ KÝ SỐ:</b> TÀI LIỆU TOÀN VẸN & HỢP PHÁP
-      </div>
-      <div>
-        SHA-256 Digest: <code>{hash_val[:24]}...{hash_val[-8:]}</code>
-      </div>
-    </div>
+    {integrity_seal_html}
   </div>
 </body>
 </html>"""

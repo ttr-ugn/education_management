@@ -68,6 +68,8 @@
           <div style="overflow: hidden;">
             <div id="previewModalTitle" style="font-weight: 600; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Xem trước văn bản</div>
             <div id="previewModalSubtitle" style="font-size: 12px; color: #cbd5e1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></div>
+          </div>
+        </div>
         <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
           <!-- Nút ký duyệt trực tiếp từ Preview Modal -->
           <button type="button" id="modalSignBtn" class="btn btn-success btn-sm" onclick="signActiveDoc()" title="Ký số điện tử và duyệt văn bản này" style="font-weight: 600;">
@@ -85,15 +87,20 @@
           <button type="button" class="btn btn-sm btn-light" onclick="closePreviewModal()" title="Đóng cửa sổ xem trước (Phím ESC)" style="font-weight: 600; padding: 4px 12px;">
             Đóng
           </button>
+        </div>
+      </div>
 
       <!-- Modal Body (Iframe Viewer) -->
       <div style="flex: 1; position: relative; background: #525659; overflow: hidden;">
-        <div id="previewLoading" style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #f8fafc; z-index: 10; color: #334155;">
+        <div id="previewLoading" style="position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; background: rgba(255,255,255,0.92); z-index: 10; color: #334155;">
           <div style="width: 36px; height: 36px; border: 3px solid #cbd5e1; border-top-color: #003366; border-radius: 50%; animation: spinLeader 0.8s linear infinite; margin-bottom: 12px;"></div>
           <div style="font-weight: 500; font-size: 14px;">Đang tải văn bản dự thảo từ máy chủ...</div>
           <div style="font-size: 12px; color: #64748b; margin-top: 4px;">Tự động định dạng trang A4 tiêu chuẩn phục vụ Lãnh đạo thẩm định</div>
         </div>
-        <iframe id="previewIframe" src="" style="width: 100%; height: 100%; border: none;" onload="onPreviewLoaded()"></iframe>
+        <iframe id="previewIframe" src="" style="width: 100%; height: 100%; border: none; background: #ffffff;"></iframe>
+      </div>
+    </div>
+  </div>
 
   <style>
     @keyframes spinLeader {

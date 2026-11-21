@@ -6,14 +6,25 @@ function openPreviewModal(docId, fileType, fileName, trichYeu, soKyHieu) {
       const iframe = document.getElementById('previewIframe');
       const loading = document.getElementById('previewLoading');
 
-      modalTitle.textContent = fileName || 'Xem trước văn bản';
-      modalSubtitle.textContent = (soKyHieu ? `[${soKyHieu}] ` : '') + (trichYeu || '');
-      downloadBtn.href = `/api/van-ban-di/${docId}/download?type=${fileType || 'goc'}`;
-      downloadBtn.download = fileName || 'van_ban';
+      if (modalTitle) modalTitle.textContent = (soKyHieu ? `[${soKyHieu}] ` : '') + (fileName || 'Xem trước văn bản');
+      if (modalSubtitle) modalSubtitle.textContent = trichYeu || '';
+      if (downloadBtn) {
+        downloadBtn.href = `/api/van-ban-di/${docId}/download?type=${fileType || 'goc'}`;
+        downloadBtn.download = fileName || 'van_ban';
+      }
 
-      loading.style.display = 'flex';
-      iframe.src = `/api/van-ban-di/${docId}/preview?type=${fileType || 'goc'}`;
-      modal.style.display = 'flex';
+      if (loading) loading.style.display = 'flex';
+      if (iframe) {
+        iframe.onload = () => {
+          if (loading) loading.style.display = 'none';
+        };
+        iframe.src = `/api/van-ban-di/${docId}/preview`;
+      }
+      setTimeout(() => {
+        if (loading) loading.style.display = 'none';
+      }, 800);
+
+      if (modal) modal.style.display = 'flex';
       document.body.style.overflow = 'hidden';
     }
 
@@ -25,14 +36,25 @@ function openPreviewModal(docId, fileType, fileName, trichYeu, soKyHieu) {
     function closePreviewModal() {
       const modal = document.getElementById('previewModal');
       const iframe = document.getElementById('previewIframe');
+      const loading = document.getElementById('previewLoading');
       if (modal) modal.style.display = 'none';
       if (iframe) iframe.src = '';
+      if (loading) loading.style.display = 'none';
       document.body.style.overflow = '';
+    }
+
+    function printPreviewFrame() {
+      const iframe = document.getElementById('previewIframe');
+      if (iframe && iframe.contentWindow) {
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+      }
     }
 
     window.openPreviewModal = openPreviewModal;
     window.closePreviewModal = closePreviewModal;
     window.onPreviewLoaded = onPreviewLoaded;
+    window.printPreviewFrame = printPreviewFrame;
 
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') closePreviewModal();
