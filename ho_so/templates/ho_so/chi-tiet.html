@@ -128,16 +128,14 @@
         </div>
       </div>
       <div style="flex: 1; position: relative; background: #525659; overflow: hidden;">
-        <div id="previewLoading" style="position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; background: rgba(255,255,255,0.92); z-index: 10; color: #334155;">
-          <div style="width: 36px; height: 36px; border: 3px solid #cbd5e1; border-top-color: #003366; border-radius: 50%; animation: spinPreview 0.8s linear infinite; margin-bottom: 12px;"></div>
-          <div style="font-weight: 500; font-size: 14px;">Đang nạp nội dung tài liệu lưu trữ...</div>
-        </div>
+        <div id="previewLoading" style="display: none !important;"></div>
         <iframe id="previewIframe" src="" style="width: 100%; height: 100%; border: none;" onload="onPreviewLoaded()"></iframe>
       </div>
     </div>
   </div>
 
   <style>
+    #previewLoading { display: none !important; opacity: 0 !important; pointer-events: none !important; }
     @keyframes spinPreview {
       to { transform: rotate(360deg); }
     }
@@ -166,5 +164,5 @@
 {% block extra_js %}
 <script src="/js/mock/du-lieu-ho-so.js?v=20261111_22"></script>
 
-<script src="/static/js/ho_so_chi_tiet.js?v=20261111_22"></script>
+<script src="/static/js/ho_so_chi_tiet.js?v=20261121_05"></script>
 {% endblock %}

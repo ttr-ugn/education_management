@@ -294,12 +294,7 @@
     </div>
 
     <div style="flex-grow: 1; position: relative; background: #f8fafc; overflow: hidden;">
-      <div id="previewLoading" style="position: absolute; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(255,255,255,0.85); z-index: 10;">
-        <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
-          <div style="width: 32px; height: 32px; border: 3px solid #e2e8f0; border-top-color: #0284c7; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
-          <span style="font-size: 13px; color: #475569; font-weight: 500;">Đang nạp toàn văn tài liệu điện tử...</span>
-        </div>
-      </div>
+      <div id="previewLoading" style="display: none !important;"></div>
       <iframe id="docPreviewIframe" style="width: 100%; height: 100%; border: none; background: #ffffff;"></iframe>
     </div>
 
@@ -312,8 +307,12 @@
     </div>
   </div>
 </div>
+
+<style>
+  #previewLoading { display: none !important; opacity: 0 !important; pointer-events: none !important; }
+</style>
 {% endblock %}
 
 {% block extra_js %}
-<script src="/static/js/van_ban_chung_thuc.js"></script>
+<script src="/static/js/van_ban_chung_thuc.js?v=20261121_05"></script>
 {% endblock %}

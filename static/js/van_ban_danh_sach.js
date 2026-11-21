@@ -13,16 +13,10 @@ function openPreviewModal(docId, fileType, fileName, trichYeu, soKyHieu) {
         downloadBtn.download = fileName || 'van_ban';
       }
 
-      if (loading) loading.style.display = 'flex';
+      if (loading) loading.style.display = 'none';
       if (iframe) {
-        iframe.onload = () => {
-          if (loading) loading.style.display = 'none';
-        };
         iframe.src = `/api/van-ban-di/${docId}/preview`;
       }
-      setTimeout(() => {
-        if (loading) loading.style.display = 'none';
-      }, 800);
 
       if (modal) modal.style.display = 'flex';
       document.body.style.overflow = 'hidden';

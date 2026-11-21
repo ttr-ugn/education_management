@@ -20,16 +20,10 @@ let currentFilterStatus = 'CHO_VAN_THU_KIEM_TRA';
         downloadBtn.download = fileName || 'van_ban_goc';
       }
 
-      if (loading) loading.style.display = 'flex';
+      if (loading) loading.style.display = 'none';
       if (iframe) {
-        iframe.onload = () => {
-          if (loading) loading.style.display = 'none';
-        };
         iframe.src = `/api/van-ban-di/${docId}/preview`;
       }
-      setTimeout(() => {
-        if (loading) loading.style.display = 'none';
-      }, 800);
 
       if (modal) modal.style.display = 'flex';
       document.body.style.overflow = 'hidden';

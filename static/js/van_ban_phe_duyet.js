@@ -25,19 +25,13 @@ let currentFilterStatus = 'CHO_LANH_DAO_KY';
       downloadBtn.href = `/api/van-ban-di/${docId}/download?type=${fileType}`;
       downloadBtn.download = fileName || 'van_ban';
 
-      if (modal) modal.style.display = 'flex';
-      document.body.style.overflow = 'hidden';
-
-      if (loading) loading.style.display = 'flex';
+      if (loading) loading.style.display = 'none';
       if (iframe) {
-        iframe.onload = () => {
-          if (loading) loading.style.display = 'none';
-        };
         iframe.src = `/api/van-ban-di/${docId}/preview`;
       }
-      setTimeout(() => {
-        if (loading) loading.style.display = 'none';
-      }, 800);
+
+      if (modal) modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
     }
 
     function onPreviewLoaded() {
@@ -52,11 +46,6 @@ let currentFilterStatus = 'CHO_LANH_DAO_KY';
       if (modal) modal.style.display = 'none';
       if (iframe) iframe.src = '';
       if (loading) loading.style.display = 'none';
-      document.body.style.overflow = '';
-    }
-      const iframe = document.getElementById('previewIframe');
-      if (modal) modal.style.display = 'none';
-      if (iframe) iframe.src = '';
       document.body.style.overflow = '';
       activeDoc = null;
     }

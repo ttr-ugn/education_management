@@ -368,9 +368,8 @@ function openDocPreviewModal(docId, fileName, trichYeu, soKyHieu) {
 
   if (titleEl) titleEl.textContent = (soKyHieu ? `[${soKyHieu}] ` : '') + (fileName || 'Xem trước văn bản');
   if (subEl) subEl.textContent = trichYeu || 'Văn bản đã chứng thực chữ ký số điện tử';
-  if (loading) loading.style.display = 'flex';
+  if (loading) loading.style.display = 'none';
   if (iframe) {
-    iframe.onload = () => { if (loading) loading.style.display = 'none'; };
     iframe.src = `/api/van-ban-di/${docId}/preview`;
   }
   if (modal) modal.style.display = 'flex';

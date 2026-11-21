@@ -15,16 +15,10 @@ let currentHsId = 1;
       if (subtitle) subtitle.textContent = trichYeu || '';
       if (downloadBtn) downloadBtn.href = url;
 
-      if (loader) loader.style.display = 'flex';
+      if (loader) loader.style.display = 'none';
       if (iframe) {
-        iframe.onload = () => {
-          if (loader) loader.style.display = 'none';
-        };
         iframe.src = url;
       }
-      setTimeout(() => {
-        if (loader) loader.style.display = 'none';
-      }, 800);
 
       if (modal) modal.style.display = 'flex';
       document.body.style.overflow = 'hidden';
